@@ -23,6 +23,13 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
+const corsOptions = {
+  origin: 'https://customcards-app.onrender.com' // Replace with your actual frontend URL
+};
+
+app.use(cors(corsOptions)); // Use the cors middleware
+
+
 // Base route
 app.get('/', (req, res) => res.send('API is running...'));
 
