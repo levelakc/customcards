@@ -1,0 +1,70 @@
+import React from 'react';
+import { RouterProvider, useRouter } from './contexts/RouterContext';
+import { AuthProvider } from './contexts/AuthContext';
+import { CartProvider, useCart } from './contexts/CartContext';
+import { SiteSettingsProvider } from './contexts/SiteSettingsContext';
+
+import Navbar from './components/Navbar';
+import Footer from './components/Footer';
+import CartPopup from './components/CartPopup';
+import FloatingWhatsApp from './components/FloatingWhatsApp';
+
+import HomePage from './pages/HomePage';
+import CategoryPage from './pages/CategoryPage';
+import ProductPage from './pages/ProductPage';
+import LoginPage from './pages/LoginPage';
+import RegisterPage from './pages/RegisterPage';
+import AdminPage from './pages/AdminPage';
+import CartPage from './pages/CartPage';
+import OrderSuccessPage from './pages/OrderSuccessPage';
+import ProfilePage from './pages/ProfilePage';
+import AccessibilityPage from './pages/AccessibilityPage';
+import PolicyPage from './pages/PolicyPage';
+import CheckoutPage from './pages/CheckoutPage';
+
+function AppContent() {
+    const { route } = useRouter();
+    const { showPopup, setShowPopup } = useCart();
+
+    const renderPage = () => {
+        switch (route.page) {
+            case 'home': return <HomePage />;
+            case 'category': return <CategoryPage />;
+            case 'product': return <ProductPage />;
+            case 'login': return <LoginPage />;
+            case 'register': return <RegisterPage />;
+            case 'admin': return <AdminPage />;
+            case 'cart': return <CartPage />;
+            case 'order-success': return <OrderSuccessPage />;
+            case 'profile': return <ProfilePage />;
+            case 'accessibility': return <AccessibilityPage />;
+            case 'policy': return <PolicyPage />;
+            case 'checkout': return <CheckoutPage />;
+            default: return <HomePage />;
+        }
+    };
+
+    return (
+        <div dir="rtl" className="bg-gray-900 font-sans">
+            <Navbar />
+            <main>{renderPage()}</main>
+            <Footer />
+            <CartPopup isVisible={showPopup} onClose={() => setShowPopup(false)} />
+            <FloatingWhatsApp />
+        </div>
+    );
+}
+
+export default function App() {
+    return (
+        <AuthProvider>
+            <CartProvider>
+                <SiteSettingsProvider>
+                    <RouterProvider>
+                        <AppContent />
+                    </RouterProvider>
+                </SiteSettingsProvider>
+            </CartProvider>
+        </AuthProvider>
+    );
+}

@@ -1,0 +1,118 @@
+@import url('https://fonts.googleapis.com/css2?family=Heebo:wght@400;500;700;800&display=swap');
+
+body {
+  margin: 0;
+  font-family: 'Heebo', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
+    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
+    sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  background-color: #111827;
+}
+
+/* --- Shimmering Text Effect --- */
+.shimmer-text {
+  background: linear-gradient(to right, #9ca3af 20%, #ffffff 50%, #9ca3af 80%);
+  background-size: 200% auto;
+  background-clip: text;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  animation: shimmer 0ms linear infinite;
+  display: inline-block;
+}
+
+@keyframes shimmer {
+  to {
+    background-position: -200% center;
+  }
+}
+
+/* --- Premium Card Reflection --- */
+.card {
+  position: relative;
+  overflow: hidden;
+}
+
+.card::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -70%;
+  width: 40%;
+  height: 100%;
+  background: linear-gradient(
+    120deg,
+    rgba(255, 255, 255, 0) 0%,
+    rgba(255, 255, 255, 0.15) 50%,
+    rgba(255, 255, 255, 0) 100%
+  );
+  animation: card-shimmer 4s ease-in-out infinite;
+  pointer-events: none;
+}
+
+@keyframes card-shimmer {
+  0% {
+    left: -70%;
+  }
+  100% {
+    left: 120%;
+  }
+}
+
+/* --- Particles --- */
+.particles-container { position: absolute; top: 0; left: 0; width: 100%; height: 100%; overflow: hidden; z-index: 1; }
+.particle { position: absolute; width: 3px; height: 3px; background-color: rgba(255, 255, 255, 0.3); border-radius: 50%; animation: float 25s infinite ease-in-out; }
+@keyframes float { 0% { transform: translateY(0) translateX(0); opacity: 0; } 25% { opacity: 1; } 50% { transform: translateY(-100vh) translateX(20vw); opacity: 1; } 75% { opacity: 1; } 100% { transform: translateY(0) translateX(0); opacity: 0; } }
+.particle:nth-child(1) { top: 20%; left: 25%; animation-duration: 18s; animation-delay: -5s; }
+.particle:nth-child(2) { top: 80%; left: 10%; animation-duration: 22s; animation-delay: -2s; }
+.particle:nth-child(3) { top: 50%; left: 70%; animation-duration: 28s; animation-delay: -8s; }
+.particle:nth-child(4) { top: 10%; left: 90%; animation-duration: 15s; animation-delay: -12s; }
+.particle:nth-child(5) { top: 90%; left: 80%; animation-duration: 20s; animation-delay: -1s; }
+.particle:nth-child(6) { top: 40%; left: 5%; animation-duration: 24s; animation-delay: -7s; }
+.particle:nth-child(7) { top: 60%; left: 50%; animation-duration: 19s; animation-delay: -4s; }
+.particle:nth-child(8) { top: 5%; left: 40%; animation-duration: 26s; animation-delay: -10s; }
+.particle:nth-child(9) { top: 85%; left: 60%; animation-duration: 21s; animation-delay: -3s; }
+.particle:nth-child(10) { top: 30%; left: 30%; animation-duration: 23s; animation-delay: -6s; }
+
+/* --- Weld Sparkles --- */
+.machinery-spark-container {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  z-index: 2;
+}
+.weld-spark {
+  position: absolute;
+  width: 6px;
+  height: 6px;
+  background-color: #ffdd77;
+  border-radius: 50%;
+  box-shadow: 0 0 10px 4px #ffdd77, 0 0 20px 8px #ffaa00, 0 0 30px 12px #ff6600;
+  opacity: 0;
+  animation: weld-spark-animation var(--duration, 1s) linear infinite;
+  animation-delay: var(--delay, 0s);
+}
+@keyframes weld-spark-animation {
+  0% { opacity: 1; transform: translate(0, 0) scale(1.5); }
+  50% { transform: translate(var(--x-end), var(--y-end)) scale(1); }
+  100% { opacity: 0; transform: translate(var(--x-end), var(--y-end)) scale(0); }
+}
+.weld-spark:nth-child(1) { top: 50%; left: 50%; --x-end: -250px; --y-end: -200px; --duration: 2.8s; --delay: 0s; }
+.weld-spark:nth-child(2) { top: 40%; left: 60%; --x-end: 300px;  --y-end: -150px; --duration: 3.2s; --delay: -0.1s; }
+.weld-spark:nth-child(3) { top: 60%; left: 40%; --x-end: -350px;  --y-end: 200px;  --duration: 3.0s; --delay: -0.3s; }
+.weld-spark:nth-child(4) { top: 55%; left: 55%; --x-end: 280px;  --y-end: 250px;  --duration: 2.9s; --delay: -0.5s; }
+.weld-spark:nth-child(5) { top: 30%; left: 30%; --x-end: -200px;  --y-end: 300px;  --duration: 3.3s; --delay: -0.2s; }
+.weld-spark:nth-child(6) { top: 70%; left: 70%; --x-end: 200px;  --y-end: -300px; --duration: 2.7s; --delay: -0.8s; }
+.weld-spark:nth-child(7) { top: 45%; left: 55%; --x-end: -400px;  --y-end: 100px;  --duration: 3.1s; --delay: -0.6s; }
+.weld-spark:nth-child(8) { top: 65%; left: 45%; --x-end: 400px;  --y-end: -50px;  --duration: 2.8s; --delay: -0.4s; }
+
+div.userway_buttons_wrapper {
+  top: auto !important;
+  bottom: 100px !important;
+  right: auto !important;
+  left: 25px !important;
+  scale: 1.4 !important;
+}
