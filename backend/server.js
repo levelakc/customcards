@@ -20,8 +20,19 @@ import galleryRoutes from './routes/galleryRoutes.js'; // <- ADD THIS LINE
 dotenv.config();
 connectDB();
 const app = express();
-app.use(cors());
+// app.use(cors()); // Removed: use only the configured CORS below
 app.use(express.json());
+
+
+const corsOptions = {
+  origin: [
+    'https://customcards-app.onrender.com', // Production frontend
+    'http://localhost:3000' // Local frontend for development
+  ]
+};
+
+app.use(cors(corsOptions)); // Use the cors middleware
+
 
 // Base route
 app.get('/', (req, res) => res.send('API is running...'));
