@@ -6,7 +6,6 @@ import PersonalDesignPage from './PersonalDesignPage';
 import AboutUs from '../components/AboutUs';
 import Reviews from '../components/Reviews';
 import RealLifeGallery from '../components/RealLifeGallery'; // FIX: The missing import is now added.
-import * as api from '../api/api';
 
 const MAX_CAROUSEL_ITEMS = 10;
 
