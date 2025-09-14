@@ -8,7 +8,7 @@ const CARD_WIDTH_MM = 85.6;
 const CARD_HEIGHT_MM = 53.98;
 const X_RATIO = SVG_WIDTH / CARD_WIDTH_MM;
 const Y_RATIO = SVG_HEIGHT / CARD_HEIGHT_MM;
-
+const MOBILE_BREAKPOINT = 768; // Corresponds to Tailwind's `md` breakpoint
 
 export default function CreditCardPreview({
     cardColor = 'black',
@@ -21,10 +21,20 @@ export default function CreditCardPreview({
     isDraggable = true
 }) {
     const [isDragging, setIsDragging] = useState(false);
+    const [isMobile, setIsMobile] = useState(false); // State to track if on a mobile-sized screen
     const svgRef = useRef(null);
     const dragStartOffset = useRef({ x: 0, y: 0 });
 
-    // THE DEFINITIVE FIX: Generate unique IDs for EVERY definition to prevent conflicts on iOS Safari.
+    // This effect runs once on component mount to check the screen size.
+    useEffect(() => {
+        const checkIsMobile = () => {
+            setIsMobile(window.innerWidth < MOBILE_BREAKPOINT);
+        };
+        checkIsMobile();
+        window.addEventListener('resize', checkIsMobile);
+        return () => window.removeEventListener('resize', checkIsMobile);
+    }, []);
+
     const uniqueIds = useMemo(() => {
         const randomString = Math.random().toString(36).substr(2, 9);
         return {
@@ -41,7 +51,6 @@ export default function CreditCardPreview({
             simStripes: `sim-stripes-gradient-${randomString}`,
         };
     }, []);
-
 
     const getSVGPoint = (e) => {
         if (!svgRef.current) return { x: 0, y: 0 };
@@ -187,12 +196,13 @@ export default function CreditCardPreview({
                     )}
 
                     <linearGradient id={uniqueIds.simStripes} x1="0" y1="0" x2="1" y2="0">
-                        <stop offset="30%" stopColor="#D4AF37" /><stop offset="30.5%" stopColor="#A9A9A9" /><stop offset="32.5%" stopColor="#A9A9A9" /><stop offset="33%" stopColor="#D4AF37" /><stop offset="66%" stopColor="#D4AF37" /><stop offset="66.5%" stopColor="#A9A9A9" /><stop offset="68.5%" stopColor="#A9A9A9" /><stop offset="69%" stopColor="#D4AF37" />
+                        <stop offset="30%" stopColor="#D4AF37" /><stop offset="30.5%" stopColor="#A9A9A9" /><stop offset="32.5%" stopColor="#A9A9A9" /><stop offset="33%" stopColor="#D4AF37" /><stop offset="66%" stopColor="#D4AF37" /><stop offset="66.5%" stopColor="#A9A9A9" /><stop offset="68.5%" stopColor="#A9A9A9" /><stop offset="69%" stopColor="#D4AF3T" />
                     </linearGradient>
                 </defs>
 
                 <g>
-                    <g filter={`url(#${uniqueIds.shimmerFilter})`}>
+                    {/* THE FIX: Conditionally apply the shimmer filter. If on mobile, set filter to 'none'. */}
+                    <g filter={!isMobile ? `url(#${uniqueIds.shimmerFilter})` : 'none'}>
                         <rect width={SVG_WIDTH} height={SVG_HEIGHT} rx="20" fill={gradientMap[cardColor] || gradientMap.black} />
                     </g>
                     
