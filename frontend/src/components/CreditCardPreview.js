@@ -24,7 +24,18 @@ export default function CreditCardPreview({
     const svgRef = useRef(null);
     const dragStartOffset = useRef({ x: 0, y: 0 });
 
-    const uniqueMaskId = useMemo(() => `logo-mask-${Math.random().toString(36).substr(2, 9)}`, []);
+    // THE FIX: Generate unique IDs for every definition to prevent conflicts on iOS Safari.
+    const uniqueIds = useMemo(() => {
+        const randomString = Math.random().toString(36).substr(2, 9);
+        return {
+            mask: `logo-mask-${randomString}`,
+            silverGradient: `silver-gradient-${randomString}`,
+            goldGradient: `gold-gradient-${randomString}`,
+            blackGradient: `black-gradient-${randomString}`,
+            roseGoldGradient: `roseGold-gradient-${randomString}`,
+            colorfulGradient: `colorful-gradient-${randomString}`,
+        };
+    }, []);
 
 
     const getSVGPoint = (e) => {
@@ -108,6 +119,13 @@ export default function CreditCardPreview({
     const logoSvgWidth = logoWidth * X_RATIO;
     const logoSvgHeight = logoHeight * Y_RATIO;
 
+    const gradientMap = {
+        silver: `url(#${uniqueIds.silverGradient})`,
+        gold: `url(#${uniqueIds.goldGradient})`,
+        black: `url(#${uniqueIds.blackGradient})`,
+        roseGold: `url(#${uniqueIds.roseGoldGradient})`,
+        colorful: `url(#${uniqueIds.colorfulGradient})`,
+    };
 
     return (
         <div className="w-full md:perspective-1000">
@@ -123,11 +141,11 @@ export default function CreditCardPreview({
                 onTouchStart={handleDragStart}
             >
                 <defs>
-                    <linearGradient id="silver-gradient" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stopColor="#c0c0c0" /><stop offset="100%" stopColor="#a9a9a9" /></linearGradient>
-                    <linearGradient id="gold-gradient" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stopColor="#d4af37" /><stop offset="100%" stopColor="#b8860b" /></linearGradient>
-                    <linearGradient id="black-gradient" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stopColor="#222222" /><stop offset="100%" stopColor="#000000" /></linearGradient>
-                    <linearGradient id="roseGold-gradient" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stopColor="#E5B4A3" /><stop offset="100%" stopColor="#C98E7A" /></linearGradient>
-                    <linearGradient id="colorful-gradient" x1="0%" y1="100%" x2="100%" y2="0%">
+                    <linearGradient id={uniqueIds.silverGradient} x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stopColor="#c0c0c0" /><stop offset="100%" stopColor="#a9a9a9" /></linearGradient>
+                    <linearGradient id={uniqueIds.goldGradient} x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stopColor="#d4af37" /><stop offset="100%" stopColor="#b8860b" /></linearGradient>
+                    <linearGradient id={uniqueIds.blackGradient} x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stopColor="#222222" /><stop offset="100%" stopColor="#000000" /></linearGradient>
+                    <linearGradient id={uniqueIds.roseGoldGradient} x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stopColor="#E5B4A3" /><stop offset="100%" stopColor="#C98E7A" /></linearGradient>
+                    <linearGradient id={uniqueIds.colorfulGradient} x1="0%" y1="100%" x2="100%" y2="0%">
                         <stop offset="0%" stopColor="#6b21a8" /><stop offset="20%" stopColor="#c026d3" /><stop offset="40%" stopColor="#db2777" /><stop offset="60%" stopColor="#ca8a04" /><stop offset="80%" stopColor="#16a34a" /><stop offset="100%" stopColor="#2563eb" />
                     </linearGradient>
                     
@@ -146,7 +164,7 @@ export default function CreditCardPreview({
                     </filter>
 
                     {finalLogoUrl && (
-                        <mask id={uniqueMaskId}>
+                        <mask id={uniqueIds.mask}>
                             <image
                                 filter="url(#force-white-filter)"
                                 href={finalLogoUrl}
@@ -170,7 +188,7 @@ export default function CreditCardPreview({
 
                 <g>
                     <g filter="url(#metallic-shimmer-filter)">
-                        <rect width={SVG_WIDTH} height={SVG_HEIGHT} rx="20" fill={`url(#${cardColor}-gradient)`} />
+                        <rect width={SVG_WIDTH} height={SVG_HEIGHT} rx="20" fill={gradientMap[cardColor]} />
                     </g>
                     
                     {finalLogoUrl && (
@@ -179,7 +197,7 @@ export default function CreditCardPreview({
                             height={SVG_HEIGHT}
                             rx="20"
                             fill={engravingFillColors[engravingColor] || engravingFillColors.silver}
-                            mask={`url(#${uniqueMaskId})`}
+                            mask={`url(#${uniqueIds.mask})`}
                         />
                     )}
                     
