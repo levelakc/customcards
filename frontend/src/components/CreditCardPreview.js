@@ -24,7 +24,7 @@ export default function CreditCardPreview({
     const svgRef = useRef(null);
     const dragStartOffset = useRef({ x: 0, y: 0 });
 
-    // THE FIX: Generate unique IDs for every definition to prevent conflicts on iOS Safari.
+    // THE DEFINITIVE FIX: Generate unique IDs for EVERY definition to prevent conflicts on iOS Safari.
     const uniqueIds = useMemo(() => {
         const randomString = Math.random().toString(36).substr(2, 9);
         return {
@@ -34,6 +34,11 @@ export default function CreditCardPreview({
             blackGradient: `black-gradient-${randomString}`,
             roseGoldGradient: `roseGold-gradient-${randomString}`,
             colorfulGradient: `colorful-gradient-${randomString}`,
+            shimmerFilter: `metallic-shimmer-filter-${randomString}`,
+            spotlight: `spotlight-reflection-gradient-${randomString}`,
+            blackSpotlight: `black-card-spotlight-gradient-${randomString}`,
+            silverSpotlight: `silver-card-spotlight-gradient-${randomString}`,
+            simStripes: `sim-stripes-gradient-${randomString}`,
         };
     }, []);
 
@@ -149,15 +154,15 @@ export default function CreditCardPreview({
                         <stop offset="0%" stopColor="#6b21a8" /><stop offset="20%" stopColor="#c026d3" /><stop offset="40%" stopColor="#db2777" /><stop offset="60%" stopColor="#ca8a04" /><stop offset="80%" stopColor="#16a34a" /><stop offset="100%" stopColor="#2563eb" />
                     </linearGradient>
                     
-                    <filter id="metallic-shimmer-filter" x="-20%" y="-20%" width="140%" height="140%">
+                    <filter id={uniqueIds.shimmerFilter} x="-20%" y="-20%" width="140%" height="140%">
                         <feDistantLight azimuth="225" elevation="30" />
                         <feSpecularLighting in="SourceAlpha" surfaceScale="3" specularConstant="0.5" specularExponent="15" lightingColor="white" result="specular" />
                         <feComposite in="SourceGraphic" in2="specular" operator="arithmetic" k1="0" k2="1" k3="1" k4="0" />
                     </filter>
                     
-                    <radialGradient id="spotlight-reflection-gradient" cx="25%" cy="25%" r="60%"><stop offset="0%" stopColor="white" stopOpacity="0.75" /><stop offset="100%" stopColor="white" stopOpacity="0" /></radialGradient>
-                    <radialGradient id="black-card-spotlight-gradient" cx="25%" cy="25%" r="60%"><stop offset="0%" stopColor="white" stopOpacity="0.15" /><stop offset="100%" stopColor="white" stopOpacity="0" /></radialGradient>
-                    <radialGradient id="silver-card-spotlight-gradient" cx="25%" cy="25%" r="60%"><stop offset="0%" stopColor="white" stopOpacity="0.9" /><stop offset="100%" stopColor="white" stopOpacity="0" /></radialGradient>
+                    <radialGradient id={uniqueIds.spotlight} cx="25%" cy="25%" r="60%"><stop offset="0%" stopColor="white" stopOpacity="0.75" /><stop offset="100%" stopColor="white" stopOpacity="0" /></radialGradient>
+                    <radialGradient id={uniqueIds.blackSpotlight} cx="25%" cy="25%" r="60%"><stop offset="0%" stopColor="white" stopOpacity="0.15" /><stop offset="100%" stopColor="white" stopOpacity="0" /></radialGradient>
+                    <radialGradient id={uniqueIds.silverSpotlight} cx="25%" cy="25%" r="60%"><stop offset="0%" stopColor="white" stopOpacity="0.9" /><stop offset="100%" stopColor="white" stopOpacity="0" /></radialGradient>
 
                     <filter id="force-white-filter">
                         <feColorMatrix type="matrix" values="0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 0 0 0 1 0" />
@@ -181,14 +186,14 @@ export default function CreditCardPreview({
                         </mask>
                     )}
 
-                    <linearGradient id="sim-stripes-gradient" x1="0" y1="0" x2="1" y2="0">
+                    <linearGradient id={uniqueIds.simStripes} x1="0" y1="0" x2="1" y2="0">
                         <stop offset="30%" stopColor="#D4AF37" /><stop offset="30.5%" stopColor="#A9A9A9" /><stop offset="32.5%" stopColor="#A9A9A9" /><stop offset="33%" stopColor="#D4AF37" /><stop offset="66%" stopColor="#D4AF37" /><stop offset="66.5%" stopColor="#A9A9A9" /><stop offset="68.5%" stopColor="#A9A9A9" /><stop offset="69%" stopColor="#D4AF37" />
                     </linearGradient>
                 </defs>
 
                 <g>
-                    <g filter="url(#metallic-shimmer-filter)">
-                        <rect width={SVG_WIDTH} height={SVG_HEIGHT} rx="20" fill={gradientMap[cardColor]} />
+                    <g filter={`url(#${uniqueIds.shimmerFilter})`}>
+                        <rect width={SVG_WIDTH} height={SVG_HEIGHT} rx="20" fill={gradientMap[cardColor] || gradientMap.black} />
                     </g>
                     
                     {finalLogoUrl && (
@@ -201,12 +206,12 @@ export default function CreditCardPreview({
                         />
                     )}
                     
-                    {cardColor === 'black' && ( <rect width={SVG_WIDTH} height={SVG_HEIGHT} rx="20" fill="url(#black-card-spotlight-gradient)" style={{ mixBlendMode: 'lighten' }} /> )}
-                    {cardColor === 'silver' && ( <rect width={SVG_WIDTH} height={SVG_HEIGHT} rx="20" fill="url(#silver-card-spotlight-gradient)" style={{ mixBlendMode: 'lighten' }} /> )}
-                    {cardColor !== 'black' && cardColor !== 'silver' && ( <rect width={SVG_WIDTH} height={SVG_HEIGHT} rx="20" fill="url(#spotlight-reflection-gradient)" style={{ mixBlendMode: 'lighten' }} /> )}
+                    {cardColor === 'black' && ( <rect width={SVG_WIDTH} height={SVG_HEIGHT} rx="20" fill={`url(#${uniqueIds.blackSpotlight})`} style={{ mixBlendMode: 'lighten' }} /> )}
+                    {cardColor === 'silver' && ( <rect width={SVG_WIDTH} height={SVG_HEIGHT} rx="20" fill={`url(#${uniqueIds.silverSpotlight})`} style={{ mixBlendMode: 'lighten' }} /> )}
+                    {cardColor !== 'black' && cardColor !== 'silver' && ( <rect width={SVG_WIDTH} height={SVG_HEIGHT} rx="20" fill={`url(#${uniqueIds.spotlight})`} style={{ mixBlendMode: 'lighten' }} /> )}
                 </g>
 
-                <path d="M40,85 h30 a5,5 0 0 1 5,5 v20 a5,5 0 0 1 -5,5 h-30 a5,5 0 0 1 -5,-5 v-20 a5,5 0 0 1 5,-5 z" fill="url(#sim-stripes-gradient)" opacity="0.9" />
+                <path d="M40,85 h30 a5,5 0 0 1 5,5 v20 a5,5 0 0 1 -5,5 h-30 a5,5 0 0 1 -5,-5 v-20 a5,5 0 0 1 5,-5 z" fill={`url(#${uniqueIds.simStripes})`} opacity="0.9" />
             </svg>
         </div>
     );
