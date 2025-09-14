@@ -6,7 +6,7 @@ import { useSiteSettings } from '../contexts/SiteSettingsContext';
 import * as api from '../api/api';
 import { ShoppingCartIcon, MenuIcon, XIcon } from './Icons';
 
-const BACKEND_URL = 'http://localhost:8000';
+const { BASE_URL } = api;
 
 export default function Navbar() {
     const { navigate } = useRouter();
@@ -44,7 +44,7 @@ export default function Navbar() {
     // Construct the full logo URL
     let finalLogoUrl = settings.logoUrl;
     if (finalLogoUrl && finalLogoUrl.startsWith('/uploads')) {
-        finalLogoUrl = `${BACKEND_URL}${finalLogoUrl}`;
+        finalLogoUrl = `${BASE_URL}${finalLogoUrl}`;
     }
 
     return (

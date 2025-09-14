@@ -1,7 +1,7 @@
 // --- TEMPORARY DEBUGGING FIX ---
 // This forces the production URL. If this works, the problem is the
 // environment variable configuration on Render.
-export const BASE_URL = process.env.REACT_APP_BACKEND_URL || 'http://localhost:8000';
+export const BASE_URL = process.env.REACT_APP_API_URL || 'http://localhost:8000';
 
 const getAuthHeaders = (token) => {
     return {
