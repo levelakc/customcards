@@ -6,8 +6,8 @@ import PersonalDesignPage from './PersonalDesignPage';
 import AboutUs from '../components/AboutUs';
 import Reviews from '../components/Reviews';
 import RealLifeGallery from '../components/RealLifeGallery'; // FIX: The missing import is now added.
+import * as api from '../api/api';
 
-const BACKEND_URL = 'http://localhost:8000';
 const MAX_CAROUSEL_ITEMS = 10;
 
 export default function HomePage() {
@@ -103,7 +103,7 @@ export default function HomePage() {
                             transform: `scale(${1 + scrollPosition / 2000})`,
                             opacity: videoOpacity
                         }}
-                        src={`${BACKEND_URL}${backgroundVideoUrl}`}
+                        src={`${api.BASE_URL}${backgroundVideoUrl}`}
                     ></video>
                 )}
                 <div className="absolute inset-0 bg-black bg-opacity-60"></div>
