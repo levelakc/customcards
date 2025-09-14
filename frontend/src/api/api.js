@@ -1,6 +1,7 @@
-// src/api/api.js
-
-const BASE_URL = process.env.REACT_APP_API_URL || 'http://localhost:8000';
+// --- TEMPORARY DEBUGGING FIX ---
+// This forces the production URL. If this works, the problem is the
+// environment variable configuration on Render.
+const BASE_URL = 'https://customcards-api.onrender.com';
 
 const getAuthHeaders = (token) => {
     return {
@@ -42,7 +43,6 @@ export const getProducts = async () => {
 };
 
 export const getProductById = async (id) => {
-    // FIXED: Corrected a typo from BASE_AURL to BASE_URL
     const response = await fetch(`${BASE_URL}/api/products/${id}`);
     if (!response.ok) throw new Error('Could not fetch product');
     return await response.json();
