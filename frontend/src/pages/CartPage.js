@@ -9,7 +9,7 @@ import Modal from '../components/Modal';
 
 export default function CartPage() {
     const { cartItems, removeFromCart, updateQuantity, addToCart } = useCart();
-// ... existing code ...
+    const { navigate } = useRouter();
     const { user } = useAuth();
     const [isUpsellModalOpen, setIsUpsellModalOpen] = useState(false);
     const [upsellProduct, setUpsellProduct] = useState(null);
