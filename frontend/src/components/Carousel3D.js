@@ -6,18 +6,28 @@ const DRAG_SENSITIVITY = 0.25;
 const INERTIA_DAMPING = 0.95;
 const AUTO_ROTATE_SPEED = -0.05;
 const IDLE_TIMEOUT = 5000;
+const MOBILE_BREAKPOINT = 768;
 
 export default function Carousel3D({ items }) {
     const [rotation, setRotation] = useState(0);
     const [colorIndexes, setColorIndexes] = useState({});
-    
+    const [isMobile, setIsMobile] = useState(window.innerWidth < MOBILE_BREAKPOINT);
+
     const elementRef = useRef(null);
     const isDragging = useRef(false);
-    const dragStart = useRef({ x: 0, rotation: 0 });
+    const dragStart = useRef({ x: 0, rotation: 0, lastX: 0, lastTime: 0 });
     const velocity = useRef(0);
     const animationFrameId = useRef(null);
     const idleTimer = useRef(null);
     const autoRotate = useRef(true);
+
+    useEffect(() => {
+        const handleResize = () => {
+            setIsMobile(window.innerWidth < MOBILE_BREAKPOINT);
+        };
+        window.addEventListener('resize', handleResize);
+        return () => window.removeEventListener('resize', handleResize);
+    }, []);
 
     useEffect(() => {
         if (!items || items.length === 0) return;
@@ -118,24 +128,11 @@ export default function Carousel3D({ items }) {
         document.body.style.cursor = '';
     }, []);
     
-    const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
-
-    useEffect(() => {
-        const handleResize = () => {
-            setIsMobile(window.innerWidth < 768);
-        };
-        window.addEventListener('resize', handleResize);
-        return () => window.removeEventListener('resize', handleResize);
-    }, []);
-
-    const handleDragStart = useCallback((e) => {
-// ... existing code ...
     if (!items || items.length === 0) {
         return <div className="text-center text-white py-10">טוען מוצרים...</div>;
     }
 
     const itemAngle = 360 / items.length;
-    // Make radius and card size responsive
     const radius = isMobile ? 150 + (items.length * 8) : 200 + (items.length * 15);
     const cardWidth = isMobile ? 200 : 260;
     const cardMarginTop = isMobile ? -160 : -250;
@@ -198,5 +195,4 @@ export default function Carousel3D({ items }) {
             </div>
         </div>
     );
-}
 }
