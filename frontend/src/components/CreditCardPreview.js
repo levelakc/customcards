@@ -1,6 +1,6 @@
 import React, { useState, useRef, useEffect, useMemo } from 'react';
+import * as api from '../api/api'; // Import the api file
 
-const BACKEND_URL = 'http://localhost:8000';
 
 const SVG_WIDTH = 335;
 const SVG_HEIGHT = 210;
@@ -118,7 +118,7 @@ export default function CreditCardPreview({
 
     let finalLogoUrl = logoUrl;
     if (logoUrl && logoUrl.startsWith('/uploads')) {
-        finalLogoUrl = `${BACKEND_URL}${logoUrl}`;
+        finalLogoUrl = `${api.BASE_URL}${logoUrl}`;
     }
 
     const engravingFillColors = {

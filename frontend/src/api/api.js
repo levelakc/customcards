@@ -1,7 +1,7 @@
 // --- TEMPORARY DEBUGGING FIX ---
 // This forces the production URL. If this works, the problem is the
 // environment variable configuration on Render.
-const BASE_URL = 'https://customcards-api.onrender.com';
+const BASE_URL = process.env.REACT_APP_BACKEND_URL || 'http://localhost:8000';
 
 const getAuthHeaders = (token) => {
     return {
