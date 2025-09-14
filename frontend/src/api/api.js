@@ -2,7 +2,6 @@
 // This forces the production URL. If this works, the problem is the
 // environment variable configuration on Render.
 export const BASE_URL = process.env.REACT_APP_API_URL || 'http://localhost:8000';
-
 const getAuthHeaders = (token) => {
     return {
         'Content-Type': 'application/json',
@@ -51,6 +50,18 @@ export const getProductById = async (id) => {
 export const getCategories = async () => {
     const response = await fetch(`${BASE_URL}/api/categories`);
     if (!response.ok) throw new Error('Could not fetch categories');
+    return await response.json();
+};
+
+export const getUpsellProduct = async () => {
+    const response = await fetch(`${BASE_URL}/api/products/upsell`);
+    if (!response.ok) {
+        // It's okay if it's not found, just return null
+        if (response.status === 404) {
+            return null;
+        }
+        throw new Error('Could not fetch upsell product');
+    }
     return await response.json();
 };
 
