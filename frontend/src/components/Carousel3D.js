@@ -118,91 +118,85 @@ export default function Carousel3D({ items }) {
         document.body.style.cursor = '';
     }, []);
     
+    const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
+
+    useEffect(() => {
+        const handleResize = () => {
+            setIsMobile(window.innerWidth < 768);
+        };
+        window.addEventListener('resize', handleResize);
+        return () => window.removeEventListener('resize', handleResize);
+    }, []);
+
+    const handleDragStart = useCallback((e) => {
+// ... existing code ...
     if (!items || items.length === 0) {
         return <div className="text-center text-white py-10">טוען מוצרים...</div>;
     }
 
     const itemAngle = 360 / items.length;
-    const radius = 200 + (items.length * 15);
+    // Make radius and card size responsive
+    const radius = isMobile ? 150 + (items.length * 8) : 200 + (items.length * 15);
+    const cardWidth = isMobile ? 200 : 260;
+    const cardMarginTop = isMobile ? -160 : -250;
+    const cardMarginLeft = isMobile ? -100 : -130;
 
     return (
-        <div ref={elementRef} className="w-full">
-            {/* Mobile View: Horizontal Scroll (Spacing Fixed) */}
-            <div className="md:hidden overflow-x-auto snap-x snap-mandatory scrollbar-hide py-4 px-4">
-                <div className="flex gap-4">
-                    {items.map((item) => {
-                         if (!item) return null;
-                         const availableColors = item.availableColors || [];
-                         const colorIndex = colorIndexes[item._id] || 0;
-                         const safeColorIndex = colorIndex < availableColors.length ? colorIndex : 0;
-                         const colorName = availableColors[safeColorIndex] || 'שחור';
-                         const cardColorKey = nameToKeyMap[colorName] || 'black';
-                         const engravingColorKey = getDefaultEngraving(cardColorKey);
+        <div 
+            ref={elementRef} 
+            className="w-full flex relative h-[400px] md:h-[500px] items-center justify-center cursor-grab active:cursor-grabbing"
+            onMouseDown={handleDragStart}
+            onTouchStart={handleDragStart}
+            onMouseMove={handleDragMove}
+            onTouchMove={handleDragMove}
+            onMouseUp={handleDragEnd}
+            onMouseLeave={handleDragEnd}
+            onTouchEnd={handleDragEnd}
+        >
+            <div className="w-full h-full" style={{ perspective: '1500px' }}>
+                <div 
+                    className="relative w-full h-full" 
+                    style={{ 
+                        transformStyle: 'preserve-3d', 
+                        transform: `rotateY(${rotation}deg)`,
+                    }}
+                >
+                    {items.map((item, i) => {
+                        if (!item || !item._id) return null;
+                        const availableColors = item.availableColors || [];
+                        const colorIndex = colorIndexes[item._id] || 0;
+                        const safeColorIndex = colorIndex < availableColors.length ? colorIndex : 0;
+                        const colorName = availableColors[safeColorIndex] || 'שחור';
+                        const cardColorKey = nameToKeyMap[colorName] || 'black';
+                        const engravingColorKey = getDefaultEngraving(cardColorKey);
 
                         return (
-                            <div key={item._id} className="w-64 flex-shrink-0 snap-center">
-                                <ProductCard
-                                    product={item}
+                            <div
+                                key={item._id} 
+                                className="absolute h-auto"
+                                style={{
+                                    width: `${cardWidth}px`,
+                                    transform: `rotateY(${i * itemAngle}deg) translateZ(${radius}px)`,
+                                    backfaceVisibility: 'hidden',
+                                    WebkitBackfaceVisibility: 'hidden',
+                                    top: '50%', 
+                                    left: '50%', 
+                                    marginTop: `${cardMarginTop}px`, 
+                                    marginLeft: `${cardMarginLeft}px`
+                                }}
+                            >
+                               <ProductCard 
+                                    product={item} 
                                     cardColorKey={cardColorKey}
                                     engravingColorKey={engravingColorKey}
-                                />
+                                    disableClick={true}
+                               />
                             </div>
                         );
                     })}
                 </div>
             </div>
-
-            {/* Desktop View: 3D Carousel */}
-            <div 
-                className="hidden md:flex relative w-full h-[500px] items-center justify-center cursor-grab active:cursor-grabbing"
-                onMouseDown={handleDragStart}
-                onTouchStart={handleDragStart}
-                onMouseMove={handleDragMove}
-                onTouchMove={handleDragMove}
-                onMouseUp={handleDragEnd}
-                onMouseLeave={handleDragEnd}
-                onTouchEnd={handleDragEnd}
-            >
-                <div className="w-full h-full" style={{ perspective: '1500px' }}>
-                    <div 
-                        className="relative w-full h-full" 
-                        style={{ 
-                            transformStyle: 'preserve-3d', 
-                            transform: `rotateY(${rotation}deg)`,
-                        }}
-                    >
-                        {items.map((item, i) => {
-                            if (!item || !item._id) return null;
-                            const availableColors = item.availableColors || [];
-                            const colorIndex = colorIndexes[item._id] || 0;
-                            const safeColorIndex = colorIndex < availableColors.length ? colorIndex : 0;
-                            const colorName = availableColors[safeColorIndex] || 'שחור';
-                            const cardColorKey = nameToKeyMap[colorName] || 'black';
-                            const engravingColorKey = getDefaultEngraving(cardColorKey);
-
-                            return (
-                                <div
-                                    key={item._id} 
-                                    className="absolute w-[260px] h-auto"
-                                    style={{
-                                        transform: `rotateY(${i * itemAngle}deg) translateZ(${radius}px)`,
-                                        backfaceVisibility: 'hidden',
-                                        WebkitBackfaceVisibility: 'hidden',
-                                        top: '50%', left: '50%', marginTop: '-250px', marginLeft: '-130px'
-                                    }}
-                                >
-                                   <ProductCard 
-                                        product={item} 
-                                        cardColorKey={cardColorKey}
-                                        engravingColorKey={engravingColorKey}
-                                        disableClick={true}
-                                   />
-                                </div>
-                            );
-                        })}
-                    </div>
-                </div>
-            </div>
         </div>
     );
+}
 }
