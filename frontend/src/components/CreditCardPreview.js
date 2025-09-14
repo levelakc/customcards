@@ -2,7 +2,6 @@ import React, { useState, useRef, useEffect, useMemo } from 'react';
 
 const BACKEND_URL = 'http://localhost:8000';
 
-// Define constants for credit card dimensions to avoid "magic numbers"
 const SVG_WIDTH = 335;
 const SVG_HEIGHT = 210;
 const CARD_WIDTH_MM = 85.6;
@@ -24,7 +23,7 @@ export default function CreditCardPreview({
     const [isDragging, setIsDragging] = useState(false);
     const svgRef = useRef(null);
     const dragStartOffset = useRef({ x: 0, y: 0 });
-    
+
     const uniqueMaskId = useMemo(() => `logo-mask-${Math.random().toString(36).substr(2, 9)}`, []);
 
 
@@ -111,23 +110,14 @@ export default function CreditCardPreview({
 
 
     return (
-        <div style={{
-            perspective: '1000px',
-            display: 'flex',
-            justifyContent: 'center',
-            alignItems: 'center',
-            background: '#2d3748',
-            padding: '2rem',
-            borderRadius: '15px'
-        }}>
+        <div className="w-full md:perspective-1000">
             <svg
                 ref={svgRef}
                 xmlns="http://www.w3.org/2000/svg"
                 viewBox={`0 0 ${SVG_WIDTH} ${SVG_HEIGHT}`}
-                className={`w-full object-cover ${isDraggable ? (isDragging ? 'cursor-grabbing' : 'cursor-grab') : ''}`}
+                className={`w-full object-cover transition-transform duration-300 md:transform-style-3d md:rotate-x-5 md:-rotate-y-10 ${isDraggable ? (isDragging ? 'cursor-grabbing' : 'cursor-grab') : ''}`}
                 style={{
-                    transform: 'rotateY(-10deg) rotateX(5deg)',
-                    filter: 'drop-shadow(0 20px 15px rgba(0,0,0,0.5))'
+                    filter: 'drop-shadow(0 10px 10px rgba(0,0,0,0.4))'
                 }}
                 onMouseDown={handleDragStart}
                 onTouchStart={handleDragStart}
@@ -143,7 +133,6 @@ export default function CreditCardPreview({
                     
                     <filter id="metallic-shimmer-filter" x="-20%" y="-20%" width="140%" height="140%">
                         <feDistantLight azimuth="225" elevation="30" />
-                        {/* FIX: Changed lighting-color to lightingColor */}
                         <feSpecularLighting in="SourceAlpha" surfaceScale="3" specularConstant="0.5" specularExponent="15" lightingColor="white" result="specular" />
                         <feComposite in="SourceGraphic" in2="specular" operator="arithmetic" k1="0" k2="1" k3="1" k4="0" />
                     </filter>
