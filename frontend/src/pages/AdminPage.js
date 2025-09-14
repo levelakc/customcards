@@ -234,7 +234,7 @@ export default function AdminPage() {
     const [isEditing, setIsEditing] = useState(false);
     const [editingId, setEditingId] = useState(null);
 
-    const [productForm, setProductForm] = useState({ name: '', description: '', price: '', image: '', category: '', availableColors: new Set(ALL_CARD_COLORS) });
+    const [productForm, setProductForm] = useState({ name: '', description: '', price: '', image: '', category: '', availableColors: new Set(ALL_CARD_COLORS), isUpsellProduct: false });
     const [categoryName, setCategoryName] = useState('');
 
     const [uploading, setUploading] = useState(false);
@@ -282,8 +282,11 @@ export default function AdminPage() {
     }, [isAdmin, navigate, fetchData]);
     
     const handleProductInputChange = (e) => {
-        const { name, value } = e.target;
-        setProductForm(prev => ({ ...prev, [name]: value }));
+        const { name, value, type, checked } = e.target;
+        setProductForm(prev => ({ 
+            ...prev, 
+            [name]: type === 'checkbox' ? checked : value 
+        }));
     };
 
     const handleColorToggle = (color) => {
@@ -296,7 +299,7 @@ export default function AdminPage() {
     };
     
     const resetProductForm = () => {
-        setProductForm({ name: '', description: '', price: '', image: '', category: categories[0]?._id || '', availableColors: new Set(ALL_CARD_COLORS) });
+        setProductForm({ name: '', description: '', price: '', image: '', category: categories[0]?._id || '', availableColors: new Set(ALL_CARD_COLORS), isUpsellProduct: false });
         setCustomization({ position: { x: 45, y: 10 }, scale: 1, rotation: 0 });
         setIsEditing(false);
         setEditingId(null);
@@ -313,6 +316,7 @@ export default function AdminPage() {
             image: product.image,
             category: product.category._id,
             availableColors: new Set(product.availableColors),
+            isUpsellProduct: product.isUpsellProduct || false,
         });
         setCustomization(product.customization || { position: { x: 45, y: 10 }, scale: 1, rotation: 0 });
     };
@@ -487,6 +491,19 @@ export default function AdminPage() {
                             </div>
 
                             <div><label className="block mb-1">קטגוריה</label><select name="category" value={productForm.category} onChange={handleProductInputChange} className="w-full bg-gray-700 rounded p-2 border border-gray-600">{categories.map(c => <option key={c._id} value={c._id}>{c.name}</option>)}</select></div>
+                            
+                            <div className="flex items-center pt-2">
+                                <input 
+                                    id="isUpsellProduct"
+                                    type="checkbox" 
+                                    name="isUpsellProduct"
+                                    checked={productForm.isUpsellProduct} 
+                                    onChange={handleProductInputChange}
+                                    className="w-4 h-4 text-indigo-600 bg-gray-700 border-gray-600 rounded focus:ring-indigo-500"
+                                />
+                                <label htmlFor="isUpsellProduct" className="mr-2 text-sm font-medium text-gray-300">האם זהו מוצר נלווה (Upsell)?</label>
+                            </div>
+
                             <div>
                                 <label className="block mb-1">צבעי כרטיס זמינים</label>
                                 <div className="grid grid-cols-2 gap-2 bg-gray-700 p-2 rounded">
