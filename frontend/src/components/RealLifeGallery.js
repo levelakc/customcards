@@ -1,8 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import * as api from '../api/api';
 
-const { BASE_URL } = api;
-
 /**
  * A modal component for viewing an image in a larger overlay.
  * @param {object} props
@@ -57,7 +55,7 @@ export default function RealLifeGallery() {
                 const data = await api.getGalleryImages();
                 // Ensure all image URLs are absolute for consistent display.
                 const fullImageUrls = (data.images || []).map(url => 
-                    url.startsWith('http') || url.startsWith('blob:') ? url : `${BASE_URL}${url}`
+                    url.startsWith('http') || url.startsWith('blob:') ? url : `${api.BASE_URL}${url}`
                 );
                 setImages(fullImageUrls);
             } catch (error) {
