@@ -21,7 +21,8 @@ const productSchema = mongoose.Schema({
         position: { x: { type: Number, default: 45 }, y: { type: Number, default: 10 } },
         scale: { type: Number, default: 1 },
         rotation: { type: Number, default: 0 }
-    }
+    },
+    isUpsellProduct: { type: Boolean, default: false }
 }, { timestamps: true });
 
 const Product = mongoose.model('Product', productSchema);

@@ -22,7 +22,13 @@ const getProductById = async (req, res) => {
 // @route   POST /api/products
 const createProduct = async (req, res) => {
     // Destructure the new customization field from the request body
-    const { name, price, description, image, category, availableColors, customization } = req.body;
+    const { name, price, description, image, category, availableColors, customization, isUpsellProduct } = req.body;
+
+    // If this product is marked as an upsell, ensure no others are
+    if (isUpsellProduct) {
+        await Product.updateMany({}, { $set: { isUpsellProduct: false } });
+    }
+
     const product = new Product({
         name,
         price,
@@ -31,6 +37,7 @@ const createProduct = async (req, res) => {
         category,
         availableColors,
         customization, // Add customization data to the new product
+        isUpsellProduct,
     });
     const createdProduct = await product.save();
     res.status(201).json(createdProduct);
@@ -40,10 +47,15 @@ const createProduct = async (req, res) => {
 // @route   PUT /api/products/:id
 const updateProduct = async (req, res) => {
     // Destructure the new customization field from the request body
-    const { name, price, description, image, category, availableColors, customization } = req.body;
+    const { name, price, description, image, category, availableColors, customization, isUpsellProduct } = req.body;
     const product = await Product.findById(req.params.id);
 
     if (product) {
+        // If this product is being marked as the upsell, ensure no others are
+        if (isUpsellProduct && !product.isUpsellProduct) {
+            await Product.updateMany({ _id: { $ne: product._id } }, { $set: { isUpsellProduct: false } });
+        }
+
         product.name = name;
         product.price = price;
         product.description = description;
@@ -51,11 +63,24 @@ const updateProduct = async (req, res) => {
         product.category = category;
         product.availableColors = availableColors;
         product.customization = customization; // Update customization data
+        product.isUpsellProduct = isUpsellProduct;
         
         const updatedProduct = await product.save();
         res.json(updatedProduct);
     } else {
         res.status(404).json({ message: 'Product not found' });
+    }
+};
+
+// @desc    Get the single upsell product
+// @route   GET /api/products/upsell
+const getUpsellProduct = async (req, res) => {
+    const upsellProduct = await Product.findOne({ isUpsellProduct: true });
+    if (upsellProduct) {
+        res.json(upsellProduct);
+    } else {
+        // It's okay if none is found, the frontend can handle this
+        res.status(404).json({ message: 'No upsell product found' });
     }
 };
 
@@ -99,4 +124,12 @@ const createProductReview = async (req, res) => {
     }
 };
 
-export { getProducts, getProductById, createProduct, updateProduct, deleteProduct, createProductReview };
+export { 
+    getProducts, 
+    getProductById, 
+    createProduct, 
+    updateProduct, 
+    deleteProduct,
+    createProductReview,
+    getUpsellProduct
+};
