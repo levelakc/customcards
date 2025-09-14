@@ -6,18 +6,28 @@ const DRAG_SENSITIVITY = 0.25;
 const INERTIA_DAMPING = 0.95;
 const AUTO_ROTATE_SPEED = -0.05;
 const IDLE_TIMEOUT = 5000;
+const MOBILE_BREAKPOINT = 768;
 
 export default function Carousel3D({ items }) {
     const [rotation, setRotation] = useState(0);
     const [colorIndexes, setColorIndexes] = useState({});
-    
+    const [isMobile, setIsMobile] = useState(window.innerWidth < MOBILE_BREAKPOINT);
+
     const elementRef = useRef(null);
     const isDragging = useRef(false);
-    const dragStart = useRef({ x: 0, rotation: 0 });
+    const dragStart = useRef({ x: 0, rotation: 0, lastX: 0, lastTime: 0 });
     const velocity = useRef(0);
     const animationFrameId = useRef(null);
     const idleTimer = useRef(null);
     const autoRotate = useRef(true);
+
+    useEffect(() => {
+        const handleResize = () => {
+            setIsMobile(window.innerWidth < MOBILE_BREAKPOINT);
+        };
+        window.addEventListener('resize', handleResize);
+        return () => window.removeEventListener('resize', handleResize);
+    }, []);
 
     useEffect(() => {
         if (!items || items.length === 0) return;
@@ -123,84 +133,64 @@ export default function Carousel3D({ items }) {
     }
 
     const itemAngle = 360 / items.length;
-    const radius = 200 + (items.length * 15);
+    const radius = isMobile ? 150 + (items.length * 8) : 200 + (items.length * 15);
+    const cardWidth = isMobile ? 200 : 260;
+    const cardMarginTop = isMobile ? -160 : -250;
+    const cardMarginLeft = isMobile ? -100 : -130;
 
     return (
-        <div ref={elementRef} className="w-full">
-            {/* Mobile View: Horizontal Scroll (Spacing Fixed) */}
-            <div className="md:hidden overflow-x-auto snap-x snap-mandatory scrollbar-hide py-4 px-4">
-                <div className="flex gap-4">
-                    {items.map((item) => {
-                         if (!item) return null;
-                         const availableColors = item.availableColors || [];
-                         const colorIndex = colorIndexes[item._id] || 0;
-                         const safeColorIndex = colorIndex < availableColors.length ? colorIndex : 0;
-                         const colorName = availableColors[safeColorIndex] || 'שחור';
-                         const cardColorKey = nameToKeyMap[colorName] || 'black';
-                         const engravingColorKey = getDefaultEngraving(cardColorKey);
+        <div 
+            ref={elementRef} 
+            className="w-full flex relative h-[400px] md:h-[500px] items-center justify-center cursor-grab active:cursor-grabbing"
+            onMouseDown={handleDragStart}
+            onTouchStart={handleDragStart}
+            onMouseMove={handleDragMove}
+            onTouchMove={handleDragMove}
+            onMouseUp={handleDragEnd}
+            onMouseLeave={handleDragEnd}
+            onTouchEnd={handleDragEnd}
+        >
+            <div className="w-full h-full" style={{ perspective: '1500px' }}>
+                <div 
+                    className="relative w-full h-full" 
+                    style={{ 
+                        transformStyle: 'preserve-3d', 
+                        transform: `rotateY(${rotation}deg)`,
+                    }}
+                >
+                    {items.map((item, i) => {
+                        if (!item || !item._id) return null;
+                        const availableColors = item.availableColors || [];
+                        const colorIndex = colorIndexes[item._id] || 0;
+                        const safeColorIndex = colorIndex < availableColors.length ? colorIndex : 0;
+                        const colorName = availableColors[safeColorIndex] || 'שחור';
+                        const cardColorKey = nameToKeyMap[colorName] || 'black';
+                        const engravingColorKey = getDefaultEngraving(cardColorKey);
 
                         return (
-                            <div key={item._id} className="w-64 flex-shrink-0 snap-center">
-                                <ProductCard
-                                    product={item}
+                            <div
+                                key={item._id} 
+                                className="absolute h-auto"
+                                style={{
+                                    width: `${cardWidth}px`,
+                                    transform: `rotateY(${i * itemAngle}deg) translateZ(${radius}px)`,
+                                    backfaceVisibility: 'hidden',
+                                    WebkitBackfaceVisibility: 'hidden',
+                                    top: '50%', 
+                                    left: '50%', 
+                                    marginTop: `${cardMarginTop}px`, 
+                                    marginLeft: `${cardMarginLeft}px`
+                                }}
+                            >
+                               <ProductCard 
+                                    product={item} 
                                     cardColorKey={cardColorKey}
                                     engravingColorKey={engravingColorKey}
-                                />
+                                    disableClick={true}
+                               />
                             </div>
                         );
                     })}
-                </div>
-            </div>
-
-            {/* Desktop View: 3D Carousel */}
-            <div 
-                className="hidden md:flex relative w-full h-[500px] items-center justify-center cursor-grab active:cursor-grabbing"
-                onMouseDown={handleDragStart}
-                onTouchStart={handleDragStart}
-                onMouseMove={handleDragMove}
-                onTouchMove={handleDragMove}
-                onMouseUp={handleDragEnd}
-                onMouseLeave={handleDragEnd}
-                onTouchEnd={handleDragEnd}
-            >
-                <div className="w-full h-full" style={{ perspective: '1500px' }}>
-                    <div 
-                        className="relative w-full h-full" 
-                        style={{ 
-                            transformStyle: 'preserve-3d', 
-                            transform: `rotateY(${rotation}deg)`,
-                        }}
-                    >
-                        {items.map((item, i) => {
-                            if (!item || !item._id) return null;
-                            const availableColors = item.availableColors || [];
-                            const colorIndex = colorIndexes[item._id] || 0;
-                            const safeColorIndex = colorIndex < availableColors.length ? colorIndex : 0;
-                            const colorName = availableColors[safeColorIndex] || 'שחור';
-                            const cardColorKey = nameToKeyMap[colorName] || 'black';
-                            const engravingColorKey = getDefaultEngraving(cardColorKey);
-
-                            return (
-                                <div
-                                    key={item._id} 
-                                    className="absolute w-[260px] h-auto"
-                                    style={{
-                                        transform: `rotateY(${i * itemAngle}deg) translateZ(${radius}px)`,
-                                        backfaceVisibility: 'hidden',
-                                        WebkitBackfaceVisibility: 'hidden',
-                                        top: '50%', left: '50%', marginTop: '-250px', marginLeft: '-130px'
-                                    }}
-                                >
-                                   <ProductCard 
-                                        product={item} 
-                                        cardColorKey={cardColorKey}
-                                        engravingColorKey={engravingColorKey}
-                                        disableClick={true}
-                                   />
-                                </div>
-                            );
-                        })}
-                    </div>
                 </div>
             </div>
         </div>
