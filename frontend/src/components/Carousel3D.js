@@ -127,27 +127,29 @@ export default function Carousel3D({ items }) {
 
     return (
         <div ref={elementRef} className="w-full">
-            {/* Mobile View: Horizontal Scroll (Structure Simplified) */}
-            <div className="md:hidden flex space-x-4 overflow-x-auto snap-x snap-mandatory scrollbar-hide py-4 -mx-4 px-4">
-                {items.map((item) => {
-                    if (!item) return null;
-                    const availableColors = item.availableColors || [];
-                    const colorIndex = colorIndexes[item._id] || 0;
-                    const safeColorIndex = colorIndex < availableColors.length ? colorIndex : 0;
-                    const colorName = availableColors[safeColorIndex] || 'שחור';
-                    const cardColorKey = nameToKeyMap[colorName] || 'black';
-                    const engravingColorKey = getDefaultEngraving(cardColorKey);
+            {/* Mobile View: Horizontal Scroll (Spacing Fixed) */}
+            <div className="md:hidden overflow-x-auto snap-x snap-mandatory scrollbar-hide py-4 px-4">
+                <div className="flex gap-4">
+                    {items.map((item) => {
+                         if (!item) return null;
+                         const availableColors = item.availableColors || [];
+                         const colorIndex = colorIndexes[item._id] || 0;
+                         const safeColorIndex = colorIndex < availableColors.length ? colorIndex : 0;
+                         const colorName = availableColors[safeColorIndex] || 'שחור';
+                         const cardColorKey = nameToKeyMap[colorName] || 'black';
+                         const engravingColorKey = getDefaultEngraving(cardColorKey);
 
-                    return (
-                        <div key={item._id} className="w-64 flex-shrink-0 snap-center">
-                            <ProductCard
-                                product={item}
-                                cardColorKey={cardColorKey}
-                                engravingColorKey={engravingColorKey}
-                            />
-                        </div>
-                    );
-                })}
+                        return (
+                            <div key={item._id} className="w-64 flex-shrink-0 snap-center">
+                                <ProductCard
+                                    product={item}
+                                    cardColorKey={cardColorKey}
+                                    engravingColorKey={engravingColorKey}
+                                />
+                            </div>
+                        );
+                    })}
+                </div>
             </div>
 
             {/* Desktop View: 3D Carousel */}

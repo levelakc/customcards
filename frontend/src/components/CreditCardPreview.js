@@ -25,7 +25,6 @@ export default function CreditCardPreview({
     const svgRef = useRef(null);
     const dragStartOffset = useRef({ x: 0, y: 0 });
 
-    // This effect runs once on component mount to check the screen size.
     useEffect(() => {
         const checkIsMobile = () => {
             setIsMobile(window.innerWidth < MOBILE_BREAKPOINT);
@@ -196,12 +195,19 @@ export default function CreditCardPreview({
                     )}
 
                     <linearGradient id={uniqueIds.simStripes} x1="0" y1="0" x2="1" y2="0">
-                        <stop offset="30%" stopColor="#D4AF37" /><stop offset="30.5%" stopColor="#A9A9A9" /><stop offset="32.5%" stopColor="#A9A9A9" /><stop offset="33%" stopColor="#D4AF37" /><stop offset="66%" stopColor="#D4AF37" /><stop offset="66.5%" stopColor="#A9A9A9" /><stop offset="68.5%" stopColor="#A9A9A9" /><stop offset="69%" stopColor="#D4AF3T" />
+                        <stop offset="30%" stopColor="#D4AF37" />
+                        <stop offset="30.5%" stopColor="#A9A9A9" />
+                        <stop offset="32.5%" stopColor="#A9A9A9" />
+                        <stop offset="33%" stopColor="#D4AF37" />
+                        <stop offset="66%" stopColor="#D4AF37" />
+                        <stop offset="66.5%" stopColor="#A9A9A9" />
+                        <stop offset="68.5%" stopColor="#A9A9A9" />
+                        {/* THE FIX: Corrected typo from D4AF3T to D4AF37 */}
+                        <stop offset="69%" stopColor="#D4AF37" />
                     </linearGradient>
                 </defs>
 
                 <g>
-                    {/* THE FIX: Conditionally apply the shimmer filter. If on mobile, set filter to 'none'. */}
                     <g filter={!isMobile ? `url(#${uniqueIds.shimmerFilter})` : 'none'}>
                         <rect width={SVG_WIDTH} height={SVG_HEIGHT} rx="20" fill={gradientMap[cardColor] || gradientMap.black} />
                     </g>
