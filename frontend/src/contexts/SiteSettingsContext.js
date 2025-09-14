@@ -5,7 +5,7 @@ const SiteSettingsContext = createContext(null);
 
 export const SiteSettingsProvider = ({ children }) => {
     const [settings, setSettings] = useState({
-        logoUrl: 'https://placehold.co/120x40/4A5568/FFFFFF?text=VIPCard',
+        logoUrl: '',
         backgroundVideoUrl: '',
         videoOpacity: 0.3,
     });
@@ -14,7 +14,9 @@ export const SiteSettingsProvider = ({ children }) => {
     const fetchSettings = useCallback(async () => {
         try {
             const data = await api.getSiteSettings();
-            setSettings(data);
+            if (data) {
+                setSettings(data);
+            }
         } catch (error) {
             console.error("Failed to fetch site settings:", error);
         } finally {
@@ -26,7 +28,12 @@ export const SiteSettingsProvider = ({ children }) => {
         fetchSettings();
     }, [fetchSettings]);
 
-    const value = { settings, loading, fetchSettings };
+    // NEW FUNCTION: Allows for instant "optimistic" UI updates.
+    const updateLocalSettings = (newSettings) => {
+        setSettings(prev => ({ ...prev, ...newSettings }));
+    };
+
+    const value = { settings, loading, fetchSettings, updateLocalSettings };
 
     return (
         <SiteSettingsContext.Provider value={value}>

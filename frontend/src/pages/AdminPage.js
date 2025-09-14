@@ -8,11 +8,10 @@ import AdminUsersPage from './AdminUsersPage';
 import CreditCardPreview from '../components/CreditCardPreview';
 import { ALL_CARD_COLORS } from '../utils/colorUtils';
 
-// This component can remain as is
 function SiteSettingsPage() {
-    // ... (no changes needed in this inner component)
     const { token } = useAuth();
-    const { settings, fetchSettings } = useSiteSettings();
+    // Get the new updateLocalSettings function from the context
+    const { settings, fetchSettings, updateLocalSettings } = useSiteSettings();
     const [localSettings, setLocalSettings] = useState(settings);
     const [uploading, setUploading] = useState(false);
     const [message, setMessage] = useState('');
@@ -37,8 +36,13 @@ function SiteSettingsPage() {
             const value = uploadResult.video || uploadResult.image;
 
             await api.updateSiteSettings({ [key]: value }, token);
+            
+            // UPDATE UI INSTANTLY
+            updateLocalSettings({ [key]: value });
+
             setMessage(`${fileType.charAt(0).toUpperCase() + fileType.slice(1)} updated successfully!`);
-            fetchSettings();
+            // We still fetch to ensure we're synced with the server
+            fetchSettings(); 
         } catch (err) {
             setMessage(`Upload Error: ${err.message}`);
         } finally {
@@ -49,7 +53,12 @@ function SiteSettingsPage() {
     const handleUrlUpdate = async (key, value) => {
         try {
             await api.updateSiteSettings({ [key]: value }, token);
+
+            // UPDATE UI INSTANTLY
+            updateLocalSettings({ [key]: value });
+
             setMessage(`${key} updated successfully!`);
+            // We still fetch to ensure we're synced with the server
             fetchSettings();
         } catch (err) {
             setMessage(`Update Error: ${err.message}`);
@@ -95,8 +104,8 @@ function SiteSettingsPage() {
                         <p className="text-xs text-gray-400 mt-1">וידאו נוכחי: {localSettings.backgroundVideoUrl}</p>
                     </div>
                     <div>
-                        <label htmlFor="opacity" className="block mb-2 text-sm font-medium">שקיפות הוידאו: {Math.round(localSettings.videoOpacity * 100)}%</label>
-                        <input id="opacity" type="range" min="0" max="1" step="0.05" value={localSettings.videoOpacity} onChange={(e) => handleUrlUpdate('videoOpacity', parseFloat(e.target.value))} className="w-full h-2 bg-gray-600 rounded-lg appearance-none cursor-pointer"/>
+                        <label htmlFor="opacity" className="block mb-2 text-sm font-medium">שקיפות הוידאו: {Math.round((localSettings.videoOpacity || 0) * 100)}%</label>
+                        <input id="opacity" type="range" min="0" max="1" step="0.05" value={localSettings.videoOpacity || 0} onChange={(e) => handleUrlUpdate('videoOpacity', parseFloat(e.target.value))} className="w-full h-2 bg-gray-600 rounded-lg appearance-none cursor-pointer"/>
                     </div>
                 </div>
 
@@ -106,7 +115,6 @@ function SiteSettingsPage() {
     );
 }
 
-// NEW INNER COMPONENT FOR MANAGING THE GALLERY
 function GallerySettingsPage() {
     const { token } = useAuth();
     const [galleryImages, setGalleryImages] = useState([]);
@@ -124,7 +132,7 @@ function GallerySettingsPage() {
         } finally {
             setIsLoading(false);
         }
-    }, []);
+    }, [token]);
 
     useEffect(() => {
         fetchGallery();
@@ -272,8 +280,7 @@ export default function AdminPage() {
             navigate('home');
         }
     }, [isAdmin, navigate, fetchData]);
-
-    // ... (All other handler functions: handleProductInputChange, handleColorToggle, etc. remain unchanged)
+    
     const handleProductInputChange = (e) => {
         const { name, value } = e.target;
         setProductForm(prev => ({ ...prev, [name]: value }));
@@ -412,7 +419,6 @@ export default function AdminPage() {
         <div className="flex flex-wrap space-x-4 space-x-reverse border-b border-gray-700 mb-8">
             <button type="button" onClick={() => setActiveTab('products')} className={`py-2 px-4 ${activeTab === 'products' ? 'border-b-2 border-indigo-500' : 'text-gray-400'}`}>ניהול מוצרים</button>
             <button type="button" onClick={() => setActiveTab('categories')} className={`py-2 px-4 ${activeTab === 'categories' ? 'border-b-2 border-indigo-500' : 'text-gray-400'}`}>ניהול קטגוריות</button>
-            {/* NEW TAB BUTTON */}
             <button type="button" onClick={() => setActiveTab('gallery')} className={`py-2 px-4 ${activeTab === 'gallery' ? 'border-b-2 border-indigo-500' : 'text-gray-400'}`}>גלריית תמונות</button>
             <button type="button" onClick={() => setActiveTab('orders')} className={`py-2 px-4 ${activeTab === 'orders' ? 'border-b-2 border-indigo-500' : 'text-gray-400'}`}>ניהול הזמנות</button>
             <button type="button" onClick={() => setActiveTab('users')} className={`py-2 px-4 ${activeTab === 'users' ? 'border-b-2 border-indigo-500' : 'text-gray-400'}`}>ניהול משתמשים</button>
@@ -526,7 +532,7 @@ export default function AdminPage() {
             </div>
         )}
 
-        {/* NEW TAB CONTENT */}
+        
         {activeTab === 'gallery' && <GallerySettingsPage />}
 
         {activeTab === 'orders' && <AdminOrdersPage />}
