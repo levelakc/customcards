@@ -6,11 +6,11 @@ import * as api from '../api/api';
 import AdminOrdersPage from './AdminOrdersPage';
 import AdminUsersPage from './AdminUsersPage';
 import CreditCardPreview from '../components/CreditCardPreview';
+import WalletPreview from '../components/WalletPreview'; // 1. Import WalletPreview
 import { ALL_CARD_COLORS } from '../utils/colorUtils';
 
 function SiteSettingsPage() {
     const { token } = useAuth();
-    // Get the new updateLocalSettings function from the context
     const { settings, fetchSettings, updateLocalSettings } = useSiteSettings();
     const [localSettings, setLocalSettings] = useState(settings);
     const [uploading, setUploading] = useState(false);
@@ -36,12 +36,8 @@ function SiteSettingsPage() {
             const value = uploadResult.video || uploadResult.image;
 
             await api.updateSiteSettings({ [key]: value }, token);
-            
-            // UPDATE UI INSTANTLY
             updateLocalSettings({ [key]: value });
-
             setMessage(`${fileType.charAt(0).toUpperCase() + fileType.slice(1)} updated successfully!`);
-            // We still fetch to ensure we're synced with the server
             fetchSettings(); 
         } catch (err) {
             setMessage(`Upload Error: ${err.message}`);
@@ -53,12 +49,8 @@ function SiteSettingsPage() {
     const handleUrlUpdate = async (key, value) => {
         try {
             await api.updateSiteSettings({ [key]: value }, token);
-
-            // UPDATE UI INSTANTLY
             updateLocalSettings({ [key]: value });
-
             setMessage(`${key} updated successfully!`);
-            // We still fetch to ensure we're synced with the server
             fetchSettings();
         } catch (err) {
             setMessage(`Update Error: ${err.message}`);
@@ -132,7 +124,7 @@ function GallerySettingsPage() {
         } finally {
             setIsLoading(false);
         }
-    }, [token]);
+    }, []);
 
     useEffect(() => {
         fetchGallery();
@@ -242,7 +234,7 @@ export default function AdminPage() {
     const [previewUrl, setPreviewUrl] = useState('');
 
     const [customization, setCustomization] = useState({
-        position: { x: 45, y: 10 },
+        position: { x: 50, y: 50 },
         scale: 1,
         rotation: 0,
     });
@@ -300,7 +292,7 @@ export default function AdminPage() {
     
     const resetProductForm = () => {
         setProductForm({ name: '', description: '', price: '', image: '', category: categories[0]?._id || '', availableColors: new Set(ALL_CARD_COLORS), isUpsellProduct: false });
-        setCustomization({ position: { x: 45, y: 10 }, scale: 1, rotation: 0 });
+        setCustomization({ position: { x: 50, y: 50 }, scale: 1, rotation: 0 });
         setIsEditing(false);
         setEditingId(null);
         setSelectedFile(null);
@@ -314,11 +306,11 @@ export default function AdminPage() {
             description: product.description,
             price: product.price,
             image: product.image,
-            category: product.category._id,
+            category: product.category?._id,
             availableColors: new Set(product.availableColors),
             isUpsellProduct: product.isUpsellProduct || false,
         });
-        setCustomization(product.customization || { position: { x: 45, y: 10 }, scale: 1, rotation: 0 });
+        setCustomization(product.customization || { position: { x: 50, y: 50 }, scale: 1, rotation: 0 });
     };
     
     const handleSelectCategoryToEdit = (category) => {
@@ -445,16 +437,26 @@ export default function AdminPage() {
                     
                     <div className="mb-6 p-4 bg-gray-900 rounded-lg">
                         <h3 className="text-lg font-semibold mb-2 text-center">תצוגה מקדימה</h3>
-                        <CreditCardPreview
-                            cardColor="black"
-                            engravingColor="silver"
-                            logoUrl={previewUrl}
-                            position={customization.position}
-                            scale={customization.scale}
-                            rotation={customization.rotation}
-                            onPositionChange={(pos) => setCustomization(c => ({ ...c, position: pos }))}
-                            isDraggable={true}
-                        />
+                        {/* THE FIX: Conditional rendering for the preview */}
+                        {productForm.isUpsellProduct ? (
+                            <WalletPreview
+                                customSvgUrl={previewUrl}
+                                svgPosition={customization.position}
+                                svgScale={customization.scale}
+                                svgRotation={customization.rotation}
+                            />
+                        ) : (
+                            <CreditCardPreview
+                                cardColor="black"
+                                engravingColor="silver"
+                                logoUrl={previewUrl}
+                                position={customization.position}
+                                scale={customization.scale}
+                                rotation={customization.rotation}
+                                onPositionChange={(pos) => setCustomization(c => ({ ...c, position: pos }))}
+                                isDraggable={true}
+                            />
+                        )}
                     </div>
 
                     <form onSubmit={handleProductFormSubmit}>
@@ -504,22 +506,25 @@ export default function AdminPage() {
                                 <label htmlFor="isUpsellProduct" className="mr-2 text-sm font-medium text-gray-300">האם זהו מוצר נלווה (Upsell)?</label>
                             </div>
 
-                            <div>
-                                <label className="block mb-1">צבעי כרטיס זמינים</label>
-                                <div className="grid grid-cols-2 gap-2 bg-gray-700 p-2 rounded">
-                                    {ALL_CARD_COLORS.map(color => (
-                                        <label key={color} className="flex items-center space-x-2 space-x-reverse cursor-pointer">
-                                            <input 
-                                                type="checkbox" 
-                                                checked={productForm.availableColors.has(color)} 
-                                                onChange={() => handleColorToggle(color)} 
-                                                className="form-checkbox bg-gray-600 border-gray-500"
-                                            />
-                                            <span>{color}</span>
-                                        </label>
-                                    ))}
+                            {/* Conditionally hide the color options if it's an upsell product */}
+                            {!productForm.isUpsellProduct && (
+                                <div>
+                                    <label className="block mb-1">צבעי כרטיס זמינים</label>
+                                    <div className="grid grid-cols-2 gap-2 bg-gray-700 p-2 rounded">
+                                        {ALL_CARD_COLORS.map(color => (
+                                            <label key={color} className="flex items-center space-x-2 space-x-reverse cursor-pointer">
+                                                <input 
+                                                    type="checkbox" 
+                                                    checked={productForm.availableColors.has(color)} 
+                                                    onChange={() => handleColorToggle(color)} 
+                                                    className="form-checkbox bg-gray-600 border-gray-500"
+                                                />
+                                                <span>{color}</span>
+                                            </label>
+                                        ))}
+                                    </div>
                                 </div>
-                            </div>
+                            )}
                             <button type="submit" disabled={uploading} className="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2 px-4 rounded disabled:bg-gray-500">
                                 {uploading ? 'מעלה קובץ...' : (isEditing ? 'עדכן מוצר' : 'הוסף מוצר')}
                             </button>
@@ -551,7 +556,6 @@ export default function AdminPage() {
 
         
         {activeTab === 'gallery' && <GallerySettingsPage />}
-
         {activeTab === 'orders' && <AdminOrdersPage />}
         {activeTab === 'users' && <AdminUsersPage />}
         {activeTab === 'settings' && <SiteSettingsPage />}

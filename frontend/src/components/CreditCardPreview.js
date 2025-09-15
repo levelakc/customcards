@@ -1,6 +1,5 @@
-import React, { useState, useRef, useEffect, useMemo } from 'react';
+import React, { useState, useRef, useEffect, useMemo, useCallback } from 'react';
 import * as api from '../api/api'; // Import the api file
-
 
 const SVG_WIDTH = 335;
 const SVG_HEIGHT = 210;
@@ -63,7 +62,7 @@ export default function CreditCardPreview({
 
     const handleDragStart = (e) => {
         if (!isDraggable) return;
-        e.preventDefault();
+        if (e.cancelable) e.preventDefault();
         setIsDragging(true);
         const startPoint = getSVGPoint(e);
         dragStartOffset.current = {
@@ -71,10 +70,11 @@ export default function CreditCardPreview({
             y: startPoint.y - (position.y * Y_RATIO),
         };
     };
-
-    const handleDragMove = (e) => {
+    
+    // Wrapped in useCallback for performance and to prevent stale closures
+    const handleDragMove = useCallback((e) => {
         if (!isDragging || !isDraggable) return;
-        e.preventDefault();
+        if (e.cancelable) e.preventDefault();
         const newPoint = getSVGPoint(e);
         const newSvgPos = {
             x: newPoint.x - dragStartOffset.current.x,
@@ -88,7 +88,7 @@ export default function CreditCardPreview({
             };
             onPositionChange(newMmPos);
         }
-    };
+    }, [isDragging, isDraggable, onPositionChange]);
 
     const handleDragEnd = () => {
         setIsDragging(false);
@@ -97,21 +97,24 @@ export default function CreditCardPreview({
     useEffect(() => {
         const handleMove = (e) => handleDragMove(e);
         const handleEnd = () => handleDragEnd();
+        
+        // THE FIX: Add { passive: false } to the touchmove listener
+        const options = { passive: false };
 
         if (isDragging) {
             window.addEventListener('mousemove', handleMove);
-            window.addEventListener('touchmove', handleMove);
+            window.addEventListener('touchmove', handleMove, options);
             window.addEventListener('mouseup', handleEnd);
             window.addEventListener('touchend', handleEnd);
         }
 
         return () => {
             window.removeEventListener('mousemove', handleMove);
-            window.removeEventListener('touchmove', handleMove);
+            window.removeEventListener('touchmove', handleMove, options);
             window.removeEventListener('mouseup', handleEnd);
             window.removeEventListener('touchend', handleEnd);
         };
-    }, [isDragging, onPositionChange]);
+    }, [isDragging, handleDragMove]); // Dependency array updated
 
     const logoWidth = 35;
     const logoHeight = 20;
@@ -202,7 +205,6 @@ export default function CreditCardPreview({
                         <stop offset="66%" stopColor="#D4AF37" />
                         <stop offset="66.5%" stopColor="#A9A9A9" />
                         <stop offset="68.5%" stopColor="#A9A9A9" />
-                        {/* THE FIX: Corrected typo from D4AF3T to D4AF37 */}
                         <stop offset="69%" stopColor="#D4AF37" />
                     </linearGradient>
                 </defs>
