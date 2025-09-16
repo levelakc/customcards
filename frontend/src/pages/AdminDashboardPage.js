@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import io from 'socket.io-client';
 
-const socket = io(process.env.REACT_APP_BACKEND_URL || 'http://localhost:8000'); // Make sure this matches your backend server address
+const socket = io(process.env.REACT_APP_API_URL || 'http://localhost:8000'); // Make sure this matches your backend server address
 
 export default function AdminDashboardPage() {
     const [onlineUsers, setOnlineUsers] = useState(0);
