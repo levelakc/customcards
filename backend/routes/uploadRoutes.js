@@ -1,19 +1,12 @@
 import path from 'path';
 import express from 'express';
 import multer from 'multer';
+import cloudinary from '../config/cloudinary.js';
 
 const router = express.Router();
 
-// --- Configuration for saving files ---
-const storage = multer.diskStorage({
-    destination(req, file, cb) {
-        cb(null, 'uploads/');
-    },
-    filename(req, file, cb) {
-        // Use the original fieldname (e.g., 'image' or 'video') in the filename
-        cb(null, `${file.fieldname}-${Date.now()}${path.extname(file.originalname)}`);
-    },
-});
+// Use memory storage to get file buffer
+const storage = multer.memoryStorage();
 
 // --- Validation function ONLY for images ---
 function checkImageFileType(file, cb) {
@@ -69,10 +62,10 @@ router.post('/image', uploadImage.single('image'), (req, res) => {
     }
     res.send({
         message: 'Image Uploaded',
-        import express from 'express';
+        import path from 'path';
+import express from 'express';
 import multer from 'multer';
 import cloudinary from '../config/cloudinary.js';
-import path from 'path';
 
 const router = express.Router();
 
@@ -107,6 +100,7 @@ function checkVideoFileType(file, cb) {
     }
 }
 
+// --- Multer instance for handling IMAGE uploads ---
 const uploadImage = multer({
     storage,
     fileFilter: function (req, file, cb) {
@@ -114,12 +108,16 @@ const uploadImage = multer({
     },
 });
 
+// --- Multer instance for handling VIDEO uploads ---
 const uploadVideo = multer({
     storage,
     fileFilter: function (req, file, cb) {
         checkVideoFileType(file, cb);
     },
 });
+
+
+// --- ROUTE DEFINITIONS ---
 
 const uploadToCloudinary = (file, options) => {
     return new Promise((resolve, reject) => {
