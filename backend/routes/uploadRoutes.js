@@ -69,7 +69,7 @@ router.post('/image', uploadImage.single('image'), (req, res) => {
     }
     res.send({
         message: 'Image Uploaded',
-        image: `/${req.file.path.replace(/\\/g, "/")}`, // Standardize path separators
+        image: `/${req.file.path.replace(/\\/g, "/")}` // Standardize path separators
     });
 });
 
@@ -80,7 +80,7 @@ router.post('/video', uploadVideo.single('video'), (req, res) => {
     }
     res.send({
         message: 'Video Uploaded',
-        video: `/${req.file.path.replace(/\\/g, "/")}`, // Standardize path separators
+        video: `/${req.file.path.replace(/\\/g, "/")}` // Standardize path separators
     });
 });
 

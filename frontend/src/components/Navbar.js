@@ -5,8 +5,11 @@ import { useCart } from '../contexts/CartContext';
 import { useSiteSettings } from '../contexts/SiteSettingsContext';
 import * as api from '../api/api';
 import { ShoppingCartIcon, MenuIcon, XIcon } from './Icons';
+import LanguageSwitcher from './LanguageSwitcher';
+import { useTranslation } from 'react-i18next';
 
 export default function Navbar() {
+    const { t } = useTranslation();
     const { navigate } = useRouter();
     const { isAuthenticated, isAdmin, logout, user } = useAuth();
     const { cartItems } = useCart();
@@ -27,7 +30,7 @@ export default function Navbar() {
     }, []);
 
     const navLinks = [
-        { name: 'דף הבית', page: 'home' },
+        { name: t('home'), page: 'home' },
         ...categories.map(c => ({ name: c.name, page: 'category', params: { id: c._id } }))
     ];
     
@@ -72,6 +75,7 @@ export default function Navbar() {
 
                     <div className="flex items-center">
                         <div className="hidden md:flex items-center">
+                            <LanguageSwitcher />
                             {isAuthenticated ? (
                                 <div className="relative group">
                                     <button className="hover:bg-gray-700 hover:bg-opacity-50 px-3 py-2 rounded-md text-sm font-medium">
