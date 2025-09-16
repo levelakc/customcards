@@ -16,6 +16,10 @@ const addOrderItems = async (req, res) => {
             totalPrice,
         });
         const createdOrder = await order.save();
+        
+        // Emit a new order event to all connected clients
+        req.io.emit('newOrder', createdOrder);
+
         res.status(201).json(createdOrder);
     }
 };

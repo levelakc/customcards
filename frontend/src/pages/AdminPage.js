@@ -5,6 +5,7 @@ import { useSiteSettings } from '../contexts/SiteSettingsContext';
 import * as api from '../api/api';
 import AdminOrdersPage from './AdminOrdersPage';
 import AdminUsersPage from './AdminUsersPage';
+import AdminDashboardPage from './AdminDashboardPage';
 import CreditCardPreview from '../components/CreditCardPreview';
 import WalletPreview from '../components/WalletPreview'; // 1. Import WalletPreview
 import { ALL_CARD_COLORS } from '../utils/colorUtils';
@@ -216,7 +217,7 @@ function GallerySettingsPage() {
 export default function AdminPage() {
     const { isAdmin, token } = useAuth();
     const { navigate } = useRouter();
-    const [activeTab, setActiveTab] = useState('products');
+    const [activeTab, setActiveTab] = useState('dashboard');
     
     const [products, setProducts] = useState([]);
     const [categories, setCategories] = useState([]);
@@ -413,6 +414,7 @@ export default function AdminPage() {
       <div className="bg-gray-900 min-h-screen text-white p-4 md:p-8">
         <h1 className="text-4xl font-extrabold mb-8">פאנל ניהול</h1>
         <div className="flex flex-wrap space-x-4 space-x-reverse border-b border-gray-700 mb-8">
+            <button type="button" onClick={() => setActiveTab('dashboard')} className={`py-2 px-4 ${activeTab === 'dashboard' ? 'border-b-2 border-indigo-500' : 'text-gray-400'}`}>Dashboard</button>
             <button type="button" onClick={() => setActiveTab('products')} className={`py-2 px-4 ${activeTab === 'products' ? 'border-b-2 border-indigo-500' : 'text-gray-400'}`}>ניהול מוצרים</button>
             <button type="button" onClick={() => setActiveTab('categories')} className={`py-2 px-4 ${activeTab === 'categories' ? 'border-b-2 border-indigo-500' : 'text-gray-400'}`}>ניהול קטגוריות</button>
             <button type="button" onClick={() => setActiveTab('gallery')} className={`py-2 px-4 ${activeTab === 'gallery' ? 'border-b-2 border-indigo-500' : 'text-gray-400'}`}>גלריית תמונות</button>
@@ -420,6 +422,8 @@ export default function AdminPage() {
             <button type="button" onClick={() => setActiveTab('users')} className={`py-2 px-4 ${activeTab === 'users' ? 'border-b-2 border-indigo-500' : 'text-gray-400'}`}>ניהול משתמשים</button>
             <button type="button" onClick={() => setActiveTab('settings')} className={`py-2 px-4 ${activeTab === 'settings' ? 'border-b-2 border-indigo-500' : 'text-gray-400'}`}>הגדרות אתר</button>
         </div>
+
+        {activeTab === 'dashboard' && <AdminDashboardPage />}
 
         {activeTab === 'products' && (
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
