@@ -5,7 +5,6 @@ import { CartProvider, useCart } from './contexts/CartContext';
 import { SiteSettingsProvider } from './contexts/SiteSettingsContext';
 import ReactGA from 'react-ga4';
 import ReactPixel from 'react-facebook-pixel';
-import ReactTiktok from 'react-tiktok-pixel';
 
 import Navbar from './components/Navbar';
 import Footer from './components/Footer';
@@ -27,11 +26,9 @@ import CheckoutPage from './pages/CheckoutPage';
 
 const GOOGLE_ANALYTICS_ID = 'YOUR_GOOGLE_ANALYTICS_ID'; // Replace with your Google Analytics ID
 const FACEBOOK_PIXEL_ID = 'YOUR_FACEBOOK_PIXEL_ID'; // Replace with your Facebook Pixel ID
-const TIKTOK_PIXEL_ID = 'YOUR_TIKTOK_PIXEL_ID'; // Replace with your TikTok Pixel ID
 
 ReactGA.initialize(GOOGLE_ANALYTICS_ID);
 ReactPixel.init(FACEBOOK_PIXEL_ID);
-ReactTiktok.init(TIKTOK_PIXEL_ID);
 
 function AppContent() {
     const { route } = useRouter();
@@ -40,7 +37,6 @@ function AppContent() {
     useEffect(() => {
         ReactGA.send({ hitType: "pageview", page: window.location.pathname + window.location.search });
         ReactPixel.pageView();
-        ReactTiktok.pageView();
     }, [route]);
 
 
