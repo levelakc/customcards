@@ -4,6 +4,8 @@ import express from 'express';
 import dotenv from 'dotenv';
 import cors from 'cors';
 import connectDB from './config/db.js';
+import http from 'http';
+import { Server } from 'socket.io';
 
 // Route imports
 import userRoutes from './routes/userRoutes.js';
@@ -14,15 +16,44 @@ import uploadRoutes from './routes/uploadRoutes.js';
 import reviewRoutes from './routes/reviewRoutes.js';
 import siteSettingsRoutes from './routes/siteSettingsRoutes.js';
 import paymentRoutes from './routes/paymentRoutes.js';
-import galleryRoutes from './routes/galleryRoutes.js'; // <- ADD THIS LINE
+import galleryRoutes from './routes/galleryRoutes.js';
+import adminRoutes from './routes/adminRoutes.js';
 
 // Initial setup
 dotenv.config();
 connectDB();
 const app = express();
-// app.use(cors()); // Removed: use only the configured CORS below
-app.use(express.json());
+const server = http.createServer(app);
+const io = new Server(server, {
+  cors: {
+    origin: [
+      'https://customcards-app.onrender.com', // Production frontend
+      'http://localhost:3000' // Local frontend for development
+    ],
+    methods: ['GET', 'POST']
+  }
+});
 
+let onlineUsers = 0;
+
+io.on('connection', (socket) => {
+  onlineUsers++;
+  io.emit('onlineUsers', onlineUsers);
+  console.log('a user connected');
+
+  socket.on('disconnect', () => {
+    onlineUsers--;
+    io.emit('onlineUsers', onlineUsers);
+    console.log('user disconnected');
+  });
+});
+
+app.use((req, res, next) => {
+  req.io = io;
+  next();
+});
+
+app.use(express.json());
 
 const corsOptions = {
   origin: [
@@ -31,8 +62,7 @@ const corsOptions = {
   ]
 };
 
-app.use(cors(corsOptions)); // Use the cors middleware
-
+app.use(cors(corsOptions));
 
 // Base route
 app.get('/', (req, res) => res.send('API is running...'));
@@ -46,15 +76,13 @@ app.use('/api/upload', uploadRoutes);
 app.use('/api/reviews', reviewRoutes);
 app.use('/api/settings', siteSettingsRoutes);
 app.use('/api/config', paymentRoutes);
-app.use('/api/gallery', galleryRoutes); // <- ADD THIS LINE
+app.use('/api/gallery', galleryRoutes);
+app.use('/api/admin', adminRoutes);
 
-// This correctly determines the path to the current directory in ES Modules
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-// This tells Express to serve the 'uploads' folder as a static directory, making images accessible
 app.use('/uploads', express.static(path.join(__dirname, '/uploads')));
 
-// Server port setup
-const PORT = process.env.PORT || 8000; // Changed from 5000 to 8000 to match your setup
-app.listen(PORT, console.log(`Server running on port ${PORT}`));
+const PORT = process.env.PORT || 8000;
+server.listen(PORT, console.log(`Server running on port ${PORT}`));
