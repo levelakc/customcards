@@ -102,7 +102,7 @@ export default function HomePage() {
                             transform: `scale(${1 + scrollPosition / 2000})`,
                             opacity: videoOpacity
                         }}
-                        src={`${api.BASE_URL}${backgroundVideoUrl}`}
+                        src={backgroundVideoUrl.startsWith('http') ? backgroundVideoUrl : `${api.BASE_URL}${backgroundVideoUrl}`}
                     ></video>
                 )}
                 <div className="absolute inset-0 bg-black bg-opacity-60"></div>
