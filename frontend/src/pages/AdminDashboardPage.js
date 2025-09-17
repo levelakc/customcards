@@ -297,12 +297,12 @@ export default function AdminDashboardPage() {
         },
     };
 
-    if (loading) return <div className="text-center p-10 text-white bg-gray-900 min-h-screen">Loading Dashboard...</div>;
+    if (loading) return <div className="text-center p-10 text-white bg-gray-900 min-h-screen">טוען לוח מחוונים...</div>;
     if (error) return <div className="text-center p-10 text-red-400 bg-gray-900 min-h-screen">Error: {error}</div>;
 
     return (
         <div className="p-4 md:p-8 bg-gray-900 text-white min-h-screen">
-            <h2 className="text-3xl font-extrabold mb-6">Dashboard Overview</h2>
+            <h2 className="text-3xl font-extrabold mb-6">סקירת לוח מחוונים</h2>
 
             {/* Summary Cards */}
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
