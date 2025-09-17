@@ -302,3 +302,13 @@ export const updateGalleryImages = async (imageData, token) => {
     if (!response.ok) throw new Error('Could not update gallery images');
     return await response.json();
 };
+
+// --- ADMIN: Dashboard ---
+export const getAdminDashboardStats = async (token) => {
+    const response = await fetch(`${BASE_URL}/api/admin/dashboard/stats`, {
+        headers: getAuthHeaders(token),
+    });
+    const data = await response.json();
+    if (!response.ok) throw new Error(data.message || 'Could not fetch dashboard stats');
+    return data;
+};

@@ -1,14 +1,38 @@
 import React, { useState, useEffect } from 'react';
 import io from 'socket.io-client';
+import { useAuth } from '../contexts/AuthContext';
+import * as api from '../api/api';
 
 const socket = io(process.env.REACT_APP_API_URL || 'http://localhost:8000'); // Make sure this matches your backend server address
 
 export default function AdminDashboardPage() {
+    const { token } = useAuth();
     const [onlineUsers, setOnlineUsers] = useState(0);
     const [recentOrders, setRecentOrders] = useState([]);
     const [todaysStats, setTodaysStats] = useState({ orders: 0, revenue: 0 });
+    const [loadingStats, setLoadingStats] = useState(true);
+    const [errorStats, setErrorStats] = useState(null);
 
     useEffect(() => {
+        const fetchInitialStats = async () => {
+            if (!token) return; // Don't fetch if not authenticated
+            try {
+                setLoadingStats(true);
+                const data = await api.getAdminDashboardStats(token);
+                setTodaysStats({
+                    orders: data.totalOrdersToday,
+                    revenue: data.totalRevenueToday,
+                });
+            } catch (err) {
+                console.error("Failed to fetch initial dashboard stats:", err);
+                setErrorStats(err.message);
+            } finally {
+                setLoadingStats(false);
+            }
+        };
+
+        fetchInitialStats();
+
         // Listen for online users count
         socket.on('onlineUsers', (count) => {
             setOnlineUsers(count);
@@ -28,7 +52,7 @@ export default function AdminDashboardPage() {
             socket.off('onlineUsers');
             socket.off('newOrder');
         };
-    }, []);
+    }, [token]); // Re-run effect if token changes
 
     return (
         <div>
@@ -40,11 +64,23 @@ export default function AdminDashboardPage() {
                 </div>
                 <div className="bg-gray-800 p-4 rounded-lg">
                     <h3 className="text-lg font-semibold">Today's Orders</h3>
-                    <p className="text-3xl font-bold">{todaysStats.orders}</p>
+                    {loadingStats ? (
+                        <p className="text-xl">Loading...</p>
+                    ) : errorStats ? (
+                        <p className="text-red-400">Error: {errorStats}</p>
+                    ) : (
+                        <p className="text-3xl font-bold">{todaysStats.orders}</p>
+                    )}
                 </div>
                 <div className="bg-gray-800 p-4 rounded-lg">
                     <h3 className="text-lg font-semibold">Today's Revenue</h3>
-                    <p className="text-3xl font-bold">₪{todaysStats.revenue.toFixed(2)}</p>
+                    {loadingStats ? (
+                        <p className="text-xl">Loading...</p>
+                    ) : errorStats ? (
+                        <p className="text-red-400">Error: {errorStats}</p>
+                    ) : (
+                        <p className="text-3xl font-bold">₪{todaysStats.revenue.toFixed(2)}</p>
+                    )}
                 </div>
             </div>
 
