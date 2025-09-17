@@ -312,3 +312,21 @@ export const getAdminDashboardStats = async (token) => {
     if (!response.ok) throw new Error(data.message || 'Could not fetch dashboard stats');
     return data;
 };
+
+export const getAdminDashboardSummary = async (token) => {
+    const response = await fetch(`${BASE_URL}/api/admin/dashboard/summary`, {
+        headers: getAuthHeaders(token),
+    });
+    const data = await response.json();
+    if (!response.ok) throw new Error(data.message || 'Could not fetch dashboard summary');
+    return data;
+};
+
+export const getAdminSalesTrend = async (token) => {
+    const response = await fetch(`${BASE_URL}/api/admin/dashboard/sales-trend`, {
+        headers: getAuthHeaders(token),
+    });
+    const data = await response.json();
+    if (!response.ok) throw new Error(data.message || 'Could not fetch sales trend data');
+    return data;
+};

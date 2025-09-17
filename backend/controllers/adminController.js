@@ -1,5 +1,6 @@
 import asyncHandler from 'express-async-handler';
 import Order from '../models/orderModel.js';
+import User from '../models/userModel.js';
 
 // @desc    Get dashboard statistics for admin
 // @route   GET /api/admin/dashboard/stats
@@ -27,4 +28,121 @@ const getDashboardStats = asyncHandler(async (req, res) => {
     });
 });
 
-export { getDashboardStats };
+// @desc    Get comprehensive dashboard summary for admin
+// @route   GET /api/admin/dashboard/summary
+// @access  Private/Admin
+const getDashboardSummary = asyncHandler(async (req, res) => {
+    const now = new Date();
+
+    // Today's Stats
+    const startOfToday = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+    const endOfToday = new Date(now.getFullYear(), now.getMonth(), now.getDate() + 1);
+
+    const ordersToday = await Order.find({
+        createdAt: { $gte: startOfToday, $lt: endOfToday },
+    });
+    const totalOrdersToday = ordersToday.length;
+    const totalRevenueToday = ordersToday.reduce((acc, order) => acc + order.totalPrice, 0);
+
+    // Last 7 Days Stats
+    const startOfLast7Days = new Date(now.getFullYear(), now.getMonth(), now.getDate() - 6);
+    startOfLast7Days.setHours(0, 0, 0, 0);
+    const ordersLast7Days = await Order.find({
+        createdAt: { $gte: startOfLast7Days, $lt: endOfToday },
+    });
+    const totalOrdersLast7Days = ordersLast7Days.length;
+    const totalRevenueLast7Days = ordersLast7Days.reduce((acc, order) => acc + order.totalPrice, 0);
+
+    // Last 30 Days Stats
+    const startOfLast30Days = new Date(now.getFullYear(), now.getMonth(), now.getDate() - 29);
+    startOfLast30Days.setHours(0, 0, 0, 0);
+    const ordersLast30Days = await Order.find({
+        createdAt: { $gte: startOfLast30Days, $lt: endOfToday },
+    });
+    const totalOrdersLast30Days = ordersLast30Days.length;
+    const totalRevenueLast30Days = ordersLast30Days.reduce((acc, order) => acc + order.totalPrice, 0);
+
+    // All Time Stats
+    const allOrders = await Order.find({});
+    const totalOrdersAllTime = allOrders.length;
+    const totalRevenueAllTime = allOrders.reduce((acc, order) => acc + order.totalPrice, 0);
+
+    // Average Order Value
+    const averageOrderValue = totalOrdersAllTime > 0 ? totalRevenueAllTime / totalOrdersAllTime : 0;
+
+    // Customer Stats
+    const totalCustomers = await User.countDocuments({});
+    const newCustomersToday = await User.countDocuments({
+        createdAt: { $gte: startOfToday, $lt: endOfToday },
+    });
+
+    res.json({
+        totalOrdersToday,
+        totalRevenueToday,
+        totalOrdersLast7Days,
+        totalRevenueLast7Days,
+        totalOrdersLast30Days,
+        totalRevenueLast30Days,
+        totalOrdersAllTime,
+        totalRevenueAllTime,
+        averageOrderValue,
+        totalCustomers,
+        newCustomersToday,
+    });
+});
+
+// @desc    Get sales trend data for admin dashboard
+// @route   GET /api/admin/dashboard/sales-trend
+// @access  Private/Admin
+const getSalesTrend = asyncHandler(async (req, res) => {
+    const now = new Date();
+    const thirtyDaysAgo = new Date(now.getFullYear(), now.getMonth(), now.getDate() - 29);
+    thirtyDaysAgo.setHours(0, 0, 0, 0);
+
+    const salesData = await Order.aggregate([
+        {
+            $match: {
+                createdAt: { $gte: thirtyDaysAgo },
+            },
+        },
+        {
+            $group: {
+                _id: {
+                    year: { $year: '$createdAt' },
+                    month: { $month: '$createdAt' },
+                    day: { $dayOfMonth: '$createdAt' },
+                },
+                totalRevenue: { $sum: '$totalPrice' },
+                countOrders: { $sum: 1 },
+            },
+        },
+        {
+            $sort: {
+                '_id.year': 1,
+                '_id.month': 1,
+                '_id.day': 1,
+            },
+        },
+    ]);
+
+    // Fill in missing dates with 0 revenue/orders
+    const trendData = {};
+    for (let i = 0; i < 30; i++) {
+        const date = new Date(thirtyDaysAgo);
+        date.setDate(thirtyDaysAgo.getDate() + i);
+        const dateString = `${date.getFullYear()}-${date.getMonth() + 1}-${date.getDate()}`;
+        trendData[dateString] = { date: dateString, totalRevenue: 0, countOrders: 0 };
+    }
+
+    salesData.forEach(data => {
+        const dateString = `${data._id.year}-${data._id.month}-${data._id.day}`;
+        if (trendData[dateString]) {
+            trendData[dateString].totalRevenue = data.totalRevenue;
+            trendData[dateString].countOrders = data.countOrders;
+        }
+    });
+
+    res.json(Object.values(trendData));
+});
+
+export { getDashboardStats, getDashboardSummary, getSalesTrend };
