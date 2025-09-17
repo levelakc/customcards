@@ -191,7 +191,19 @@ const getSalesByCategory = asyncHandler(async (req, res) => {
             },
         },
         { $sort: { totalRevenue: -1 } },
-        { $project: { category: '$_id', totalRevenue: 1, totalSold: 1, _id: 0 } },
+        {
+            $addFields: {
+                categoryName: "$_id"
+            }
+        },
+        {
+            $project: {
+                _id: 0,
+                category: "$categoryName",
+                totalRevenue: 1,
+                totalSold: 1,
+            },
+        },
     ]);
 
     res.json(salesByCategory);
