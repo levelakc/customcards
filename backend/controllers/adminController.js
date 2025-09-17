@@ -2,6 +2,7 @@ import asyncHandler from 'express-async-handler';
 import Order from '../models/orderModel.js';
 import User from '../models/userModel.js';
 import Product from '../models/productModel.js';
+import mongoose from 'mongoose';
 
 // @desc    Get dashboard statistics for admin
 // @route   GET /api/admin/dashboard/stats
@@ -152,8 +153,11 @@ const getSalesTrend = asyncHandler(async (req, res) => {
 const getTopSellingProducts = asyncHandler(async (req, res) => {
     const topProducts = await Order.aggregate([
         { $unwind: '$orderItems' },
-        { $lookup: { from: 'products', localField: '$orderItems.product', foreignField: '_id', as: 'productDetails' } },
-        { $unwind: { path: '$productDetails', preserveNullAndEmptyArrays: false } }, // Only unwind if productDetails exists
+        // Ensure product ID is a valid ObjectId before lookup
+        { $match: { 'orderItems.product': { $type: 'objectId' } } },
+        { $lookup: { from: 'products', localField: 'orderItems.product', foreignField: '_id', as: 'productDetails' } },
+        { $match: { 'productDetails': { $ne: [] } } }, // Only proceed if productDetails is not empty
+        { $unwind: '$productDetails' },
         { $group: { _id: '$orderItems.product', name: { $first: '$productDetails.name' }, image: { $first: '$productDetails.image' }, totalRevenue: { $sum: { $multiply: ['$orderItems.qty', '$orderItems.price'] } }, totalSold: { $sum: '$orderItems.qty' } } },
         { $sort: { totalRevenue: -1 } },
         { $limit: 5 }, // Top 5 products
@@ -169,10 +173,16 @@ const getTopSellingProducts = asyncHandler(async (req, res) => {
 const getSalesByCategory = asyncHandler(async (req, res) => {
     const salesByCategory = await Order.aggregate([
         { $unwind: '$orderItems' },
+        // Ensure product ID is a valid ObjectId before lookup
+        { $match: { 'orderItems.product': { $type: 'objectId' } } },
         { $lookup: { from: 'products', localField: '$orderItems.product', foreignField: '_id', as: 'productDetails' } },
-        { $unwind: { path: '$productDetails', preserveNullAndEmptyArrays: false } }, // Only unwind if productDetails exists
+        { $match: { 'productDetails': { $ne: [] } } }, // Only proceed if productDetails is not empty
+        { $unwind: '$productDetails' },
+        // Ensure category ID is a valid ObjectId before lookup
+        { $match: { 'productDetails.category': { $type: 'objectId' } } },
         { $lookup: { from: 'categories', localField: '$productDetails.category', foreignField: '_id', as: 'categoryDetails' } },
-        { $unwind: { path: '$categoryDetails', preserveNullAndEmptyArrays: false } }, // Only unwind if categoryDetails exists
+        { $match: { 'categoryDetails': { $ne: [] } } }, // Only proceed if categoryDetails is not empty
+        { $unwind: '$categoryDetails' },
         { $group: { _id: '$categoryDetails.name', totalRevenue: { $sum: { $multiply: ['$orderItems.qty', '$orderItems.price'] } } } },
         { $sort: { totalRevenue: -1 } },
         { $project: { _id: 0, category: '$_id', totalRevenue: 1 } },
