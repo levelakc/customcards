@@ -276,9 +276,9 @@ export default function AdminPage() {
     
     const handleProductInputChange = (e) => {
         const { name, value, type, checked } = e.target;
-        setProductForm(prev => ({ 
-            ...prev, 
-            [name]: type === 'checkbox' ? checked : value 
+        setProductForm(prev => ({
+            ...prev,
+            [name]: type === 'checkbox' ? checked : value
         }));
     };
 
@@ -361,7 +361,8 @@ export default function AdminPage() {
         try {
             if (isEditing) {
                 await api.updateProduct(editingId, productData, token);
-            } else {
+            }
+            else {
                 await api.addProduct(productData, token);
             }
             resetProductForm();
