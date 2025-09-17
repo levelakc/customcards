@@ -152,12 +152,12 @@ const getSalesTrend = asyncHandler(async (req, res) => {
 const getTopSellingProducts = asyncHandler(async (req, res) => {
     const topProducts = await Order.aggregate([
         { $unwind: '$orderItems' },
-        { $group: { _id: '$orderItems.product', totalRevenue: { $sum: { $multiply: ['$orderItems.qty', '$orderItems.price'] } }, totalSold: { $sum: '$orderItems.qty' } } },
+        { $lookup: { from: 'products', localField: '$orderItems.product', foreignField: '_id', as: 'productDetails' } },
+        { $unwind: { path: '$productDetails', preserveNullAndEmptyArrays: false } }, // Only unwind if productDetails exists
+        { $group: { _id: '$orderItems.product', name: { $first: '$productDetails.name' }, image: { $first: '$productDetails.image' }, totalRevenue: { $sum: { $multiply: ['$orderItems.qty', '$orderItems.price'] } }, totalSold: { $sum: '$orderItems.qty' } } },
         { $sort: { totalRevenue: -1 } },
         { $limit: 5 }, // Top 5 products
-        { $lookup: { from: 'products', localField: '_id', foreignField: '_id', as: 'productDetails' } },
-        { $unwind: '$productDetails' },
-        { $project: { _id: 0, name: '$productDetails.name', image: '$productDetails.image', totalRevenue: 1, totalSold: 1 } },
+        { $project: { _id: 0, name: 1, image: 1, totalRevenue: 1, totalSold: 1 } },
     ]);
 
     res.json(topProducts);
@@ -170,9 +170,9 @@ const getSalesByCategory = asyncHandler(async (req, res) => {
     const salesByCategory = await Order.aggregate([
         { $unwind: '$orderItems' },
         { $lookup: { from: 'products', localField: '$orderItems.product', foreignField: '_id', as: 'productDetails' } },
-        { $unwind: '$productDetails' },
+        { $unwind: { path: '$productDetails', preserveNullAndEmptyArrays: false } }, // Only unwind if productDetails exists
         { $lookup: { from: 'categories', localField: '$productDetails.category', foreignField: '_id', as: 'categoryDetails' } },
-        { $unwind: '$categoryDetails' },
+        { $unwind: { path: '$categoryDetails', preserveNullAndEmptyArrays: false } }, // Only unwind if categoryDetails exists
         { $group: { _id: '$categoryDetails.name', totalRevenue: { $sum: { $multiply: ['$orderItems.qty', '$orderItems.price'] } } } },
         { $sort: { totalRevenue: -1 } },
         { $project: { _id: 0, category: '$_id', totalRevenue: 1 } },
