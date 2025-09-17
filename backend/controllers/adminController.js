@@ -184,9 +184,8 @@ const getSalesByCategory = asyncHandler(async (req, res) => {
         { $match: { 'categoryDetails': { $ne: [] } } }, // Only proceed if categoryDetails is not empty
         { $unwind: '$categoryDetails' },
         { $group: { _id: '$categoryDetails.name', totalRevenue: { $sum: { $multiply: ['$orderItems.qty', '$orderItems.price'] } } } },
-        { $addFields: { category: '$_id' } }, // Add a new field 'category' with the value of '_id'
-        { $project: { _id: 0, category: 1, totalRevenue: 1 } }, // Exclude original _id, keep new category and totalRevenue
         { $sort: { totalRevenue: -1 } },
+        { $set: { category: '$_id', _id: '$REMOVE' } }, // Rename _id to category and remove original _id
     ]);
 
     res.json(salesByCategory);
