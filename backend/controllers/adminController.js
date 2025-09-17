@@ -154,145 +154,29 @@ const getTopSellingProducts = asyncHandler(async (req, res) => {
             $addFields: {
                 sanitizedProductName: {
                     $cond: {
-                        if: { $regexMatch: { input: '$productDetails.name', regex: '^\\
-        { $sort: { totalRevenue: -1 } },
-        { $limit: 5 }, // Top 5 products
-        { $project: { _id: 0, name: 1, image: 1, totalRevenue: 1, totalSold: 1 } },
-    ]);
-
-    res.json(topProducts);
-});
-
-// @desc    Get sales by category for admin dashboard
-// @route   GET /api/admin/dashboard/sales-by-category
-// @access  Private/Admin
-const getSalesByCategory = asyncHandler(async (req, res) => {
-    const salesByCategory = await Order.aggregate([
-        { $unwind: '$orderItems' },
-        // Ensure product ID is a valid ObjectId before lookup
-        { $match: { 'orderItems.product': { $type: 'objectId' } } },
-        { $lookup: { from: 'products', localField: '$orderItems.product', foreignField: '_id', as: 'productDetails' } },
-        { $match: { 'productDetails': { $ne: [] } } }, // Only proceed if productDetails is not empty
-        { $unwind: '$productDetails' },
-        // Ensure category ID is a valid ObjectId before lookup
-        { $match: { 'productDetails.category': { $type: 'objectId' } } },
-        { $lookup: { from: 'categories', localField: '$productDetails.category', foreignField: '_id', as: 'categoryDetails' } },
-        { $match: { 'categoryDetails': { $ne: [] } } }, // Only proceed if categoryDetails is not empty
-        { $unwind: '$categoryDetails' },
-        {
-            $addFields: {
-                sanitizedCategoryName: {
-                    $cond: {
-                        if: { $regexMatch: { input: '$categoryDetails.name', regex: '^\\$' } }, // Corrected regex
-                        then: { $substrCP: ['$categoryDetails.name', 1, { $strLenCP: '$categoryDetails.name' }] },
-                        else: '$categoryDetails.name'
-                    }
-                }
-            }
-        },
-        {
-            $group: {
-                _id: { $ifNull: ['$sanitizedCategoryName', 'Unknown Category'] }, // Use the sanitized name
-                totalRevenue: { $sum: { $multiply: ['$orderItems.qty', '$orderItems.price'] } },
-                totalSold: { $sum: '$orderItems.qty' },
-            },
-        },
-        { $sort: { totalRevenue: -1 } },
-        {
-            $addFields: {
-                categoryName: "$_id"
-            }
-        },
-        {
-            $project: {
-                _id: 0,
-                category: { $getField: "$categoryName" },
-                totalRevenue: 1,
-                totalSold: 1,
-            },
-        },
-    ]);
-
-    res.json(salesByCategory);
-});
-
-export { getDashboardStats, getDashboardSummary, getSalesTrend, getTopSellingProducts, getSalesByCategory }; } },
+                        if: { $regexMatch: { input: '$productDetails.name', regex: '^\$' } },
                         then: { $substrCP: ['$productDetails.name', 1, { $strLenCP: '$productDetails.name' }] },
                         else: '$productDetails.name'
                     }
                 },
                 sanitizedProductImage: {
                     $cond: {
-                        if: { $regexMatch: { input: '$productDetails.image', regex: '^\\
-        { $sort: { totalRevenue: -1 } },
-        { $limit: 5 }, // Top 5 products
-        { $project: { _id: 0, name: 1, image: 1, totalRevenue: 1, totalSold: 1 } },
-    ]);
-
-    res.json(topProducts);
-});
-
-// @desc    Get sales by category for admin dashboard
-// @route   GET /api/admin/dashboard/sales-by-category
-// @access  Private/Admin
-const getSalesByCategory = asyncHandler(async (req, res) => {
-    const salesByCategory = await Order.aggregate([
-        { $unwind: '$orderItems' },
-        // Ensure product ID is a valid ObjectId before lookup
-        { $match: { 'orderItems.product': { $type: 'objectId' } } },
-        { $lookup: { from: 'products', localField: '$orderItems.product', foreignField: '_id', as: 'productDetails' } },
-        { $match: { 'productDetails': { $ne: [] } } }, // Only proceed if productDetails is not empty
-        { $unwind: '$productDetails' },
-        // Ensure category ID is a valid ObjectId before lookup
-        { $match: { 'productDetails.category': { $type: 'objectId' } } },
-        { $lookup: { from: 'categories', localField: '$productDetails.category', foreignField: '_id', as: 'categoryDetails' } },
-        { $match: { 'categoryDetails': { $ne: [] } } }, // Only proceed if categoryDetails is not empty
-        { $unwind: '$categoryDetails' },
-        {
-            $addFields: {
-                sanitizedCategoryName: {
-                    $cond: {
-                        if: { $regexMatch: { input: '$categoryDetails.name', regex: '^\\$' } }, // Corrected regex
-                        then: { $substrCP: ['$categoryDetails.name', 1, { $strLenCP: '$categoryDetails.name' }] },
-                        else: '$categoryDetails.name'
-                    }
-                }
-            }
-        },
-        {
-            $group: {
-                _id: { $ifNull: ['$sanitizedCategoryName', 'Unknown Category'] }, // Use the sanitized name
-                totalRevenue: { $sum: { $multiply: ['$orderItems.qty', '$orderItems.price'] } },
-                totalSold: { $sum: '$orderItems.qty' },
-            },
-        },
-        { $sort: { totalRevenue: -1 } },
-        {
-            $addFields: {
-                categoryName: "$_id"
-            }
-        },
-        {
-            $project: {
-                _id: 0,
-                category: { $getField: "$categoryName" },
-                totalRevenue: 1,
-                totalSold: 1,
-            },
-        },
-    ]);
-
-    res.json(salesByCategory);
-});
-
-export { getDashboardStats, getDashboardSummary, getSalesTrend, getTopSellingProducts, getSalesByCategory }; } },
+                        if: { $regexMatch: { input: '$productDetails.image', regex: '^\$' } },
                         then: { $substrCP: ['$productDetails.image', 1, { $strLenCP: '$productDetails.image' }] },
                         else: '$productDetails.image'
                     }
                 }
             }
         },
-        { $group: { _id: '$orderItems.product', name: { $first: '$sanitizedProductName' }, image: { $first: '$sanitizedProductImage' }, totalRevenue: { $sum: { $multiply: ['$orderItems.qty', '$orderItems.price'] } }, totalSold: { $sum: '$orderItems.qty' } } }
+        {
+            $group: {
+                _id: '$orderItems.product',
+                name: { $first: '$sanitizedProductName' },
+                image: { $first: '$sanitizedProductImage' },
+                totalRevenue: { $sum: { $multiply: ['$orderItems.qty', '$orderItems.price'] } },
+                totalSold: { $sum: '$orderItems.qty' }
+            }
+        },
         { $sort: { totalRevenue: -1 } },
         { $limit: 5 }, // Top 5 products
         { $project: { _id: 0, name: 1, image: 1, totalRevenue: 1, totalSold: 1 } },
@@ -321,7 +205,7 @@ const getSalesByCategory = asyncHandler(async (req, res) => {
             $addFields: {
                 sanitizedCategoryName: {
                     $cond: {
-                        if: { $regexMatch: { input: '$categoryDetails.name', regex: '^\\$' } }, // Corrected regex
+                        if: { $regexMatch: { input: '$categoryDetails.name', regex: '^\$' } }, // Corrected regex
                         then: { $substrCP: ['$categoryDetails.name', 1, { $strLenCP: '$categoryDetails.name' }] },
                         else: '$categoryDetails.name'
                     }
