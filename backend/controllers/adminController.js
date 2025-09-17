@@ -199,7 +199,7 @@ const getSalesByCategory = asyncHandler(async (req, res) => {
         {
             $project: {
                 _id: 0,
-                category: "$categoryName",
+                category: { $getField: "$categoryName" },
                 totalRevenue: 1,
                 totalSold: 1,
             },
