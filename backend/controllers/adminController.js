@@ -185,7 +185,7 @@ const getSalesByCategory = asyncHandler(async (req, res) => {
         { $unwind: '$categoryDetails' },
         {
             $group: {
-                _id: '$categoryDetails.name',
+                _id: { $ifNull: ['$categoryDetails.name', 'Unknown Category'] },
                 totalRevenue: { $sum: { $multiply: ['$orderItems.qty', '$orderItems.price'] } },
                 totalSold: { $sum: '$orderItems.qty' },
             },
