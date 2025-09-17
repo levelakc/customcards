@@ -22,7 +22,8 @@ const productSchema = mongoose.Schema({
         scale: { type: Number, default: 1 },
         rotation: { type: Number, default: 0 }
     },
-    isUpsellProduct: { type: Boolean, default: false }
+    isUpsellProduct: { type: Boolean, default: false },
+    
 }, { timestamps: true });
 
 const Product = mongoose.model('Product', productSchema);
