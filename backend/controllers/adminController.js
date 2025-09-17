@@ -40,27 +40,21 @@ const getDashboardSummary = asyncHandler(async (req, res) => {
     const startOfToday = new Date(now.getFullYear(), now.getMonth(), now.getDate());
     const endOfToday = new Date(now.getFullYear(), now.getMonth(), now.getDate() + 1);
 
-    const ordersToday = await Order.find({
-        createdAt: { $gte: startOfToday, $lt: endOfToday },
-    });
+    const ordersToday = await Order.find({ createdAt: { $gte: startOfToday, $lt: endOfToday } });
     const totalOrdersToday = ordersToday.length;
     const totalRevenueToday = ordersToday.reduce((acc, order) => acc + order.totalPrice, 0);
 
     // Last 7 Days Stats
     const startOfLast7Days = new Date(now.getFullYear(), now.getMonth(), now.getDate() - 6);
     startOfLast7Days.setHours(0, 0, 0, 0);
-    const ordersLast7Days = await Order.find({
-        createdAt: { $gte: startOfLast7Days, $lt: endOfToday },
-    });
+    const ordersLast7Days = await Order.find({ createdAt: { $gte: startOfLast7Days, $lt: endOfToday } });
     const totalOrdersLast7Days = ordersLast7Days.length;
     const totalRevenueLast7Days = ordersLast7Days.reduce((acc, order) => acc + order.totalPrice, 0);
 
     // Last 30 Days Stats
     const startOfLast30Days = new Date(now.getFullYear(), now.getMonth(), now.getDate() - 29);
     startOfLast30Days.setHours(0, 0, 0, 0);
-    const ordersLast30Days = await Order.find({
-        createdAt: { $gte: startOfLast30Days, $lt: endOfToday },
-    });
+    const ordersLast30Days = await Order.find({ createdAt: { $gte: startOfLast30Days, $lt: endOfToday } });
     const totalOrdersLast30Days = ordersLast30Days.length;
     const totalRevenueLast30Days = ordersLast30Days.reduce((acc, order) => acc + order.totalPrice, 0);
 
@@ -74,9 +68,7 @@ const getDashboardSummary = asyncHandler(async (req, res) => {
 
     // Customer Stats
     const totalCustomers = await User.countDocuments({});
-    const newCustomersToday = await User.countDocuments({
-        createdAt: { $gte: startOfToday, $lt: endOfToday },
-    });
+    const newCustomersToday = await User.countDocuments({ createdAt: { $gte: startOfToday, $lt: endOfToday } });
 
     res.json({
         totalOrdersToday,
@@ -155,7 +147,7 @@ const getTopSellingProducts = asyncHandler(async (req, res) => {
         { $unwind: '$orderItems' },
         // Ensure product ID is a valid ObjectId before lookup
         { $match: { 'orderItems.product': { $type: 'objectId' } } },
-        { $lookup: { from: 'products', localField: 'orderItems.product', foreignField: '_id', as: 'productDetails' } },
+        { $lookup: { from: 'products', localField: '$orderItems.product', foreignField: '_id', as: 'productDetails' } },
         { $match: { 'productDetails': { $ne: [] } } }, // Only proceed if productDetails is not empty
         { $unwind: '$productDetails' },
         { $group: { _id: '$orderItems.product', name: { $first: '$productDetails.name' }, image: { $first: '$productDetails.image' }, totalRevenue: { $sum: { $multiply: ['$orderItems.qty', '$orderItems.price'] } }, totalSold: { $sum: '$orderItems.qty' } } },
