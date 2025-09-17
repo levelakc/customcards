@@ -202,33 +202,23 @@ const getSalesByCategory = asyncHandler(async (req, res) => {
         { $match: { 'categoryDetails': { $ne: [] } } }, // Only proceed if categoryDetails is not empty
         { $unwind: '$categoryDetails' },
         {
-            $addFields: {
-                sanitizedCategoryName: {
+            $group: {
+                _id: {
                     $cond: {
-                        if: { $regexMatch: { input: '$categoryDetails.name', regex: '^\$' } }, // Corrected regex
+                        if: { $regexMatch: { input: '$categoryDetails.name', regex: '^\$' } },
                         then: { $substrCP: ['$categoryDetails.name', 1, { $strLenCP: '$categoryDetails.name' }] },
                         else: '$categoryDetails.name'
                     }
-                }
-            }
-        },
-        {
-            $group: {
-                _id: { $ifNull: ['$sanitizedCategoryName', 'Unknown Category'] }, // Use the sanitized name
+                },
                 totalRevenue: { $sum: { $multiply: ['$orderItems.qty', '$orderItems.price'] } },
                 totalSold: { $sum: '$orderItems.qty' },
             },
         },
         { $sort: { totalRevenue: -1 } },
         {
-            $addFields: {
-                categoryName: "$_id"
-            }
-        },
-        {
             $project: {
                 _id: 0,
-                category: { $getField: "$categoryName" },
+                category: "$_id", // Directly use _id from group stage
                 totalRevenue: 1,
                 totalSold: 1,
             },
