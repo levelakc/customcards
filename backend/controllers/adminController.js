@@ -187,27 +187,7 @@ const getSalesByCategory = asyncHandler(async (req, res) => {
             $addFields: {
                 sanitizedCategoryName: {
                     $cond: {
-                        if: { $regexMatch: { input: '$categoryDetails.name', regex: '^\\
-        { $sort: { totalRevenue: -1 } },
-        {
-            $addFields: {
-                categoryName: "$_id"
-            }
-        },
-        {
-            $project: {
-                _id: 0,
-                category: { $getField: "$categoryName" },
-                totalRevenue: 1,
-                totalSold: 1,
-            },
-        },
-    ]);
-
-    res.json(salesByCategory);
-});
-
-export { getDashboardStats, getDashboardSummary, getSalesTrend, getTopSellingProducts, getSalesByCategory }; } },
+                        if: { $regexMatch: { input: '$categoryDetails.name', regex: '^\\$' } }, // Corrected regex
                         then: { $substrCP: ['$categoryDetails.name', 1, { $strLenCP: '$categoryDetails.name' }] },
                         else: '$categoryDetails.name'
                     }
