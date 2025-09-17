@@ -183,22 +183,15 @@ const getSalesByCategory = asyncHandler(async (req, res) => {
         { $lookup: { from: 'categories', localField: '$productDetails.category', foreignField: '_id', as: 'categoryDetails' } },
         { $match: { 'categoryDetails': { $ne: [] } } }, // Only proceed if categoryDetails is not empty
         { $unwind: '$categoryDetails' },
-        // --- DIAGNOSTIC: Filter out category names starting with '
+        {
+            $group: {
+                _id: '$categoryDetails.name',
+                totalRevenue: { $sum: { $multiply: ['$orderItems.qty', '$orderItems.price'] } },
+                totalSold: { $sum: '$orderItems.qty' },
+            },
+        },
         { $sort: { totalRevenue: -1 } },
-        { $addFields: { category: '$_id' } }, // Add a new field 'category' with the value of '_id'
-        { $project: { _id: 0, category: 1, totalRevenue: 1 } }, // Exclude original _id, keep category and totalRevenue
-    ]);
-
-    res.json(salesByCategory);
-});
-
-export { getDashboardStats, getDashboardSummary, getSalesTrend, getTopSellingProducts, getSalesByCategory }; ---
-        { $match: { 'categoryDetails.name': { $not: /^$/ } } }, // Add this line
-        // -------------------------------------------------------------
-        { $group: { _id: '$categoryDetails.name', totalRevenue: { $sum: { $multiply: ['$orderItems.qty', '$orderItems.price'] } } } },
-        { $sort: { totalRevenue: -1 } },
-        { $addFields: { category: '$_id' } }, // Add a new field 'category' with the value of '_id'
-        { $project: { _id: 0, category: 1, totalRevenue: 1 } }, // Exclude original _id, keep category and totalRevenue
+        { $project: { category: '$_id', totalRevenue: 1, totalSold: 1, _id: 0 } },
     ]);
 
     res.json(salesByCategory);
