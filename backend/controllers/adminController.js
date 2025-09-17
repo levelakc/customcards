@@ -185,7 +185,7 @@ const getSalesByCategory = asyncHandler(async (req, res) => {
         { $unwind: '$categoryDetails' },
         { $group: { _id: '$categoryDetails.name', totalRevenue: { $sum: { $multiply: ['$orderItems.qty', '$orderItems.price'] } } } },
         { $sort: { totalRevenue: -1 } },
-        { $set: { category: '$_id', _id: '$REMOVE' } }, // Rename _id to category and remove original _id
+        { $project: { _id: 0, category: '$_id', totalRevenue: 1 } }, // Rename _id to category and remove original _id
     ]);
 
     res.json(salesByCategory);
