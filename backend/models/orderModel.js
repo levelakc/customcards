@@ -9,7 +9,7 @@ const orderSchema = mongoose.Schema({
         image: { type: String, required: true },
         price: { type: Number, required: true },
         // FIX: The product field is no longer required.
-        product: { type: mongoose.Schema.Types.ObjectId, ref: 'Product' },
+        product: { type: mongoose.Schema.Types.ObjectId, ref: 'Product' }
     }],
     totalPrice: { type: Number, required: true, default: 0.0 },
     isPaid: { type: Boolean, required: true, default: false },
