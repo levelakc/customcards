@@ -150,7 +150,33 @@ const getTopSellingProducts = asyncHandler(async (req, res) => {
         { $lookup: { from: 'products', localField: '$orderItems.product', foreignField: '_id', as: 'productDetails' } },
         { $match: { 'productDetails': { $ne: [] } } }, // Only proceed if productDetails is not empty
         { $unwind: '$productDetails' },
-        { $group: { _id: '$orderItems.product', name: { $first: '$productDetails.name' }, image: { $first: '$productDetails.image' }, totalRevenue: { $sum: { $multiply: ['$orderItems.qty', '$orderItems.price'] } }, totalSold: { $sum: '$orderItems.qty' } } },
+        {
+            $addFields: {
+                sanitizedProductName: {
+                    $cond: {
+                        if: { $regexMatch: { input: '$productDetails.name', regex: '^\$' } },
+                        then: { $substrCP: ['$productDetails.name', 1, { $strLenCP: '$productDetails.name' }] },
+                        else: '$productDetails.name'
+                    }
+                },
+                sanitizedProductImage: {
+                    $cond: {
+                        if: { $regexMatch: { input: '$productDetails.image', regex: '^\$' } },
+                        then: { $substrCP: ['$productDetails.image', 1, { $strLenCP: '$productDetails.image' }] },
+                        else: '$productDetails.image'
+                    }
+                }
+            }
+        },
+        {
+            $group: {
+                _id: '$orderItems.product',
+                name: { $first: '$sanitizedProductName' },
+                image: { $first: '$sanitizedProductImage' },
+                totalRevenue: { $sum: { $multiply: ['$orderItems.qty', '$orderItems.price'] } },
+                totalSold: { $sum: '$orderItems.qty' }
+            }
+        },
         { $sort: { totalRevenue: -1 } },
         { $limit: 5 }, // Top 5 products
         { $project: { _id: 0, name: 1, image: 1, totalRevenue: 1, totalSold: 1 } },
@@ -179,7 +205,7 @@ const getSalesByCategory = asyncHandler(async (req, res) => {
             $addFields: {
                 sanitizedCategoryName: {
                     $cond: {
-                        if: { $regexMatch: { input: '$categoryDetails.name', regex: '^\\$' } }, // Corrected regex
+                        if: { $regexMatch: { input: '$categoryDetails.name', regex: '^\$' } }, // Corrected regex
                         then: { $substrCP: ['$categoryDetails.name', 1, { $strLenCP: '$categoryDetails.name' }] },
                         else: '$categoryDetails.name'
                     }
