@@ -1,6 +1,7 @@
 import asyncHandler from 'express-async-handler';
 import Order from '../models/orderModel.js';
 import User from '../models/userModel.js';
+import Product from '../models/productModel.js';
 
 // @desc    Get dashboard statistics for admin
 // @route   GET /api/admin/dashboard/stats
@@ -145,4 +146,39 @@ const getSalesTrend = asyncHandler(async (req, res) => {
     res.json(Object.values(trendData));
 });
 
-export { getDashboardStats, getDashboardSummary, getSalesTrend };
+// @desc    Get top selling products for admin dashboard
+// @route   GET /api/admin/dashboard/top-products
+// @access  Private/Admin
+const getTopSellingProducts = asyncHandler(async (req, res) => {
+    const topProducts = await Order.aggregate([
+        { $unwind: '$orderItems' },
+        { $group: { _id: '$orderItems.product', totalRevenue: { $sum: { $multiply: ['$orderItems.qty', '$orderItems.price'] } }, totalSold: { $sum: '$orderItems.qty' } } },
+        { $sort: { totalRevenue: -1 } },
+        { $limit: 5 }, // Top 5 products
+        { $lookup: { from: 'products', localField: '_id', foreignField: '_id', as: 'productDetails' } },
+        { $unwind: '$productDetails' },
+        { $project: { _id: 0, name: '$productDetails.name', image: '$productDetails.image', totalRevenue: 1, totalSold: 1 } },
+    ]);
+
+    res.json(topProducts);
+});
+
+// @desc    Get sales by category for admin dashboard
+// @route   GET /api/admin/dashboard/sales-by-category
+// @access  Private/Admin
+const getSalesByCategory = asyncHandler(async (req, res) => {
+    const salesByCategory = await Order.aggregate([
+        { $unwind: '$orderItems' },
+        { $lookup: { from: 'products', localField: '$orderItems.product', foreignField: '_id', as: 'productDetails' } },
+        { $unwind: '$productDetails' },
+        { $lookup: { from: 'categories', localField: '$productDetails.category', foreignField: '_id', as: 'categoryDetails' } },
+        { $unwind: '$categoryDetails' },
+        { $group: { _id: '$categoryDetails.name', totalRevenue: { $sum: { $multiply: ['$orderItems.qty', '$orderItems.price'] } } } },
+        { $sort: { totalRevenue: -1 } },
+        { $project: { _id: 0, category: '$_id', totalRevenue: 1 } },
+    ]);
+
+    res.json(salesByCategory);
+});
+
+export { getDashboardStats, getDashboardSummary, getSalesTrend, getTopSellingProducts, getSalesByCategory };

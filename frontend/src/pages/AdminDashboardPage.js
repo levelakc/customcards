@@ -2,17 +2,19 @@ import React, { useState, useEffect } from 'react';
 import io from 'socket.io-client';
 import { useAuth } from '../contexts/AuthContext';
 import * as api from '../api/api';
-import { Line } from 'react-chartjs-2';
 import {
     Chart as ChartJS,
     CategoryScale,
     LinearScale,
     PointElement,
     LineElement,
+    BarElement,
+    ArcElement,
     Title,
     Tooltip,
     Legend,
 } from 'chart.js';
+import { Line, Bar, Pie } from 'react-chartjs-2';
 
 // Register Chart.js components
 ChartJS.register(
@@ -20,6 +22,8 @@ ChartJS.register(
     LinearScale,
     PointElement,
     LineElement,
+    BarElement,
+    ArcElement,
     Title,
     Tooltip,
     Legend
@@ -33,6 +37,8 @@ export default function AdminDashboardPage() {
     const [recentOrders, setRecentOrders] = useState([]);
     const [summaryStats, setSummaryStats] = useState(null);
     const [salesTrendData, setSalesTrendData] = useState(null);
+    const [topProducts, setTopProducts] = useState(null);
+    const [salesByCategory, setSalesByCategory] = useState(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
 
@@ -41,12 +47,16 @@ export default function AdminDashboardPage() {
             if (!token) return;
             try {
                 setLoading(true);
-                const [summary, salesTrend] = await Promise.all([
+                const [summary, salesTrend, products, categories] = await Promise.all([
                     api.getAdminDashboardSummary(token),
                     api.getAdminSalesTrend(token),
+                    api.getAdminTopSellingProducts(token),
+                    api.getAdminSalesByCategory(token),
                 ]);
                 setSummaryStats(summary);
                 setSalesTrendData(salesTrend);
+                setTopProducts(products);
+                setSalesByCategory(categories);
             } catch (err) {
                 console.error("Failed to fetch dashboard data:", err);
                 setError(err.message);
@@ -76,7 +86,6 @@ export default function AdminDashboardPage() {
                     totalRevenueLast30Days: prevSummary.totalRevenueLast30Days + order.totalPrice,
                     totalOrdersAllTime: prevSummary.totalOrdersAllTime + 1,
                     totalRevenueAllTime: prevSummary.totalRevenueAllTime + order.totalPrice,
-                    // AOV would need re-calculation based on new total orders/revenue
                     averageOrderValue: (prevSummary.totalRevenueAllTime + order.totalPrice) / (prevSummary.totalOrdersAllTime + 1),
                 };
             });
@@ -101,7 +110,7 @@ export default function AdminDashboardPage() {
         };
     }, [token]);
 
-    const chartData = {
+    const lineChartData = {
         labels: salesTrendData ? salesTrendData.map(data => data.date) : [],
         datasets: [
             {
@@ -114,19 +123,19 @@ export default function AdminDashboardPage() {
         ],
     };
 
-    const chartOptions = {
+    const lineChartOptions = {
         responsive: true,
         plugins: {
             legend: {
                 position: 'top',
                 labels: {
-                    color: '#fff', // White legend text
+                    color: '#fff',
                 },
             },
             title: {
                 display: true,
                 text: 'Revenue Trend (Last 30 Days)',
-                color: '#fff', // White title text
+                color: '#fff',
             },
             tooltip: {
                 callbacks: {
@@ -146,23 +155,145 @@ export default function AdminDashboardPage() {
         scales: {
             x: {
                 ticks: {
-                    color: '#ccc', // White x-axis labels
+                    color: '#ccc',
                 },
                 grid: {
-                    color: 'rgba(255, 255, 255, 0.1)', // Light grid lines
+                    color: 'rgba(255, 255, 255, 0.1)',
                 },
             },
             y: {
                 ticks: {
-                    color: '#ccc', // White y-axis labels
+                    color: '#ccc',
                     callback: function(value) {
                         return new Intl.NumberFormat('en-US', { style: 'currency', currency: 'ILS' }).format(value);
                     }
                 },
                 grid: {
-                    color: 'rgba(255, 255, 255, 0.1)', // Light grid lines
+                    color: 'rgba(255, 255, 255, 0.1)',
                 },
             },
+        },
+    };
+
+    const topProductsChartData = {
+        labels: topProducts ? topProducts.map(p => p.name) : [],
+        datasets: [
+            {
+                label: 'Revenue',
+                data: topProducts ? topProducts.map(p => p.totalRevenue) : [],
+                backgroundColor: 'rgba(153, 102, 255, 0.6)',
+                borderColor: 'rgba(153, 102, 255, 1)',
+                borderWidth: 1,
+            },
+        ],
+    };
+
+    const topProductsChartOptions = {
+        responsive: true,
+        plugins: {
+            legend: {
+                position: 'top',
+                labels: {
+                    color: '#fff',
+                },
+            },
+            title: {
+                display: true,
+                text: 'Top 5 Selling Products by Revenue',
+                color: '#fff',
+            },
+            tooltip: {
+                callbacks: {
+                    label: function(context) {
+                        let label = context.dataset.label || '';
+                        if (label) {
+                            label += ': ';
+                        }
+                        if (context.parsed.y !== null) {
+                            label += new Intl.NumberFormat('en-US', { style: 'currency', currency: 'ILS' }).format(context.parsed.y);
+                        }
+                        return label;
+                    }
+                }
+            }
+        },
+        scales: {
+            x: {
+                ticks: {
+                    color: '#ccc',
+                },
+                grid: {
+                    color: 'rgba(255, 255, 255, 0.1)',
+                },
+            },
+            y: {
+                ticks: {
+                    color: '#ccc',
+                    callback: function(value) {
+                        return new Intl.NumberFormat('en-US', { style: 'currency', currency: 'ILS' }).format(value);
+                    }
+                },
+                grid: {
+                    color: 'rgba(255, 255, 255, 0.1)',
+                },
+            },
+        },
+    };
+
+    const salesByCategoryChartData = {
+        labels: salesByCategory ? salesByCategory.map(c => c.category) : [],
+        datasets: [
+            {
+                data: salesByCategory ? salesByCategory.map(c => c.totalRevenue) : [],
+                backgroundColor: [
+                    'rgba(255, 99, 132, 0.6)',
+                    'rgba(54, 162, 235, 0.6)',
+                    'rgba(255, 206, 86, 0.6)',
+                    'rgba(75, 192, 192, 0.6)',
+                    'rgba(153, 102, 255, 0.6)',
+                    'rgba(255, 159, 64, 0.6)',
+                ],
+                borderColor: [
+                    'rgba(255, 99, 132, 1)',
+                    'rgba(54, 162, 235, 1)',
+                    'rgba(255, 206, 86, 1)',
+                    'rgba(75, 192, 192, 1)',
+                    'rgba(153, 102, 255, 1)',
+                    'rgba(255, 159, 64, 1)',
+                ],
+                borderWidth: 1,
+            },
+        ],
+    };
+
+    const salesByCategoryChartOptions = {
+        responsive: true,
+        plugins: {
+            legend: {
+                position: 'top',
+                labels: {
+                    color: '#fff',
+                },
+            },
+            title: {
+                display: true,
+                text: 'Sales by Category',
+                color: '#fff',
+            },
+            tooltip: {
+                callbacks: {
+                    label: function(context) {
+                        let label = context.label || '';
+                        if (label) {
+                            label += ': ';
+                        }
+                        if (context.parsed !== null) {
+                            label += new Intl.NumberFormat('en-US', { style: 'currency', currency: 'ILS' }).format(context.parsed);
+                        }
+                        return label;
+                    }
+                }
+            }
         },
     };
 
@@ -193,10 +324,30 @@ export default function AdminDashboardPage() {
             <div className="bg-gray-800 p-6 rounded-lg shadow-lg mb-8">
                 <h3 className="text-xl font-semibold mb-4">Revenue Trend (Last 30 Days)</h3>
                 {salesTrendData && salesTrendData.length > 0 ? (
-                    <Line data={chartData} options={chartOptions} />
+                    <Line data={lineChartData} options={lineChartOptions} />
                 ) : (
                     <p className="text-gray-400">No sales data available for the last 30 days.</p>
                 )}
+            </div>
+
+            {/* Product Performance & Sales by Category */}
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+                <div className="bg-gray-800 p-6 rounded-lg shadow-lg">
+                    <h3 className="text-xl font-semibold mb-4">Top 5 Selling Products</h3>
+                    {topProducts && topProducts.length > 0 ? (
+                        <Bar data={topProductsChartData} options={topProductsChartOptions} />
+                    ) : (
+                        <p className="text-gray-400">No top selling products data available.</p>
+                    )}
+                </div>
+                <div className="bg-gray-800 p-6 rounded-lg shadow-lg">
+                    <h3 className="text-xl font-semibold mb-4">Sales by Category</h3>
+                    {salesByCategory && salesByCategory.length > 0 ? (
+                        <Pie data={salesByCategoryChartData} options={salesByCategoryChartOptions} />
+                    ) : (
+                        <p className="text-gray-400">No sales by category data available.</p>
+                    )}
+                </div>
             </div>
 
             {/* Recent Orders */}
