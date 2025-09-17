@@ -31,7 +31,7 @@ const ImageModal = ({ imageUrl, onClose }) => {
                 <img src={imageUrl} alt="Enlarged view" className="max-w-screen-lg max-h-[90vh] object-contain rounded-lg shadow-2xl" />
                 <button 
                     onClick={onClose}
-                    className="absolute top-2 right-2 text-white bg-gray-800 hover:bg-gray-900 rounded-full w-8 h-8 text-xl flex items-center justify-center transition-colors cursor-pointer z-50"
+                    className="absolute top-4 right-4 text-white bg-gray-800 hover:bg-gray-900 rounded-full w-10 h-10 text-2xl flex items-center justify-center transition-colors cursor-pointer z-[60]"
                     aria-label="Close"
                 >
                     &times;
