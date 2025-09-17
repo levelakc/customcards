@@ -184,8 +184,39 @@ const getSalesByCategory = asyncHandler(async (req, res) => {
         { $match: { 'categoryDetails': { $ne: [] } } }, // Only proceed if categoryDetails is not empty
         { $unwind: '$categoryDetails' },
         {
+            $addFields: {
+                sanitizedCategoryName: {
+                    $cond: {
+                        if: { $regexMatch: { input: '$categoryDetails.name', regex: '^\\
+        { $sort: { totalRevenue: -1 } },
+        {
+            $addFields: {
+                categoryName: "$_id"
+            }
+        },
+        {
+            $project: {
+                _id: 0,
+                category: { $getField: "$categoryName" },
+                totalRevenue: 1,
+                totalSold: 1,
+            },
+        },
+    ]);
+
+    res.json(salesByCategory);
+});
+
+export { getDashboardStats, getDashboardSummary, getSalesTrend, getTopSellingProducts, getSalesByCategory }; } },
+                        then: { $substrCP: ['$categoryDetails.name', 1, { $strLenCP: '$categoryDetails.name' }] },
+                        else: '$categoryDetails.name'
+                    }
+                }
+            }
+        },
+        {
             $group: {
-                _id: { $ifNull: ['$categoryDetails.name', 'Unknown Category'] },
+                _id: { $ifNull: ['$sanitizedCategoryName', 'Unknown Category'] }, // Use the sanitized name
                 totalRevenue: { $sum: { $multiply: ['$orderItems.qty', '$orderItems.price'] } },
                 totalSold: { $sum: '$orderItems.qty' },
             },
