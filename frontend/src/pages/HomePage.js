@@ -102,7 +102,19 @@ export default function HomePage() {
                             transform: `scale(${1 + scrollPosition / 2000})`,
                             opacity: videoOpacity
                         }}
-                        src={backgroundVideoUrl && backgroundVideoUrl.trim().startsWith('http') ? backgroundVideoUrl.trim() : `${api.BASE_URL}${backgroundVideoUrl}`}
+                        src={(() => {
+                            if (!backgroundVideoUrl) return '';
+                            let formattedUrl = backgroundVideoUrl.trim();
+                            // Correct malformed 'https//' to 'https://'
+                            if (formattedUrl.startsWith('https//') && !formattedUrl.startsWith('https://')) {
+                                formattedUrl = formattedUrl.replace('https//', 'https://');
+                            }
+                            // If it's still not an absolute URL, prepend BASE_URL
+                            if (!formattedUrl.startsWith('http://') && !formattedUrl.startsWith('https://')) {
+                                return `${api.BASE_URL}${formattedUrl}`;
+                            }
+                            return formattedUrl;
+                        })()}
                     ></video>
                 )}
                 <div className="absolute inset-0 bg-black bg-opacity-60"></div>
