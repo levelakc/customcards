@@ -183,10 +183,15 @@ const getSalesByCategory = asyncHandler(async (req, res) => {
         { $lookup: { from: 'categories', localField: '$productDetails.category', foreignField: '_id', as: 'categoryDetails' } },
         { $match: { 'categoryDetails': { $ne: [] } } }, // Only proceed if categoryDetails is not empty
         { $unwind: '$categoryDetails' },
-        { $group: { _id: '$categoryDetails.name', totalRevenue: { $sum: { $multiply: ['$orderItems.qty', '$orderItems.price'] } } } },
+        {
+            $group: {
+                _id: '$categoryDetails.name',
+                totalRevenue: { $sum: { $multiply: ['$orderItems.qty', '$orderItems.price'] } },
+                totalSold: { $sum: '$orderItems.qty' },
+            },
+        },
         { $sort: { totalRevenue: -1 } },
-        { $addFields: { category: '$_id' } }, // Add a new field 'category' with the value of '_id'
-        { $project: { _id: 0, category: 1, totalRevenue: 1 } }, // Exclude original _id, keep category and totalRevenue
+        { $project: { category: '$_id', totalRevenue: 1, totalSold: 1, _id: 0 } },
     ]);
 
     res.json(salesByCategory);

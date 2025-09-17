@@ -217,7 +217,7 @@ function GallerySettingsPage() {
 export default function AdminPage() {
     const { isAdmin, token } = useAuth();
     const { navigate } = useRouter();
-    const [activeTab, setActiveTab] = useState('dashboard');
+    const [activeTab, setActiveTab] = useState('לוח מחוונים');
     
     const [products, setProducts] = useState([]);
     const [categories, setCategories] = useState([]);
@@ -415,7 +415,7 @@ export default function AdminPage() {
       <div className="bg-gray-900 min-h-screen text-white p-4 md:p-8">
         <h1 className="text-4xl font-extrabold mb-8">פאנל ניהול</h1>
         <div className="flex flex-wrap space-x-4 space-x-reverse border-b border-gray-700 mb-8">
-            <button type="button" onClick={() => setActiveTab('dashboard')} className={`py-2 px-4 ${activeTab === 'dashboard' ? 'border-b-2 border-indigo-500' : 'text-gray-400'}`}>Dashboard</button>
+            <button type="button" onClick={() => setActiveTab('לוח מחוונים')} className={`py-2 px-4 ${activeTab === 'לוח מחוונים' ? 'border-b-2 border-indigo-500' : 'text-gray-400'}`}>לוח מחוונים</button>
             <button type="button" onClick={() => setActiveTab('products')} className={`py-2 px-4 ${activeTab === 'products' ? 'border-b-2 border-indigo-500' : 'text-gray-400'}`}>ניהול מוצרים</button>
             <button type="button" onClick={() => setActiveTab('categories')} className={`py-2 px-4 ${activeTab === 'categories' ? 'border-b-2 border-indigo-500' : 'text-gray-400'}`}>ניהול קטגוריות</button>
             <button type="button" onClick={() => setActiveTab('gallery')} className={`py-2 px-4 ${activeTab === 'gallery' ? 'border-b-2 border-indigo-500' : 'text-gray-400'}`}>גלריית תמונות</button>
@@ -424,7 +424,7 @@ export default function AdminPage() {
             <button type="button" onClick={() => setActiveTab('settings')} className={`py-2 px-4 ${activeTab === 'settings' ? 'border-b-2 border-indigo-500' : 'text-gray-400'}`}>הגדרות אתר</button>
         </div>
 
-        {activeTab === 'dashboard' && <AdminDashboardPage />}
+        {activeTab === 'לוח מחוונים' && <AdminDashboardPage />}
 
         {activeTab === 'products' && (
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
