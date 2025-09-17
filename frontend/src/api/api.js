@@ -330,3 +330,21 @@ export const getAdminSalesTrend = async (token) => {
     if (!response.ok) throw new Error(data.message || 'Could not fetch sales trend data');
     return data;
 };
+
+export const getAdminTopSellingProducts = async (token) => {
+    const response = await fetch(`${BASE_URL}/api/admin/dashboard/top-products`, {
+        headers: getAuthHeaders(token),
+    });
+    const data = await response.json();
+    if (!response.ok) throw new Error(data.message || 'Could not fetch top selling products');
+    return data;
+};
+
+export const getAdminSalesByCategory = async (token) => {
+    const response = await fetch(`${BASE_URL}/api/admin/dashboard/sales-by-category`, {
+        headers: getAuthHeaders(token),
+    });
+    const data = await response.json();
+    if (!response.ok) throw new Error(data.message || 'Could not fetch sales by category');
+    return data;
+};
