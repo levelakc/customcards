@@ -7,6 +7,7 @@ export const nameToKeyMap = {
     'שחור': 'black',
     'רוז גולד': 'roseGold',
     'צבעוני': 'colorful',
+    'ויזה': 'visa',
 };
 
 /**
@@ -27,6 +28,7 @@ export const cardColorOptions = {
     silver:   { name: 'כסף',       engraving: ['black'] },
     roseGold: { name: 'רוז גולד',  engraving: ['black'] },
     colorful: { name: 'צבעוני',    engraving: ['silver'] },
+    visa:     { name: 'ויזה',       engraving: ['silver'] },
     black:    { name: 'שחור',       engraving: ['silver', 'gold'] },
 };
 
