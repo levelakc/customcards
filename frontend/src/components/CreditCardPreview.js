@@ -175,27 +175,9 @@ export default function CreditCardPreview({
                     <radialGradient id={uniqueIds.blackSpotlight} cx="25%" cy="25%" r="60%"><stop offset="0%" stopColor="white" stopOpacity="0.15" /><stop offset="100%" stopColor="white" stopOpacity="0" /></radialGradient>
                     <radialGradient id={uniqueIds.silverSpotlight} cx="25%" cy="25%" r="60%"><stop offset="0%" stopColor="white" stopOpacity="0.9" /><stop offset="100%" stopColor="white" stopOpacity="0" /></radialGradient>
 
-                    <filter id="force-white-filter">
-                        <feColorMatrix type="matrix" values="0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 0 0 0 1 0" />
-                    </filter>
 
-                    {finalLogoUrl && (
-                        <mask id={uniqueIds.mask}>
-                            <image
-                                filter="url(#force-white-filter)"
-                                href={finalLogoUrl}
-                                x={logoX}
-                                y={logoY}
-                                height={logoSvgHeight}
-                                width={logoSvgWidth}
-                                preserveAspectRatio="xMidYMid meet"
-                                transform={`
-                                    rotate(${rotation}, ${logoX + logoSvgWidth / 2}, ${logoY + logoSvgHeight / 2})
-                                    scale(${scale})
-                                `}
-                            />
-                        </mask>
-                    )}
+
+
 
                     <linearGradient id={uniqueIds.simStripes} x1="0" y1="0" x2="1" y2="0">
                         <stop offset="30%" stopColor="#D4AF37" />
@@ -214,19 +196,25 @@ export default function CreditCardPreview({
                         <rect width={SVG_WIDTH} height={SVG_HEIGHT} rx="20" fill={gradientMap[cardColor] || gradientMap.black} />
                     </g>
                     
-                    {finalLogoUrl && (
-                        <rect
-                            width={SVG_WIDTH}
-                            height={SVG_HEIGHT}
-                            rx="20"
-                            fill={engravingFillColors[engravingColor] || engravingFillColors.silver}
-                            mask={`url(#${uniqueIds.mask})`}
-                        />
-                    )}
+
                     
                     {cardColor === 'black' && ( <rect width={SVG_WIDTH} height={SVG_HEIGHT} rx="20" fill={`url(#${uniqueIds.blackSpotlight})`} style={{ mixBlendMode: 'lighten' }} /> )}
                     {cardColor === 'silver' && ( <rect width={SVG_WIDTH} height={SVG_HEIGHT} rx="20" fill={`url(#${uniqueIds.silverSpotlight})`} style={{ mixBlendMode: 'lighten' }} /> )}
                     {cardColor !== 'black' && cardColor !== 'silver' && ( <rect width={SVG_WIDTH} height={SVG_HEIGHT} rx="20" fill={`url(#${uniqueIds.spotlight})`} style={{ mixBlendMode: 'lighten' }} /> )}
+                    {finalLogoUrl && (
+                        <image
+                            href={finalLogoUrl}
+                            x={logoX}
+                            y={logoY}
+                            height={logoSvgHeight}
+                            width={logoSvgWidth}
+                            preserveAspectRatio="xMidYMid meet"
+                            transform={`
+                                rotate(${rotation}, ${logoX + logoSvgWidth / 2}, ${logoY + logoSvgHeight / 2})
+                                scale(${scale})
+                            `}
+                        />
+                    )}
                 </g>
 
                 <path d="M40,85 h30 a5,5 0 0 1 5,5 v20 a5,5 0 0 1 -5,5 h-30 a5,5 0 0 1 -5,-5 v-20 a5,5 0 0 1 5,-5 z" fill={`url(#${uniqueIds.simStripes})`} opacity="0.9" />
