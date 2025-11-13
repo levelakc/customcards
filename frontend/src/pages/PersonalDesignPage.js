@@ -27,6 +27,10 @@ export default function PersonalDesignPage() {
         const file = event.target.files[0];
         if (file) {
             setUploadedImage(URL.createObjectURL(file));
+            // Reset transformations when a new image is uploaded
+            setScale(1);
+            setRotation(0);
+            setPosition({ x: 45, y: 10 });
         }
     };
     
@@ -61,8 +65,11 @@ export default function PersonalDesignPage() {
                             scale={scale}
                             rotation={rotation}
                             position={position}
-                            onPositionChange={setPosition} // This correctly passes the state setter
+                            onPositionChange={setPosition}
+                            onScaleChange={setScale}
+                            onRotationChange={setRotation}
                             isDraggable={true}
+                            showTransformHandles={true}
                         />
                     </div>
                     <div className="flex flex-col space-y-6">
@@ -116,13 +123,40 @@ export default function PersonalDesignPage() {
                         {uploadedImage && (
                             <div className="space-y-4 bg-gray-800 p-4 rounded-lg">
                                 <h3 className="text-lg font-semibold">4. התאם את העיצוב:</h3>
+                                <p className="text-sm text-gray-400 mb-3">גרור את פינות העיצוב כדי לשנות את גודלו וסיבובו, או השתמש במחוונים:</p>
+
+                                {/* SCALE SLIDER */}
                                 <div>
-                                    <label htmlFor="scale" className="block mb-2 text-sm font-medium">גודל (זום):</label>
-                                    <input id="scale" type="range" min="0.5" max="2.5" step="0.05" value={scale} onChange={(e) => setScale(parseFloat(e.target.value))} className="w-full h-2 bg-gray-600 rounded-lg appearance-none cursor-pointer"/>
+                                    <label htmlFor="scale-slider" className="block text-sm font-medium mb-1">
+                                        גודל (Scale): {scale.toFixed(2)}x
+                                    </label>
+                                    <input
+                                        id="scale-slider"
+                                        type="range"
+                                        min="0.25"
+                                        max="4"
+                                        step="0.01"
+                                        value={scale}
+                                        onChange={(e) => setScale(parseFloat(e.target.value))}
+                                        className="w-full h-2 bg-gray-700 rounded-lg appearance-none cursor-pointer range-lg"
+                                    />
                                 </div>
+
+                                {/* ROTATION SLIDER */}
                                 <div>
-                                    <label htmlFor="rotation" className="block mb-2 text-sm font-medium">סיבוב:</label>
-                                    <input id="rotation" type="range" min="0" max="360" step="1" value={rotation} onChange={(e) => setRotation(parseInt(e.target.value))} className="w-full h-2 bg-gray-600 rounded-lg appearance-none cursor-pointer"/>
+                                    <label htmlFor="rotation-slider" className="block text-sm font-medium mb-1">
+                                        סיבוב (Rotation): {Math.round(rotation)}°
+                                    </label>
+                                    <input
+                                        id="rotation-slider"
+                                        type="range"
+                                        min="0"
+                                        max="360"
+                                        step="1"
+                                        value={rotation}
+                                        onChange={(e) => setRotation(parseFloat(e.target.value))}
+                                        className="w-full h-2 bg-gray-700 rounded-lg appearance-none cursor-pointer range-lg"
+                                    />
                                 </div>
                             </div>
                         )}

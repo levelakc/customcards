@@ -1,0 +1,5 @@
+<svg width="150" height="100" viewBox="0 0 150 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+<rect width="150" height="100" rx="10" fill="#ADD8E6"/>
+<rect x="20" y="40" width="110" height="20" fill="#FFFFFF"/>
+<text x="75" y="55" font-family="Arial" font-size="12" fill="#000000" text-anchor="middle">CARD</text>
+</svg>

@@ -1,6 +1,7 @@
 import React, { useState, useRef, useEffect, useMemo, useCallback } from 'react';
 import * as api from '../api/api'; // Import the api file
-import { cardColorOptions } from '../utils/colorUtils';
+// Removed unused import: cardColorOptions
+// import { cardColorOptions } from '../utils/colorUtils'; 
 
 // Helper function to check if a string is a valid CSS color
 const isValidCssColor = (color) => {
@@ -15,21 +16,27 @@ const CARD_WIDTH_MM = 85.6;
 const CARD_HEIGHT_MM = 53.98;
 const X_RATIO = SVG_WIDTH / CARD_WIDTH_MM;
 const Y_RATIO = SVG_HEIGHT / CARD_HEIGHT_MM;
-const MOBILE_BREAKPOINT = 768; // Corresponds to Tailwind's `md` breakpoint
+// Removed unused variable: MOBILE_BREAKPOINT
 
 export default function CreditCardPreview({
     cardColor = 'black',
     engravingColor = 'silver',
     logoUrl = null,
-    position = { x: 45, y: 10 },
+    position = { x: 0, y: 0 },
     scale = 1,
     rotation = 0,
     onPositionChange,
-    isDraggable = true
+    onScaleChange,
+    onRotationChange,
+    isDraggable = true,
+    showTransformHandles = false
 }) {
 
     const [svgContent, setSvgContent] = useState(null);
+    const [svgRatio, setSvgRatio] = useState(1);
     const [isDragging, setIsDragging] = useState(false);
+    const [isResizing, setIsResizing] = useState(false);
+    const [resizeStart, setResizeStart] = useState(null);
     const svgRef = useRef(null);
     const dragStartOffset = useRef({ x: 0, y: 0 });
 
@@ -53,23 +60,36 @@ export default function CreditCardPreview({
 
     const finalLogoUrl = useMemo(() => {
         const url = (logoUrl && logoUrl.startsWith('/uploads')) ? `${api.BASE_URL}${logoUrl}` : logoUrl;
-        console.log('finalLogoUrl:', url); // Debug log
+    
         return url;
     }, [logoUrl]);
 
     useEffect(() => {
-        console.log('useEffect for svgContent triggered. finalLogoUrl:', finalLogoUrl); // Debug log
+    
         if (finalLogoUrl && finalLogoUrl.endsWith('.svg')) {
             fetch(finalLogoUrl)
                 .then(response => response.text())
                 .then(svgText => {
-                    console.log('SVG fetched successfully. svgText length:', svgText.length); // Debug log
+
                     const parser = new DOMParser();
-                    const svgDoc = parser.documentElement;
+                    const svgDoc = parser.parseFromString(svgText, "image/svg+xml").documentElement;
+
+                    const viewBox = svgDoc.getAttribute('viewBox');
+                    let ratio = 1;
+                    if (viewBox) {
+                        const parts = viewBox.split(' ').map(parseFloat);
+                        if (parts.length === 4 && parts[2] > 0 && parts[3] > 0) {
+                            ratio = parts[2] / parts[3];
+                        }
+                    }
+                    setSvgRatio(ratio);
 
                     // Remove width and height attributes to prevent incorrect scaling
                     svgDoc.removeAttribute('width');
                     svgDoc.removeAttribute('height');
+                    svgDoc.setAttribute('width', '100%');
+                    svgDoc.setAttribute('height', '100%');
+                    svgDoc.setAttribute('preserveAspectRatio', 'xMidYMid meet');
 
                     // Set fill to white for all paths, circles, rects within the SVG
                     svgDoc.querySelectorAll('path, circle, rect, polygon, line, polyline, ellipse')
@@ -78,15 +98,15 @@ export default function CreditCardPreview({
                             el.removeAttribute('stroke'); // Remove stroke to ensure clean mask
                         });
                     const processedSvg = svgDoc.outerHTML;
-                    console.log('Processed SVG content length:', processedSvg.length); // Debug log
+
                     setSvgContent(processedSvg);
                 })
                 .catch(error => {
                     console.error("Error fetching SVG:", error);
-                    setSvgContent(null);
+                    setSvgContent('<text x="50%" y="50%" fill="red" text-anchor="middle">Error loading SVG</text>');
                 });
         } else {
-            console.log('finalLogoUrl is not an SVG or is null:', finalLogoUrl); // Debug log
+        
             setSvgContent(null);
         }
     }, [finalLogoUrl]);
@@ -114,7 +134,6 @@ export default function CreditCardPreview({
         };
     };
     
-    // Wrapped in useCallback for performance and to prevent stale closures
     const handleDragMove = useCallback((e) => {
         if (!isDragging || !isDraggable) return;
         if (e.cancelable) e.preventDefault();
@@ -141,7 +160,6 @@ export default function CreditCardPreview({
         const handleMove = (e) => handleDragMove(e);
         const handleEnd = () => handleDragEnd();
         
-        // THE FIX: Add { passive: false } to the touchmove listener
         const options = { passive: false };
 
         if (isDragging) {
@@ -157,18 +175,107 @@ export default function CreditCardPreview({
             window.removeEventListener('mouseup', handleEnd);
             window.removeEventListener('touchend', handleEnd);
         };
-    }, [isDragging, handleDragMove]); // Dependency array updated
+    }, [isDragging, handleDragMove]);
 
-    const engravingFillColors = {
+    const handleCornerDragStart = (e, cornerIndex) => {
+        if (e.cancelable) e.preventDefault();
+        e.stopPropagation();
+        setIsResizing(true);
+        const startPoint = getSVGPoint(e);
+        
+        // Use the scaled width and height to calculate the current center
+        const centerX = logoX + (unscaledLogoSvgWidth * scale) / 2;
+        const centerY = logoY + (unscaledLogoSvgHeight * scale) / 2;
+        
+        // We use the UN-OFFSET boundary for drag calculation 
+        // to ensure the scale and rotation math is based on the actual corner.
+        const originalCorner = transformBoundaries.drag[cornerIndex];
+
+        setResizeStart({
+            cornerIndex,
+            startPoint,
+            initialScale: scale,
+            initialRotation: rotation,
+            initialCenter: { x: centerX, y: centerY },
+            initialCorner: originalCorner,
+        });
+    };
+
+    const handleCornerDragMove = useCallback((e) => {
+        if (!isResizing || !resizeStart) return;
+        if (e.cancelable) e.preventDefault();
+        const newPoint = getSVGPoint(e);
+
+        const { initialCenter, initialCorner, initialScale, initialRotation } = resizeStart;
+
+        const originalVector = {
+            x: initialCorner.x - initialCenter.x,
+            y: initialCorner.y - initialCenter.y,
+        };
+
+        const newVector = {
+            x: newPoint.x - initialCenter.x,
+            y: newPoint.y - initialCenter.y,
+        };
+
+        const originalDist = Math.sqrt(originalVector.x ** 2 + originalVector.y ** 2);
+        const newDist = Math.sqrt(newVector.x ** 2 + newVector.y ** 2);
+
+        if (originalDist === 0) return;
+
+        const scaleFactor = newDist / originalDist;
+        if (onScaleChange) {
+            onScaleChange(initialScale * scaleFactor);
+        }
+
+        const originalAngle = Math.atan2(originalVector.y, originalVector.x) * (180 / Math.PI);
+        const newAngle = Math.atan2(newVector.y, newVector.x) * (180 / Math.PI);
+        const angleDiff = newAngle - originalAngle;
+
+        if (onRotationChange) {
+            onRotationChange(initialRotation + angleDiff);
+        }
+
+    }, [isResizing, resizeStart, onScaleChange, onRotationChange]);
+
+    const handleCornerDragEnd = () => {
+        setIsResizing(false);
+        setResizeStart(null);
+    };
+
+    useEffect(() => {
+        const handleMove = (e) => handleCornerDragMove(e);
+        const handleEnd = () => handleCornerDragEnd();
+
+        const options = { passive: false };
+
+        if (isResizing) {
+            window.addEventListener('mousemove', handleMove);
+            window.addEventListener('touchmove', handleMove, options);
+            window.addEventListener('mouseup', handleEnd);
+            window.addEventListener('touchend', handleEnd);
+        }
+
+        return () => {
+            window.removeEventListener('mousemove', handleMove);
+            window.removeEventListener('touchmove', handleMove, options);
+            window.removeEventListener('mouseup', handleEnd);
+            window.removeEventListener('touchend', handleEnd);
+        };
+    }, [isResizing, handleCornerDragMove]);
+
+    // FIX: Wrapped in useMemo to stabilize the object reference
+    const engravingFillColors = useMemo(() => ({
         silver: '#D1D5DB',
         gold: '#D4AF37',
         black: '#000000',
-    };
+    }), []);
 
+
+    // FIX: Added 'engravingFillColors' to the dependency array
     const getContrastingEngravingColor = useCallback((cardColor, requestedEngravingColor) => {
         let effectiveEngravingColor = requestedEngravingColor;
 
-        // Define contrasting colors for problematic card/engraving color combinations
         if (cardColor === 'black' && requestedEngravingColor === 'black') {
             effectiveEngravingColor = 'silver';
         } else if (cardColor === 'gold' && requestedEngravingColor === 'gold') {
@@ -176,18 +283,13 @@ export default function CreditCardPreview({
         } else if (cardColor === 'silver' && requestedEngravingColor === 'silver') {
             effectiveEngravingColor = 'black';
         }
-        // Add more rules as needed.
 
-        // Return the hex code if available in engravingFillColors, otherwise return the color name
         return engravingFillColors[effectiveEngravingColor] || effectiveEngravingColor;
-    }, []);
+    }, [engravingFillColors]);
 
 
-
-
-
-    const logoWidth = 35;
-    const logoHeight = 20;
+    const logoWidth = CARD_WIDTH_MM;
+    const logoHeight = CARD_WIDTH_MM / svgRatio;
 
     const effectiveEngravingColor = useMemo(() => {
         return getContrastingEngravingColor(cardColor, engravingColor);
@@ -196,8 +298,59 @@ export default function CreditCardPreview({
 
     const logoX = position.x * X_RATIO;
     const logoY = position.y * Y_RATIO;
-    const logoSvgWidth = (logoWidth * scale) * X_RATIO;
-    const logoSvgHeight = (logoHeight * scale) * Y_RATIO;
+    const unscaledLogoSvgWidth = logoWidth * X_RATIO;
+    const unscaledLogoSvgHeight = logoHeight * X_RATIO;
+    // These are the visually perceived width/height after scaling
+    const currentLogoSvgWidth = unscaledLogoSvgWidth * scale;
+    const currentLogoSvgHeight = unscaledLogoSvgHeight * scale;
+
+    const transformBoundaries = useMemo(() => {
+        // Calculate center based on current position and *scaled* size
+        const centerX = logoX + currentLogoSvgWidth / 2;
+        const centerY = logoY + currentLogoSvgHeight / 2;
+        
+        // Factor to move the handles inward (1.0 = corner, 0.75 = 1/4 of the way toward center)
+        const inwardFactor = 0.75; 
+
+        // 1. Calculate the corners of the *currently scaled* bounding box *before* rotation
+        const corners = [
+            { x: logoX, y: logoY },
+            { x: logoX + currentLogoSvgWidth, y: logoY },
+            { x: logoX + currentLogoSvgWidth, y: logoY + currentLogoSvgHeight },
+            { x: logoX, y: logoY + currentLogoSvgHeight },
+        ];
+    
+        const rotatePoint = (point, angle) => {
+            const rad = (angle * Math.PI) / 180;
+            const cos = Math.cos(rad);
+            const sin = Math.sin(rad);
+            const dx = point.x - centerX;
+            const dy = point.y - centerY;
+            return {
+                x: centerX + dx * cos - dy * sin,
+                y: centerY + dx * sin + dy * cos,
+            };
+        };
+        
+        // 2. Return the original (un-offset) points for accurate drag calculation
+        const unoffsetRotatedCorners = corners.map(p => rotatePoint(p, rotation));
+
+        // 3. Calculate the offset points for rendering the handle
+        const offsetRenderPoints = unoffsetRotatedCorners.map(p => {
+            const dx = p.x - centerX;
+            const dy = p.y - centerY;
+            return {
+                x: centerX + dx * inwardFactor,
+                y: centerY + dy * inwardFactor,
+            };
+        });
+        
+        return {
+            drag: unoffsetRotatedCorners, // Used by handleCornerDragStart
+            render: offsetRenderPoints, // Used for rendering the circles
+        };
+        
+    }, [logoX, logoY, currentLogoSvgWidth, currentLogoSvgHeight, rotation]);
 
     const gradientMap = {
         silver: `url(#${uniqueIds.silverGradient})`,
@@ -251,614 +404,90 @@ export default function CreditCardPreview({
                                                               0 0 0 0 1
                                                               0 0 0 1 0" />
                     </filter>
-
-
-
-
-
-
-
                                         <linearGradient id={uniqueIds.simStripes} x1="0" y1="0" x2="1" y2="0">
-
-
-
-
-
                                             <stop offset="30%" stopColor="#D4AF37" />
-
-
-
-
-
                                             <stop offset="30.5%" stopColor="#A9A9A9" />
-
-
-
-
-
                                             <stop offset="32.5%" stopColor="#A9A9A9" />
-
-
-
-
-
                                             <stop offset="33%" stopColor="#D4AF37" />
-
-
-
-
-
                                             <stop offset="66%" stopColor="#D4AF37" />
-
-
-
-
-
                                             <stop offset="66.5%" stopColor="#A9A9A9" />
-
-
-
-
-
                                             <stop offset="68.5%" stopColor="#A9A9A9" />
-
-
-
-
-
                                             <stop offset="69%" stopColor="#D4AF37" />
-
-
-
-
-
                                         </linearGradient>
-
-
-
-
-
-                    
-
-
-
-
-
-                                                                                                                                                                                                        {finalLogoUrl && (
-
-
-
-
-
-                    
-
-
-
-
-
-                                                                                                                                                                                                            <mask id={uniqueIds.mask}>
-
-
-
-
-
-                    
-
-
-
-
-
-                                                                                                                                                                                                                {console.log('Rendering mask. svgContent available:', !!svgContent)} {/* Debug log */}
-
-
-
-
-
-                    
-
-
-
-
-
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                {svgContent ? (
-
-
-
-
-
-                    
-
-
-
-
-
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    <g
-
-
-
-
-
-                    
-
-
-
-
-
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        dangerouslySetInnerHTML={{ __html: svgContent }}
-
-
-
-
-
-                    
-
-
-
-
-
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        transform={`
-
-
-
-
-
-                    
-
-
-
-
-
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            translate(${logoX}, ${logoY})
-
-
-
-
-
-                    
-
-
-
-
-
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            rotate(${rotation}, ${logoSvgWidth / 2}, ${logoSvgHeight / 2})
-
-
-
-
-
-                    
-
-
-
-
-
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            scale(${scale})
-
-
-
-
-
-                    
-
-
-
-
-
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        `}
-
-
-
-
-
-                    
-
-
-
-
-
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    />
-
-
-
-
-
-                    
-
-
-
-
-
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                ) : (
-
-
-
-
-
-                    
-
-
-
-
-
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    <g
-
-
-
-
-
-                    
-
-
-
-
-
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        transform={`
-
-
-
-
-
-                    
-
-
-
-
-
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            translate(${logoX}, ${logoY})
-
-
-
-
-
-                    
-
-
-
-
-
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            rotate(${rotation}, ${logoSvgWidth / 2}, ${logoSvgHeight / 2})
-
-
-
-
-
-                    
-
-
-
-
-
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            scale(${scale})
-
-
-
-
-
-                    
-
-
-
-
-
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        `}
-
-
-
-
-
-                    
-
-
-
-
-
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    >
-
-
-
-
-
-                    
-
-
-
-
-
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        <image
-
-
-
-
-
-                    
-
-
-
-
-
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                href={finalLogoUrl}
-
-
-
-
-
-                    
-
-
-
-
-
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                x="0" y="0"
-
-
-
-
-
-                    
-
-
-
-
-
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                height={logoSvgHeight} width={logoSvgWidth}
-
-
-
-
-
-                    
-
-
-
-
-
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                preserveAspectRatio="xMidYMid meet"
-
-
-
-
-
-                    
-
-
-
-
-
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                filter="url(#white-mask-filter)"
-
-
-
-
-
-                    
-
-
-
-
-
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        />
-
-
-
-
-
-                    
-
-
-
-
-
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    </g>
-
-
-
-
-
-                    
-
-
-
-
-
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                )}
-
-
-
-
-
-                    
-
-
-
-
-
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                )}
-
-
-
-
-
-                    
-
-
-
-
-
-                                                                                                                                                                                                            </mask>
-
-
-
-
-
-                    
-
-
-
-
-
-                                                                                                                                                                                                        )}
-
-
-
-
-
-                                                                            </defs>
-
-
-
-
-
                                         
-
-
-
-
-
-                                                                            <g>
-
-
-
-
-
-                                                                                <g>
-
-
-
-
-
-                                                                                    <rect
-
-
-
-
-
-                                                                                        width={SVG_WIDTH}
-
-
-
-
-
-                                                                                        height={SVG_HEIGHT}
-
-
-
-
-
-                                                                                        rx="20"
-
-
-
-
-
-                                                                                        fill={
-
-
-
-
-
-                                                                                            gradientMap[cardColor] ||
-
-
-
-
-
-                                                                                            (isValidCssColor(cardColor) ? cardColor : gradientMap.black)
-
-
-
-
-
-                                                                                        }
-
-
-
-
-
-                                                                                        stroke={cardColor === 'visa' ? '#CCCCCC' : 'none'}
-
-
-
-
-
-                                                                                        strokeWidth={cardColor === 'visa' ? '1' : '0'}
-
-
-
-
-
-                                                                                    />
-
-
-
-
-
-                                                                                </g>
-
-
-
-
-
-                                        
-
-
-
-
-
-                                        
-
-
-
-
-
-                                                                                                                        {finalLogoUrl && (
-                                                                                                                            <rect
-                                                                                                                                x={logoX}
-                                                                                                                                y={logoY}
-                                                                                                                                height={logoSvgHeight}
-                                                                                                                                width={logoSvgWidth}
-                                                                                                                                mask={`url(#${uniqueIds.mask})`}
-                                                                                                                                fill={effectiveEngravingColor}
-                                                                                                                                                                                                                                                                                                                            transform={`
-                                                                                                                                                                                                                                                                                                                                rotate(${rotation}, ${logoX + logoSvgWidth / 2}, ${logoY + logoSvgHeight / 2})
-                                                                                                                                                                                                                                                                                                                            `}                                                                                                                            />
-                                                                                                                        )}
-
-
-
-
-
-                                        
-
-
-
-
-
-                                                                                {cardColor === 'black' && ( <rect width={SVG_WIDTH} height={SVG_HEIGHT} rx="20" fill={`url(#${uniqueIds.blackSpotlight})`} style={{ mixBlendMode: 'lighten' }} /> )}
-
-
-
-
-
-                                        {cardColor === 'silver' && ( <rect width={SVG_WIDTH} height={SVG_HEIGHT} rx="20" fill={`url(#${uniqueIds.silverSpotlight})`} style={{ mixBlendMode: 'lighten' }} /> )}
-
-
-
-
-
-                                        {cardColor !== 'black' && cardColor !== 'silver' && ( <rect width={SVG_WIDTH} height={SVG_HEIGHT} rx="20" fill={`url(#${uniqueIds.spotlight})`} style={{ mixBlendMode: 'lighten' }} /> )}
-
-
-
-
-
-                                                                                
-
-
-
-
-
-                                    </g>
-
+                    {finalLogoUrl && (
+                        <mask id={uniqueIds.mask}>
+                            {svgContent ? (
+                                <g dangerouslySetInnerHTML={{ __html: svgContent }} />
+                            ) : (
+                                <image 
+                                    href={finalLogoUrl} 
+                                    x="0" y="0" 
+                                    width="100%" height="100%" 
+                                    preserveAspectRatio="xMidYMid meet" 
+                                    filter="url(#white-mask-filter)"
+                                />
+                            )}
+                        </mask>
+                    )}
+                </defs>
+                <g>
+                    {/* 1. Base Card Fill */}
+                    <g>
+                        <rect
+                            width={SVG_WIDTH}
+                            height={SVG_HEIGHT}
+                            rx="20"
+                            fill={
+                                gradientMap[cardColor] ||
+                                (isValidCssColor(cardColor) ? cardColor : gradientMap.black)
+                            }
+                            stroke={cardColor === 'visa' ? '#CCCCCC' : 'none'}
+                            strokeWidth={cardColor === 'visa' ? '1' : '0'}
+                        />
+                    </g>
+                    
+                    {/* 2. Logo Group (Draw logo BEFORE the general spotlight) */}
+                    {finalLogoUrl && (
+                        <g>
+                            {/* The transformed group for the logo */}
+                            <g
+                                transform={`translate(${logoX}, ${logoY}) scale(${scale}) rotate(${rotation}, ${unscaledLogoSvgWidth / 2}, ${unscaledLogoSvgHeight / 2})`}
+                            >
+                                <rect
+                                    x="0"
+                                    y="0"
+                                    height={unscaledLogoSvgHeight} 
+                                    width={unscaledLogoSvgWidth}   
+                                    mask={`url(#${uniqueIds.mask})`}
+                                    fill={effectiveEngravingColor}
+                                />
+                            </g>
+                            
+                            {/* Four Transform Handles (using the offset position for rendering) */}
+                            {showTransformHandles && transformBoundaries.render.map((pos, i) => (
+                                <circle 
+                                    key={i} 
+                                    cx={pos.x} 
+                                    cy={pos.y} 
+                                    r="4" 
+                                    fill="white" 
+                                    stroke="black" 
+                                    strokeWidth="1" 
+                                    cursor="pointer" 
+                                    onMouseDown={(e) => handleCornerDragStart(e, i)} 
+                                    onTouchStart={(e) => handleCornerDragStart(e, i)} 
+                                />
+                            ))}
+                        </g>
+                    )}
+
+                    {/* 3. Spotlight Effects (Draw OVER the logo) */}
+                    {cardColor === 'black' && ( <rect width={SVG_WIDTH} height={SVG_HEIGHT} rx="20" fill={`url(#${uniqueIds.blackSpotlight})`} /> )}
+                    {cardColor === 'silver' && ( <rect width={SVG_WIDTH} height={SVG_HEIGHT} rx="20" fill={`url(#${uniqueIds.silverSpotlight})`} /> )}
+                    {cardColor !== 'black' && cardColor !== 'silver' && ( <rect width={SVG_WIDTH} height={SVG_HEIGHT} rx="20" fill={`url(#${uniqueIds.spotlight})`} /> )}
+
+                </g>
                 <path d="M40,85 h30 a5,5 0 0 1 5,5 v20 a5,5 0 0 1 -5,5 h-30 a5,5 0 0 1 -5,-5 v-20 a5,5 0 0 1 5,-5 z" fill={`url(#${uniqueIds.simStripes})`} opacity="0.9" />
             </svg>
         </div>

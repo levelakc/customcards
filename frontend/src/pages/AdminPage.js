@@ -235,7 +235,7 @@ export default function AdminPage() {
     const [previewUrl, setPreviewUrl] = useState('');
 
     const [customization, setCustomization] = useState({
-        position: { x: 50, y: 50 },
+        position: { x: 45, y: 10 }, // Set initial position to match default preview
         scale: 1,
         rotation: 0,
     });
@@ -293,7 +293,8 @@ export default function AdminPage() {
     
     const resetProductForm = () => {
         setProductForm({ name: '', description: '', price: '', image: '', category: categories[0]?._id || '', availableColors: new Set(ALL_CARD_COLORS), isUpsellProduct: false });
-        setCustomization({ position: { x: 50, y: 50 }, scale: 1, rotation: 0 });
+        // Reset customization to default values
+        setCustomization({ position: { x: 45, y: 10 }, scale: 1, rotation: 0 });
         setIsEditing(false);
         setEditingId(null);
         setSelectedFile(null);
@@ -311,7 +312,8 @@ export default function AdminPage() {
             availableColors: new Set(product.availableColors),
             isUpsellProduct: product.isUpsellProduct || false,
         });
-        setCustomization(product.customization || { position: { x: 50, y: 50 }, scale: 1, rotation: 0 });
+        // Load existing customization, defaulting to standard values if missing
+        setCustomization(product.customization || { position: { x: 45, y: 10 }, scale: 1, rotation: 0 });
     };
     
     const handleSelectCategoryToEdit = (category) => {
@@ -355,20 +357,22 @@ export default function AdminPage() {
             image: imageUrl, 
             price: Number(productForm.price), 
             availableColors: Array.from(productForm.availableColors),
-            customization: customization,
+            customization: customization, // Include the customization object
         };
         
         try {
             if (isEditing) {
-                await api.updateProduct(editingId, productData, token);
+                // FIX for 404: Ensure we are using updateProduct with the correct ID
+                await api.updateProduct(editingId, productData, token); 
             }
             else {
+                // FIX for 404: Ensure we are using addProduct for new items
                 await api.addProduct(productData, token);
             }
             resetProductForm();
             fetchData();
         } catch (err) {
-            alert(`שגיאה: ${err.message}`);
+            alert(`שגיאה: ${err.message}. ${err.response?.data?.message || ''}`); // Improved error message
         }
     };
 
@@ -440,31 +444,72 @@ export default function AdminPage() {
                 <div>
                     <h2 className="text-2xl font-bold mb-4">{isEditing ? 'עריכת מוצר' : 'הוסף מוצר חדש'}</h2>
                     
-                    <div className="mb-6 p-4 bg-gray-900 rounded-lg">
-                        <h3 className="text-lg font-semibold mb-2 text-center">תצוגה מקדימה</h3>
-                        {/* THE FIX: Conditional rendering for the preview */}
-                        {productForm.isUpsellProduct ? (
-                            <WalletPreview
-                                customSvgUrl={previewUrl}
-                                svgPosition={customization.position}
-                                svgScale={customization.scale}
-                                svgRotation={customization.rotation}
-                            />
-                        ) : (
-                            <CreditCardPreview
-                                cardColor="black"
-                                engravingColor="silver"
-                                logoUrl={previewUrl}
-                                position={customization.position}
-                                scale={customization.scale}
-                                rotation={customization.rotation}
-                                onPositionChange={(pos) => setCustomization(c => ({ ...c, position: pos }))}
-                                isDraggable={true}
-                            />
-                        )}
-                    </div>
-
                     <form onSubmit={handleProductFormSubmit}>
+                        <div className="mb-6 p-4 bg-gray-900 rounded-lg">
+                            <h3 className="text-lg font-semibold mb-2 text-center">תצוגה מקדימה</h3>
+                            {/* THE FIX: Conditional rendering for the preview */}
+                            {productForm.isUpsellProduct ? (
+                                <WalletPreview
+                                    customSvgUrl={previewUrl}
+                                    svgPosition={customization.position}
+                                    svgScale={customization.scale}
+                                    svgRotation={customization.rotation}
+                                />
+                            ) : (
+                                <CreditCardPreview
+                                    cardColor="black"
+                                    engravingColor="silver"
+                                    logoUrl={previewUrl}
+                                    position={customization.position}
+                                    scale={customization.scale}
+                                    rotation={customization.rotation}
+                                    onPositionChange={(pos) => setCustomization(c => ({ ...c, position: pos }))}
+                                    onScaleChange={(scale) => setCustomization(c => ({ ...c, scale: scale }))}
+                                    onRotationChange={(rotation) => setCustomization(c => ({ ...c, rotation: rotation }))}
+                                    isDraggable={true}
+                                    showTransformHandles={true}
+                                />
+                            )}
+                            <div className="space-y-4 pt-4">
+                                <h3 className="text-lg font-semibold">התאם את העיצוב</h3>
+                                <p className="text-sm text-gray-400">גרור את פינות העיצוב כדי לשנות את גודלו וסיבובו.</p>
+                                
+                                {/* SCALE SLIDER - ADDED */}
+                                <div>
+                                    <label htmlFor="scale-slider" className="block text-sm font-medium mb-1">
+                                        גודל (Scale): {customization.scale.toFixed(2)}x
+                                    </label>
+                                    <input
+                                        id="scale-slider"
+                                        type="range"
+                                        min="0.25"
+                                        max="4"
+                                        step="0.01"
+                                        value={customization.scale}
+                                        onChange={(e) => setCustomization(c => ({ ...c, scale: parseFloat(e.target.value) }))}
+                                        className="w-full h-2 bg-gray-700 rounded-lg appearance-none cursor-pointer range-lg"
+                                    />
+                                </div>
+
+                                {/* ROTATION SLIDER - ADDED */}
+                                <div>
+                                    <label htmlFor="rotation-slider" className="block text-sm font-medium mb-1">
+                                        סיבוב (Rotation): {Math.round(customization.rotation)}°
+                                    </label>
+                                    <input
+                                        id="rotation-slider"
+                                        type="range"
+                                        min="0"
+                                        max="360"
+                                        step="1"
+                                        value={customization.rotation}
+                                        onChange={(e) => setCustomization(c => ({ ...c, rotation: parseFloat(e.target.value) }))}
+                                        className="w-full h-2 bg-gray-700 rounded-lg appearance-none cursor-pointer range-lg"
+                                    />
+                                </div>
+                                
+                            </div>
+                        </div>
                         <div className="bg-gray-800 p-6 rounded-lg space-y-4">
                             <div><label className="block mb-1">שם המוצר</label><input type="text" name="name" value={productForm.name} onChange={handleProductInputChange} required className="w-full bg-gray-700 rounded p-2 border border-gray-600"/></div>
                             <div><label className="block mb-1">תיאור</label><textarea name="description" value={productForm.description} onChange={handleProductInputChange} required className="w-full bg-gray-700 rounded p-2 border border-gray-600 h-24"/></div>
@@ -485,18 +530,7 @@ export default function AdminPage() {
                                 <input type="text" name="image" value={productForm.image} onChange={handleProductInputChange} placeholder="https://example.com/logo.svg" className="w-full bg-gray-700 rounded p-2 border border-gray-600"/>
                             </div>
                             
-                            <div className="space-y-4 pt-4 border-t border-gray-700">
-                                <h3 className="text-lg font-semibold">התאם את העיצוב</h3>
-                                <div>
-                                    <label htmlFor="scale" className="block mb-2 text-sm font-medium">גודל (זום):</label>
-                                    <input id="scale" type="range" min="0.5" max="2.5" step="0.05" value={customization.scale} onChange={(e) => setCustomization(c => ({ ...c, scale: parseFloat(e.target.value) }))} className="w-full h-2 bg-gray-600 rounded-lg appearance-none cursor-pointer"/>
-                                </div>
-                                <div>
-                                    <label htmlFor="rotation" className="block mb-2 text-sm font-medium">סיבוב:</label>
-                                    <input id="rotation" type="range" min="0" max="360" step="1" value={customization.rotation} onChange={(e) => setCustomization(c => ({ ...c, rotation: parseInt(e.target.value) }))} className="w-full h-2 bg-gray-600 rounded-lg appearance-none cursor-pointer"/>
-                                </div>
-                            </div>
-
+                            
                             <div><label className="block mb-1">קטגוריה</label><select name="category" value={productForm.category} onChange={handleProductInputChange} className="w-full bg-gray-700 rounded p-2 border border-gray-600">{categories.map(c => <option key={c._id} value={c._id}>{c.name}</option>)}</select></div>
                             
                             <div className="flex items-center pt-2">
