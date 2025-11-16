@@ -4,7 +4,7 @@ import { useAuth } from '../contexts/AuthContext';
 import { useCart } from '../contexts/CartContext';
 import { useSiteSettings } from '../contexts/SiteSettingsContext';
 import * as api from '../api/api';
-import { ShoppingCartIcon, MenuIcon, XIcon } from './Icons';
+import { ShoppingCartIcon, MenuIcon, XIcon, SearchIcon } from './Icons';
 
 
 
@@ -76,6 +76,9 @@ export default function Navbar() {
                     <div className="flex items-center">
                         <div className="hidden md:flex items-center">
                             
+                            <button onClick={() => navigate('search')} className="relative p-2 rounded-full hover:bg-gray-700 hover:bg-opacity-50 focus:outline-none ml-4">
+                                <SearchIcon />
+                            </button>
                             {isAuthenticated ? (
                                 <div className="relative group">
                                     <button className="hover:bg-gray-700 hover:bg-opacity-50 px-3 py-2 rounded-md text-sm font-medium">
@@ -98,6 +101,9 @@ export default function Navbar() {
                         </div>
                         
                         <div className="flex items-center md:hidden">
+                            <button onClick={() => navigate('search')} className="relative p-2 rounded-full text-gray-400 hover:text-white hover:bg-gray-700 focus:outline-none">
+                                <SearchIcon />
+                            </button>
                             <button onClick={() => navigate('cart')} className="relative p-2 rounded-full text-gray-400 hover:text-white hover:bg-gray-700 focus:outline-none">
                                 <ShoppingCartIcon />
                                 {cartItemCount > 0 && (

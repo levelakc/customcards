@@ -65,6 +65,13 @@ export const getUpsellProduct = async () => {
     return await response.json();
 };
 
+export const searchProducts = async (params) => {
+    const query = new URLSearchParams(params).toString();
+    const response = await fetch(`${BASE_URL}/api/products/search?${query}`);
+    if (!response.ok) throw new Error('Could not fetch search results');
+    return await response.json();
+};
+
 // --- ADMIN: Products ---
 export const addProduct = async (productData, token) => {
     const response = await fetch(`${BASE_URL}/api/products`, {

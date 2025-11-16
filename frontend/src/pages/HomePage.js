@@ -156,7 +156,7 @@ export default function HomePage() {
                             transition: 'transform 0.2s ease-out'
                         }}
                     >
-                        <span>
+                        <span className="shimmer-text">
                             כרטיסי אשראי ממתכת. העיצוב שלך.
                         </span>
                     </h1>

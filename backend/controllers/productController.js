@@ -82,45 +82,42 @@ const getUpsellProduct = async (req, res) => {
         // It's okay if none is found, the frontend can handle this
         res.status(404).json({ message: 'No upsell product found' });
     }
+    getUpsellProduct
 };
 
-// @desc    Delete a product
-// @route   DELETE /api/products/:id
-const deleteProduct = async (req, res) => {
-    const product = await Product.findById(req.params.id);
-    if (product) {
-        await product.deleteOne();
-        res.json({ message: 'Product removed' });
-    } else {
-        res.status(404).json({ message: 'Product not found' });
+// @desc    Search products
+// @route   GET /api/products/search
+const searchProducts = async (req, res) => {
+    const { keyword, minPrice, maxPrice, color, engraveColor } = req.query;
+    let query = {};
+
+    if (keyword) {
+        query.$or = [
+            { name: { $regex: keyword, $options: 'i' } },
+            { description: { $regex: keyword, $options: 'i' } }
+        ];
     }
-};
 
-const createProductReview = async (req, res) => {
-    const { rating, comment } = req.body;
-    const product = await Product.findById(req.params.id);
+    if (minPrice || maxPrice) {
+        query.price = {};
+        if (minPrice) query.price.$gte = Number(minPrice);
+        if (maxPrice) query.price.$lte = Number(maxPrice);
+    }
 
-    if (product) {
-        const alreadyReviewed = product.reviews.find(r => r.user.toString() === req.user._id.toString());
-        if (alreadyReviewed) {
-            return res.status(400).json({ message: 'Product already reviewed' });
-        }
+    if (color) {
+        query.availableColors = { $in: [color] };
+    }
 
-        const review = {
-            name: req.user.name,
-            rating: Number(rating),
-            comment,
-            user: req.user._id,
-        };
+    if (engraveColor) {
+        // Assuming engraveColor is part of customization.engraveColors array
+        query['customization.engraveColors'] = { $in: [engraveColor] };
+    }
 
-        product.reviews.push(review);
-        product.numReviews = product.reviews.length;
-        product.rating = product.reviews.reduce((acc, item) => item.rating + acc, 0) / product.reviews.length;
-
-        await product.save();
-        res.status(201).json({ message: 'Review added' });
-    } else {
-        res.status(404).json({ message: 'Product not found' });
+    try {
+        const products = await Product.find(query).populate('category', 'name');
+        res.json(products);
+    } catch (error) {
+        res.status(500).json({ message: error.message });
     }
 };
 
@@ -131,5 +128,6 @@ export {
     updateProduct, 
     deleteProduct,
     createProductReview,
-    getUpsellProduct
+    getUpsellProduct,
+    searchProducts // Export the new searchProducts function
 };

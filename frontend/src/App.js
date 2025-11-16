@@ -23,6 +23,7 @@ import ProfilePage from './pages/ProfilePage';
 import AccessibilityPage from './pages/AccessibilityPage';
 import PolicyPage from './pages/PolicyPage';
 import CheckoutPage from './pages/CheckoutPage';
+import SearchPage from './pages/SearchPage';
 
 const GOOGLE_ANALYTICS_ID = 'YOUR_GOOGLE_ANALYTICS_ID'; // Replace with your Google Analytics ID
 const FACEBOOK_PIXEL_ID = 'YOUR_FACEBOOK_PIXEL_ID'; // Replace with your Facebook Pixel ID
@@ -54,6 +55,7 @@ function AppContent() {
             case 'accessibility': return <AccessibilityPage />;
             case 'policy': return <PolicyPage />;
             case 'checkout': return <CheckoutPage />;
+            case 'search': return <SearchPage />;
             default: return <HomePage />;
         }
     };
@@ -61,7 +63,7 @@ function AppContent() {
     return (
         <div dir="rtl" className="bg-gray-900 font-sans">
             <Navbar />
-            <main className="pt-20" style={{ willChange: 'transform' }}>{renderPage()}</main>
+            <main className="pt-20">{renderPage()}</main>
             <Footer />
             <CartPopup isVisible={showPopup} onClose={() => setShowPopup(false)} />
             <FloatingWhatsApp />
