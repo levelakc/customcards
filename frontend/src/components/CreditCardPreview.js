@@ -10,6 +10,20 @@ const isValidCssColor = (color) => {
     return s.color !== '';
 };
 
+// Utility function for throttling
+const throttle = (func, limit) => {
+    let inThrottle;
+    return function() {
+        const args = arguments;
+        const context = this;
+        if (!inThrottle) {
+            func.apply(context, args);
+            inThrottle = true;
+            setTimeout(() => (inThrottle = false), limit);
+        }
+    };
+};
+
 const SVG_WIDTH = 335;
 const SVG_HEIGHT = 210;
 const CARD_WIDTH_MM = 85.6;
@@ -150,21 +164,21 @@ const CreditCardPreview = React.memo(function CreditCardPreview({
     };
 
     useEffect(() => {
-        const handleMove = (e) => handleDragMove(e);
+        const throttledHandleMove = throttle(handleDragMove, 50); // Throttle to 50ms
         const handleEnd = () => handleDragEnd();
         
         const options = { passive: false };
 
         if (isDragging) {
-            window.addEventListener('mousemove', handleMove);
-            window.addEventListener('touchmove', handleMove, options);
+            window.addEventListener('mousemove', throttledHandleMove);
+            window.addEventListener('touchmove', throttledHandleMove, options);
             window.addEventListener('mouseup', handleEnd);
             window.addEventListener('touchend', handleEnd);
         }
 
         return () => {
-            window.removeEventListener('mousemove', handleMove);
-            window.removeEventListener('touchmove', handleMove, options);
+            window.removeEventListener('mousemove', throttledHandleMove);
+            window.removeEventListener('touchmove', throttledHandleMove, options);
             window.removeEventListener('mouseup', handleEnd);
             window.removeEventListener('touchend', handleEnd);
         };
@@ -237,21 +251,21 @@ const CreditCardPreview = React.memo(function CreditCardPreview({
     };
 
     useEffect(() => {
-        const handleMove = (e) => handleCornerDragMove(e);
+        const throttledHandleMove = throttle(handleCornerDragMove, 50); // Throttle to 50ms
         const handleEnd = () => handleCornerDragEnd();
 
         const options = { passive: false };
 
         if (isResizing) {
-            window.addEventListener('mousemove', handleMove);
-            window.addEventListener('touchmove', handleMove, options);
+            window.addEventListener('mousemove', throttledHandleMove);
+            window.addEventListener('touchmove', throttledHandleMove, options);
             window.addEventListener('mouseup', handleEnd);
             window.addEventListener('touchend', handleEnd);
         }
 
         return () => {
-            window.removeEventListener('mousemove', handleMove);
-            window.removeEventListener('touchmove', handleMove, options);
+            window.removeEventListener('mousemove', throttledHandleMove);
+            window.removeEventListener('touchmove', throttledHandleMove, options);
             window.removeEventListener('mouseup', handleEnd);
             window.removeEventListener('touchend', handleEnd);
         };
@@ -362,7 +376,8 @@ const CreditCardPreview = React.memo(function CreditCardPreview({
                 viewBox={`0 0 ${SVG_WIDTH} ${SVG_HEIGHT}`}
                 className={`w-full object-cover transition-transform duration-300 md:transform-style-3d md:rotate-x-5 md:-rotate-y-10 ${isDraggable ? (isDragging ? 'cursor-grabbing' : 'cursor-grab') : ''}`}
                 style={{
-                    filter: 'drop-shadow(0 10px 10px rgba(0,0,0,0.4))'
+                    filter: 'drop-shadow(0 10px 10px rgba(0,0,0,0.4))',
+                    touchAction: 'none'
                 }}
                 onMouseDown={handleDragStart}
                 onTouchStart={handleDragStart}
