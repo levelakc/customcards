@@ -84,7 +84,8 @@ export default function Carousel3D({ items }) {
 
     const resetIdleTimer = () => {
         clearTimeout(idleTimer.current);
-        autoRotate.current = false;
+        // autoRotate.current is set to false on drag start.
+        // It will be set to true after IDLE_TIMEOUT if no further interaction.
         idleTimer.current = setTimeout(() => {
             autoRotate.current = true;
         }, IDLE_TIMEOUT);
@@ -93,8 +94,8 @@ export default function Carousel3D({ items }) {
     const handleDragStart = useCallback((e) => {
         isDragging.current = true;
         velocity.current = 0;
-        autoRotate.current = false;
-        clearTimeout(idleTimer.current);
+        clearTimeout(idleTimer.current); // Clear any existing idle timer
+        autoRotate.current = false; // Disable auto-rotate immediately
 
         const clientX = e.touches ? e.touches[0].clientX : e.clientX;
         dragStart.current = { x: clientX, rotation: rotation, lastX: clientX, lastTime: Date.now() };
@@ -180,7 +181,8 @@ export default function Carousel3D({ items }) {
                                     top: '50%', 
                                     left: '50%', 
                                     marginTop: `${cardMarginTop}px`, 
-                                    marginLeft: `${cardMarginLeft}px`
+                                    marginLeft: `${cardMarginLeft}px`,
+                                    willChange: 'transform'
                                 }}
                             >
                                <ProductCard 
