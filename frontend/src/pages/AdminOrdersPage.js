@@ -74,7 +74,7 @@ export default function AdminOrdersPage() {
                 setOrderToDelete(null);
             } catch (error) {
                 console.error("Failed to delete order:", error);
-                alert("Could not delete order.");
+                alert(`Could not delete order: ${error.message}`);
             }
         }
     };
