@@ -374,7 +374,7 @@ const CreditCardPreview = React.memo(function CreditCardPreview({
                 ref={svgRef}
                 xmlns="http://www.w3.org/2000/svg"
                 viewBox={`0 0 ${SVG_WIDTH} ${SVG_HEIGHT}`}
-                className={`w-full object-cover transition-transform duration-300 md:transform-style-3d md:rotate-x-5 md:-rotate-y-10 ${isDraggable ? (isDragging ? 'cursor-grabbing' : 'cursor-grab') : ''}`}
+                className={`w-full object-cover md:transform-style-3d md:rotate-x-5 md:-rotate-y-10 ${isDraggable ? (isDragging ? 'cursor-grabbing' : 'cursor-grab') : ''}`}
                 style={{
                     filter: 'drop-shadow(0 10px 10px rgba(0,0,0,0.4))',
                     touchAction: 'none'
@@ -461,6 +461,7 @@ const CreditCardPreview = React.memo(function CreditCardPreview({
                             {/* The transformed group for the logo */}
                             <g
                                 transform={`translate(${logoX}, ${logoY}) scale(${scale}) rotate(${rotation}, ${unscaledLogoSvgWidth / 2}, ${unscaledLogoSvgHeight / 2})`}
+                                style={{ willChange: 'transform' }}
                             >
                                 <rect
                                     x="0"
