@@ -18,7 +18,7 @@ const X_RATIO = SVG_WIDTH / CARD_WIDTH_MM;
 const Y_RATIO = SVG_HEIGHT / CARD_HEIGHT_MM;
 // Removed unused variable: MOBILE_BREAKPOINT
 
-export default function CreditCardPreview({
+const CreditCardPreview = React.memo(function CreditCardPreview({
     cardColor = 'black',
     engravingColor = 'silver',
     logoUrl = null,
@@ -65,12 +65,10 @@ export default function CreditCardPreview({
     }, [logoUrl]);
 
     useEffect(() => {
-    
         if (finalLogoUrl && finalLogoUrl.endsWith('.svg')) {
             fetch(finalLogoUrl)
                 .then(response => response.text())
                 .then(svgText => {
-
                     const parser = new DOMParser();
                     const svgDoc = parser.parseFromString(svgText, "image/svg+xml").documentElement;
 
@@ -81,32 +79,27 @@ export default function CreditCardPreview({
                         if (parts.length === 4 && parts[2] > 0 && parts[3] > 0) {
                             ratio = parts[2] / parts[3];
                         }
+                    } else {
+                        const w = parseFloat(svgDoc.getAttribute('width'));
+                        const h = parseFloat(svgDoc.getAttribute('height'));
+                        if (w > 0 && h > 0) {
+                            ratio = w / h;
+                            svgDoc.setAttribute('viewBox', `0 0 ${w} ${h}`);
+                        }
                     }
                     setSvgRatio(ratio);
 
-                    // Remove width and height attributes to prevent incorrect scaling
-                    svgDoc.removeAttribute('width');
-                    svgDoc.removeAttribute('height');
                     svgDoc.setAttribute('width', '100%');
                     svgDoc.setAttribute('height', '100%');
                     svgDoc.setAttribute('preserveAspectRatio', 'xMidYMid meet');
 
-                    // Set fill to white for all paths, circles, rects within the SVG
-                    svgDoc.querySelectorAll('path, circle, rect, polygon, line, polyline, ellipse')
-                        .forEach(el => {
-                            el.setAttribute('fill', 'white');
-                            el.removeAttribute('stroke'); // Remove stroke to ensure clean mask
-                        });
-                    const processedSvg = svgDoc.outerHTML;
-
-                    setSvgContent(processedSvg);
+                    setSvgContent(svgDoc.outerHTML);
                 })
                 .catch(error => {
                     console.error("Error fetching SVG:", error);
                     setSvgContent('<text x="50%" y="50%" fill="red" text-anchor="middle">Error loading SVG</text>');
                 });
         } else {
-        
             setSvgContent(null);
         }
     }, [finalLogoUrl]);
@@ -418,7 +411,7 @@ export default function CreditCardPreview({
                     {finalLogoUrl && (
                         <mask id={uniqueIds.mask}>
                             {svgContent ? (
-                                <g dangerouslySetInnerHTML={{ __html: svgContent }} />
+                                <g dangerouslySetInnerHTML={{ __html: svgContent }} filter="url(#white-mask-filter)" />
                             ) : (
                                 <image 
                                     href={finalLogoUrl} 
@@ -492,4 +485,6 @@ export default function CreditCardPreview({
             </svg>
         </div>
     );
-}
+});
+
+export default CreditCardPreview;

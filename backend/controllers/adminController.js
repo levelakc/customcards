@@ -151,28 +151,10 @@ const getTopSellingProducts = asyncHandler(async (req, res) => {
         { $match: { 'productDetails': { $ne: [] } } }, // Only proceed if productDetails is not empty
         { $unwind: '$productDetails' },
         {
-            $addFields: {
-                sanitizedProductName: {
-                    $cond: {
-                        if: { $regexMatch: { input: '$productDetails.name', regex: '^\$' } },
-                        then: { $substrCP: ['$productDetails.name', 1, { $strLenCP: '$productDetails.name' }] },
-                        else: '$productDetails.name'
-                    }
-                },
-                sanitizedProductImage: {
-                    $cond: {
-                        if: { $regexMatch: { input: '$productDetails.image', regex: '^\$' } },
-                        then: { $substrCP: ['$productDetails.image', 1, { $strLenCP: '$productDetails.image' }] },
-                        else: '$productDetails.image'
-                    }
-                }
-            }
-        },
-        {
             $group: {
                 _id: '$orderItems.product',
-                name: { $first: '$sanitizedProductName' },
-                image: { $first: '$sanitizedProductImage' },
+                name: { $first: '$productDetails.name' },
+                image: { $first: '$productDetails.image' },
                 totalRevenue: { $sum: { $multiply: ['$orderItems.qty', '$orderItems.price'] } },
                 totalSold: { $sum: '$orderItems.qty' }
             }
@@ -203,13 +185,7 @@ const getSalesByCategory = asyncHandler(async (req, res) => {
         { $unwind: '$categoryDetails' },
         {
             $group: {
-                _id: {
-                    $cond: {
-                        if: { $regexMatch: { input: '$categoryDetails.name', regex: '^\$' } },
-                        then: { $substrCP: ['$categoryDetails.name', 1, { $strLenCP: '$categoryDetails.name' }] },
-                        else: '$categoryDetails.name'
-                    }
-                },
+                _id: '$categoryDetails.name',
                 totalRevenue: { $sum: { $multiply: ['$orderItems.qty', '$orderItems.price'] } },
                 totalSold: { $sum: '$orderItems.qty' },
             },
