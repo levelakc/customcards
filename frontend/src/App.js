@@ -61,7 +61,7 @@ function AppContent() {
     return (
         <div dir="rtl" className="bg-gray-900 font-sans">
             <Navbar />
-            <main className="pt-20">{renderPage()}</main>
+            <main className="pt-20" style={{ willChange: 'transform' }}>{renderPage()}</main>
             <Footer />
             <CartPopup isVisible={showPopup} onClose={() => setShowPopup(false)} />
             <FloatingWhatsApp />
