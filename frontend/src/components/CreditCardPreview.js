@@ -303,7 +303,7 @@ const CreditCardPreview = React.memo(function CreditCardPreview({
         const centerY = logoY + currentLogoSvgHeight / 2;
         
         // Factor to move the handles inward (1.0 = corner, 0.75 = 1/4 of the way toward center)
-        const inwardFactor = 0.75; 
+        const inwardFactor = 1.0; 
 
         // 1. Calculate the corners of the *currently scaled* bounding box *before* rotation
         const corners = [

@@ -100,7 +100,6 @@ export default function HomePage() {
                         autoPlay loop muted playsInline
                         className="absolute z-0 w-auto min-w-full min-h-full max-w-none transition-transform duration-500 ease-out"
                         style={{ 
-                            transform: `scale(${1 + scrollPosition / 2000})`,
                             opacity: videoOpacity
                         }}
                         src={(() => {
@@ -131,7 +130,6 @@ export default function HomePage() {
                     <h1 
                         className="text-5xl md:text-7xl font-extrabold mb-4 drop-shadow-lg"
                         style={{
-                            transform: `scale(${1 + scrollPosition / 1000})`,
                             transition: 'transform 0.2s ease-out'
                         }}
                     >
