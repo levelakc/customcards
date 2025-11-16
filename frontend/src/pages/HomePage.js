@@ -121,7 +121,7 @@ export default function HomePage() {
                     <video
                         key={backgroundVideoUrl}
                         autoPlay loop muted playsInline
-                        className="absolute z-0 w-auto min-w-full min-h-full max-w-none transition-transform duration-500 ease-out"
+                        className="absolute z-0 w-full h-full object-cover transition-transform duration-500 ease-out"
                         style={{ 
                             opacity: videoOpacity
                         }}
