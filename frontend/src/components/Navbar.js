@@ -56,8 +56,8 @@ export default function Navbar() {
                     <div className="flex items-center">
                         <div className="flex-shrink-0">
                             {finalLogoUrl && (
-                                <button onClick={() => navigate('home')} className="cursor-pointer focus:outline-none">
-                                    <img src={finalLogoUrl} alt="VIPCard Logo" height="112px" width="112px" />
+                            <button onClick={() => navigate('home')} className="cursor-pointer focus:outline-none" style={{ marginTop: '20px' }}>
+                                    <img src={finalLogoUrl} alt="VIPCard Logo" height="224px" width="224px" />
                                 </button>
                             )}
                         </div>
