@@ -355,7 +355,7 @@ const CreditCardPreview = React.memo(function CreditCardPreview({
     };
 
     return (
-        <div className="w-full md:perspective-1000">
+        <div className="w-full md:perspective-1000" style={{ transform: 'translateZ(0)' }}>
             <svg
                 ref={svgRef}
                 xmlns="http://www.w3.org/2000/svg"

@@ -173,7 +173,7 @@ export default function Carousel3D({ items }) {
                                 className="absolute h-auto"
                                 style={{
                                     width: `${cardWidth}px`,
-                                    transform: `rotateY(${i * itemAngle}deg) translateZ(${radius}px) translateZ(0)`,
+                                    transform: `rotateY(${i * itemAngle}deg) translateZ(${radius}px)`,
                                     backfaceVisibility: 'hidden',
                                     WebkitBackfaceVisibility: 'hidden',
                                     top: '50%', 
