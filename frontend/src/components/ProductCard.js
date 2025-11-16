@@ -32,6 +32,7 @@ export default function ProductCard({ product, cardColorKey, engravingColorKey, 
         >
             <div className="transition-transform duration-300 md:group-hover:-translate-y-2">
                 <CreditCardPreview 
+                    key={`${finalCardColor}-${finalEngravingColor}`}
                     cardColor={finalCardColor}
                     engravingColor={finalEngravingColor}
                     logoUrl={product.image}
