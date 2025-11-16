@@ -2,8 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import { getReviews, deleteReview } from '../api/api'; // Assuming getReviews is also in api.js
-import Loader from '../components/Loader'; // Assuming a Loader component exists
-import Message from '../components/Message'; // Assuming a Message component exists
+// Removed unused imports: Loader, Message
 
 const AdminReviewsPage = () => {
     const [reviews, setReviews] = useState([]);
@@ -56,9 +55,9 @@ const AdminReviewsPage = () => {
         <div className="container mx-auto p-4">
             <h1 className="text-2xl font-bold mb-4">Reviews</h1>
             {loading ? (
-                <Loader />
+                <div className="text-center p-10 text-white">Loading Reviews...</div>
             ) : error ? (
-                <Message type="error">{error}</Message>
+                <div className="text-center p-10 text-red-400">Error: {error}</div>
             ) : (
                 <div className="overflow-x-auto">
                     <table className="min-w-full bg-white border border-gray-200">
