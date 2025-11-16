@@ -39,12 +39,12 @@ let onlineUsers = 0;
 io.on('connection', (socket) => {
   onlineUsers++;
   io.emit('onlineUsers', onlineUsers);
-  console.log('a user connected');
+  console.log('a user connected, total online users:', onlineUsers);
 
   socket.on('disconnect', () => {
     onlineUsers--;
     io.emit('onlineUsers', onlineUsers);
-    console.log('user disconnected');
+    console.log('user disconnected, total online users:', onlineUsers);
   });
 });
 

@@ -143,26 +143,22 @@ const getSalesTrend = asyncHandler(async (req, res) => {
 // @route   GET /api/admin/dashboard/top-products
 // @access  Private/Admin
 const getTopSellingProducts = asyncHandler(async (req, res) => {
-    const topProducts = await Order.aggregate([
-        { $unwind: '$orderItems' },
-        // Ensure product ID is a valid ObjectId before lookup
-        { $match: { 'orderItems.product': { $type: 'objectId' } } },
-        { $lookup: { from: 'products', localField: '$orderItems.product', foreignField: '_id', as: 'productDetails' } },
-        { $match: { 'productDetails': { $ne: [] } } }, // Only proceed if productDetails is not empty
-        { $unwind: '$productDetails' },
-        {
-            $group: {
-                _id: '$orderItems.product',
-                name: { $first: '$productDetails.name' },
-                image: { $first: '$productDetails.image' },
-                totalRevenue: { $sum: { $multiply: ['$orderItems.qty', '$orderItems.price'] } },
-                totalSold: { $sum: '$orderItems.qty' }
-            }
-        },
-        { $sort: { totalRevenue: -1 } },
-        { $limit: 5 }, // Top 5 products
-        { $project: { _id: 0, name: 1, image: 1, totalRevenue: 1, totalSold: 1 } },
-    ]);
+    const topProducts = await Order.aggregate()
+        .unwind('$orderItems')
+        .match({ 'orderItems.product': { $type: 'objectId' } })
+        .lookup({ from: 'products', localField: 'orderItems.product', foreignField: '_id', as: 'productDetails' })
+        .match({ 'productDetails': { $ne: [] } })
+        .unwind('$productDetails')
+        .group({
+            _id: '$orderItems.product',
+            name: { $first: '$productDetails.name' },
+            image: { $first: '$productDetails.image' },
+            totalRevenue: { $sum: { $multiply: ['$orderItems.qty', '$orderItems.price'] } },
+            totalSold: { $sum: '$orderItems.qty' }
+        })
+        .sort({ totalRevenue: -1 })
+        .limit(5)
+        .project({ _id: 0, name: 1, image: 1, totalRevenue: 1, totalSold: 1 });
 
     res.json(topProducts);
 });
@@ -171,35 +167,28 @@ const getTopSellingProducts = asyncHandler(async (req, res) => {
 // @route   GET /api/admin/dashboard/sales-by-category
 // @access  Private/Admin
 const getSalesByCategory = asyncHandler(async (req, res) => {
-    const salesByCategory = await Order.aggregate([
-        { $unwind: '$orderItems' },
-        // Ensure product ID is a valid ObjectId before lookup
-        { $match: { 'orderItems.product': { $type: 'objectId' } } },
-        { $lookup: { from: 'products', localField: '$orderItems.product', foreignField: '_id', as: 'productDetails' } },
-        { $match: { 'productDetails': { $ne: [] } } }, // Only proceed if productDetails is not empty
-        { $unwind: '$productDetails' },
-        // Ensure category ID is a valid ObjectId before lookup
-        { $match: { 'productDetails.category': { $type: 'objectId' } } },
-        { $lookup: { from: 'categories', localField: '$productDetails.category', foreignField: '_id', as: 'categoryDetails' } },
-        { $match: { 'categoryDetails': { $ne: [] } } }, // Only proceed if categoryDetails is not empty
-        { $unwind: '$categoryDetails' },
-        {
-            $group: {
-                _id: '$categoryDetails.name',
-                totalRevenue: { $sum: { $multiply: ['$orderItems.qty', '$orderItems.price'] } },
-                totalSold: { $sum: '$orderItems.qty' },
-            },
-        },
-        { $sort: { totalRevenue: -1 } },
-        {
-            $project: {
-                _id: 0,
-                category: "$_id", // Directly use _id from group stage
-                totalRevenue: 1,
-                totalSold: 1,
-            },
-        },
-    ]);
+    const salesByCategory = await Order.aggregate()
+        .unwind('$orderItems')
+        .match({ 'orderItems.product': { $type: 'objectId' } })
+        .lookup({ from: 'products', localField: 'orderItems.product', foreignField: '_id', as: 'productDetails' })
+        .match({ 'productDetails': { $ne: [] } })
+        .unwind('$productDetails')
+        .match({ 'productDetails.category': { $type: 'objectId' } })
+        .lookup({ from: 'categories', localField: 'productDetails.category', foreignField: '_id', as: 'categoryDetails' })
+        .match({ 'categoryDetails': { $ne: [] } })
+        .unwind('$categoryDetails')
+        .group({
+            _id: '$categoryDetails.name',
+            totalRevenue: { $sum: { $multiply: ['$orderItems.qty', '$orderItems.price'] } },
+            totalSold: { $sum: '$orderItems.qty' }
+        })
+        .sort({ totalRevenue: -1 })
+        .project({
+            _id: 0,
+            category: '$_id',
+            totalRevenue: 1,
+            totalSold: 1
+        });
 
     res.json(salesByCategory);
 });
