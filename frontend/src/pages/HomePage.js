@@ -5,7 +5,7 @@ import CategoryGallery from '../components/CategoryGallery';
 import PersonalDesignPage from './PersonalDesignPage';
 import AboutUs from '../components/AboutUs';
 import Reviews from '../components/Reviews';
-import RealLifeGallery from '../components/RealLifeGallery'; // FIX: The missing import is now added.
+import RealLifeGallery from '../components/RealLifeGallery'; 
 
 const MAX_CAROUSEL_ITEMS = 8;
 const MOBILE_BREAKPOINT = 768;
@@ -19,6 +19,25 @@ export default function HomePage() {
     const designsSectionRef = useRef(null);
     const personalDesignSectionRef = useRef(null);
 
+    // FIX: useEffect hook to calculate and set the viewport height for mobile browsers
+    useEffect(() => {
+        const setAppHeight = () => {
+            // Calculate the inner height of the window (the true viewport height)
+            const doc = document.documentElement;
+            doc.style.setProperty('--app-height', `${window.innerHeight}px`);
+        };
+
+        // Set the height on load and listen for changes
+        setAppHeight();
+        window.addEventListener('resize', setAppHeight);
+        window.addEventListener('orientationchange', setAppHeight);
+
+        return () => {
+            window.removeEventListener('resize', setAppHeight);
+            window.removeEventListener('orientationchange', setAppHeight);
+        };
+    }, []);
+    
     useEffect(() => {
         const fetchInitialData = async () => {
             try {
@@ -93,7 +112,11 @@ export default function HomePage() {
 
     return (
         <div>
-            <div className="relative h-screen flex items-center justify-center text-white text-center overflow-hidden">
+            {/* FIX: Removed 'h-screen' and used the custom 'var(--app-height)' style */}
+            <div 
+                className="relative flex items-center justify-center text-white text-center overflow-hidden"
+                style={{ height: 'var(--app-height, 100vh)' }} 
+            >
                 {backgroundVideoUrl && (
                     <video
                         key={backgroundVideoUrl}
