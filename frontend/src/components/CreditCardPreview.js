@@ -133,6 +133,7 @@ const CreditCardPreview = React.memo(function CreditCardPreview({
     const handleDragStart = (e) => {
         if (!isDraggable) return;
         if (e.cancelable) e.preventDefault();
+        e.stopPropagation(); // Stop event propagation
         setIsDragging(true);
         const startPoint = getSVGPoint(e);
         dragStartOffset.current = {
