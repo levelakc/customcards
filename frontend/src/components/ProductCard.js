@@ -30,9 +30,11 @@ export default function ProductCard({ product, cardColorKey, engravingColorKey, 
             onClick={handleClick}
             className="group flex flex-col h-full cursor-pointer"
         >
-            <div className="transition-transform duration-300 md:group-hover:-translate-y-2">
+            <div 
+                className="transition-transform duration-300 md:group-hover:-translate-y-2"
+                style={{ transform: 'translateZ(0)' }}
+            >
                 <CreditCardPreview 
-                    key={`${finalCardColor}-${finalEngravingColor}`}
                     cardColor={finalCardColor}
                     engravingColor={finalEngravingColor}
                     logoUrl={product.image}
