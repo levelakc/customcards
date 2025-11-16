@@ -27,4 +27,18 @@ const getReviews = async (req, res) => {
     res.json(reviews);
 };
 
-export { createReview, getReviews };
+// @desc    Delete a review
+// @route   DELETE /api/reviews/:id
+// @access  Private/Admin
+const deleteReview = async (req, res) => {
+    const review = await Review.findById(req.params.id);
+
+    if (review) {
+        await review.deleteOne(); // Use deleteOne() for Mongoose 6+
+        res.json({ message: 'Review removed' });
+    } else {
+        res.status(404).json({ message: 'Review not found' });
+    }
+};
+
+export { createReview, getReviews, deleteReview };

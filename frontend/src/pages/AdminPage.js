@@ -5,6 +5,7 @@ import { useSiteSettings } from '../contexts/SiteSettingsContext';
 import * as api from '../api/api';
 import AdminOrdersPage from './AdminOrdersPage';
 import AdminUsersPage from './AdminUsersPage';
+import AdminReviewsPage from './AdminReviewsPage'; // Import the new AdminReviewsPage
 import AdminDashboardPage from './AdminDashboardPage';
 import CreditCardPreview from '../components/CreditCardPreview';
 import WalletPreview from '../components/WalletPreview'; // 1. Import WalletPreview
@@ -125,7 +126,7 @@ function GallerySettingsPage() {
         } finally {
             setIsLoading(false);
         }
-    }, []);
+    }, [token]); // Added token to dependency array
 
     useEffect(() => {
         fetchGallery();
@@ -264,7 +265,7 @@ export default function AdminPage() {
         } finally {
             setLoading(false);
         }
-    }, []);
+    }, [token]); // Added token to dependency array
 
     useEffect(() => {
         if (isAdmin) {
@@ -425,6 +426,7 @@ export default function AdminPage() {
             <button type="button" onClick={() => setActiveTab('gallery')} className={`py-2 px-4 ${activeTab === 'gallery' ? 'border-b-2 border-indigo-500' : 'text-gray-400'}`}>גלריית תמונות</button>
             <button type="button" onClick={() => setActiveTab('orders')} className={`py-2 px-4 ${activeTab === 'orders' ? 'border-b-2 border-indigo-500' : 'text-gray-400'}`}>ניהול הזמנות</button>
             <button type="button" onClick={() => setActiveTab('users')} className={`py-2 px-4 ${activeTab === 'users' ? 'border-b-2 border-indigo-500' : 'text-gray-400'}`}>ניהול משתמשים</button>
+            <button type="button" onClick={() => setActiveTab('reviews')} className={`py-2 px-4 ${activeTab === 'reviews' ? 'border-b-2 border-indigo-500' : 'text-gray-400'}`}>ניהול ביקורות</button> {/* New Reviews Button */}
             <button type="button" onClick={() => setActiveTab('settings')} className={`py-2 px-4 ${activeTab === 'settings' ? 'border-b-2 border-indigo-500' : 'text-gray-400'}`}>הגדרות אתר</button>
         </div>
 
@@ -597,6 +599,7 @@ export default function AdminPage() {
         {activeTab === 'gallery' && <GallerySettingsPage />}
         {activeTab === 'orders' && <AdminOrdersPage />}
         {activeTab === 'users' && <AdminUsersPage />}
+        {activeTab === 'reviews' && <AdminReviewsPage />} {/* Render AdminReviewsPage */}
         {activeTab === 'settings' && <SiteSettingsPage />}
       </div>
     );

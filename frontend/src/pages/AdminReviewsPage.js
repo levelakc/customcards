@@ -1,0 +1,101 @@
+import React, { useEffect, useState } from 'react';
+import { useSelector } from 'react-redux';
+import { useNavigate } from 'react-router-dom';
+import { getReviews, deleteReview } from '../api/api'; // Assuming getReviews is also in api.js
+import Loader from '../components/Loader'; // Assuming a Loader component exists
+import Message from '../components/Message'; // Assuming a Message component exists
+
+const AdminReviewsPage = () => {
+    const [reviews, setReviews] = useState([]);
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState(null);
+    const [deleteSuccess, setDeleteSuccess] = useState(false);
+
+    const userLogin = useSelector((state) => state.userLogin);
+    const { userInfo } = userLogin;
+
+    const navigate = useNavigate();
+
+    useEffect(() => {
+        if (!userInfo || !userInfo.isAdmin) {
+            navigate('/login');
+        } else {
+            fetchReviews();
+        }
+    }, [userInfo, navigate, deleteSuccess]); // Re-fetch when a review is deleted
+
+    const fetchReviews = async () => {
+        try {
+            setLoading(true);
+            const data = await getReviews();
+            setReviews(data);
+            setLoading(false);
+        } catch (err) {
+            setError(err.message);
+            setLoading(false);
+        }
+    };
+
+    const deleteHandler = async (id) => {
+        if (window.confirm('Are you sure you want to delete this review?')) {
+            try {
+                setLoading(true);
+                await deleteReview(id, userInfo.token);
+                setDeleteSuccess(true); // Trigger re-fetch
+                setLoading(false);
+                // Optionally, clear deleteSuccess after a short delay or next fetch
+                setTimeout(() => setDeleteSuccess(false), 100); 
+            } catch (err) {
+                setError(err.message);
+                setLoading(false);
+            }
+        }
+    };
+
+    return (
+        <div className="container mx-auto p-4">
+            <h1 className="text-2xl font-bold mb-4">Reviews</h1>
+            {loading ? (
+                <Loader />
+            ) : error ? (
+                <Message type="error">{error}</Message>
+            ) : (
+                <div className="overflow-x-auto">
+                    <table className="min-w-full bg-white border border-gray-200">
+                        <thead>
+                            <tr>
+                                <th className="py-2 px-4 border-b">ID</th>
+                                <th className="py-2 px-4 border-b">User</th>
+                                <th className="py-2 px-4 border-b">Rating</th>
+                                <th className="py-2 px-4 border-b">Comment</th>
+                                <th className="py-2 px-4 border-b">Created At</th>
+                                <th className="py-2 px-4 border-b">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {reviews.map((review) => (
+                                <tr key={review._id}>
+                                    <td className="py-2 px-4 border-b">{review._id}</td>
+                                    <td className="py-2 px-4 border-b">{review.name}</td>
+                                    <td className="py-2 px-4 border-b">{review.rating}</td>
+                                    <td className="py-2 px-4 border-b">{review.comment}</td>
+                                    <td className="py-2 px-4 border-b">{new Date(review.createdAt).toLocaleDateString()}</td>
+                                    <td className="py-2 px-4 border-b">
+                                        <button
+                                            onClick={() => deleteHandler(review._id)}
+                                            className="bg-red-500 hover:bg-red-700 text-white font-bold py-1 px-2 rounded text-xs"
+                                        >
+                                            Delete
+                                        </button>
+                                    </td>
+                                </tr>
+                            ))}
+                        </tbody>
+                    </table>
+                </div>
+            )}
+        </div>
+    );
+};
+
+export default AdminReviewsPage;

@@ -274,6 +274,15 @@ export const createReview = async (reviewData, token) => {
     return data;
 };
 
+export const deleteReview = async (id, token) => {
+    const response = await fetch(`${BASE_URL}/api/reviews/${id}`, {
+        method: 'DELETE',
+        headers: getAuthHeaders(token),
+    });
+    if (!response.ok) throw new Error('Could not delete review');
+    return await response.json();
+};
+
 // --- SITE SETTINGS ---
 export const getSiteSettings = async () => {
     const response = await fetch(`${BASE_URL}/api/settings`);
