@@ -8,16 +8,17 @@ body {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   background-color: #111827;
+  overflow-x: hidden; /* Prevent horizontal scrolling */
 }
 
 /* --- Shimmering Text Effect --- */
 .shimmer-text {
-  background: linear-gradient(to right, #9ca3af 20%, #ffffff 50%, #9ca3af 80%);
+  background: linear-gradient(to right, rgba(255, 255, 255, 0.7) 20%, #ffffff 60%, rgba(255, 255, 255, 0.7) 80%);
   background-size: 200% auto;
   background-clip: text;
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
-  animation: shimmer 0ms linear infinite;
+  animation: shimmer 3s linear infinite; /* Adjusted animation duration */
   display: inline-block;
 }
 
