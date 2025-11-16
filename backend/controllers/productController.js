@@ -82,7 +82,6 @@ const getUpsellProduct = async (req, res) => {
         // It's okay if none is found, the frontend can handle this
         res.status(404).json({ message: 'No upsell product found' });
     }
-    getUpsellProduct
 };
 
 // @desc    Search products
