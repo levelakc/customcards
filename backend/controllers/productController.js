@@ -120,9 +120,6 @@ const searchProducts = async (req, res) => {
     }
 };
 
-    }
-};
-
 // @desc    Create new review
 // @route   POST /api/products/:id/reviews
 const createProductReview = async (req, res) => {
