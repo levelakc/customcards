@@ -133,7 +133,7 @@ export default function Carousel3D({ items }) {
     }
 
     const itemAngle = 360 / items.length;
-    const radius = isMobile ? 150 + (items.length * 8) : 200 + (items.length * 15);
+    const radius = isMobile ? 220 + (items.length * 8) : 200 + (items.length * 15);
     const cardWidth = isMobile ? 200 : 260;
     const cardMarginTop = isMobile ? -160 : -250;
     const cardMarginLeft = isMobile ? -100 : -130;
