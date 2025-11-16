@@ -144,6 +144,35 @@ export const updateOrderStatus = async (id, status, token) => {
     return await response.json();
 };
 
+export const deleteOrder = async (id, token) => {
+    const response = await fetch(`${BASE_URL}/api/orders/${id}`, {
+        method: 'DELETE',
+        headers: getAuthHeaders(token),
+    });
+    if (!response.ok) throw new Error('Could not delete order');
+    return await response.json();
+};
+
+export const deleteOrders = async (orderIds, token) => {
+    const response = await fetch(`${BASE_URL}/api/orders`, {
+        method: 'DELETE',
+        headers: getAuthHeaders(token),
+        body: JSON.stringify({ orderIds }),
+    });
+    if (!response.ok) throw new Error('Could not delete orders');
+    return await response.json();
+};
+
+export const updateOrder = async (id, orderData, token) => {
+    const response = await fetch(`${BASE_URL}/api/orders/${id}`, {
+        method: 'PUT',
+        headers: getAuthHeaders(token),
+        body: JSON.stringify(orderData),
+    });
+    if (!response.ok) throw new Error('Could not update order');
+    return await response.json();
+};
+
 // --- ADMIN: File Upload ---
 export const uploadFile = async (formData, token) => {
     const response = await fetch(`${BASE_URL}/api/upload/image`, {
