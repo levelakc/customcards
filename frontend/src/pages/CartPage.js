@@ -122,8 +122,15 @@ export default function CartPage() {
                                         />
                                     ) : (
                                         <CreditCardPreview
-                                            cardColor={item.selectedColor?.split(' ')[0].toLowerCase() || 'black'}
-                                            engravingColor={item.selectedColor?.split(' ')[2] || 'silver'}
+                                            cardColor={
+                                                (() => {
+                                                    const color = item.selectedColor?.toLowerCase().split(' ')[0];
+                                                    if (color === 'rose') return 'roseGold';
+                                                    if (color === 'golden') return 'gold';
+                                                    return color || 'black';
+                                                })()
+                                            }
+                                            engravingColor={item.selectedColor?.toLowerCase().includes('black') ? 'black' : item.selectedColor?.toLowerCase().includes('gold') ? 'gold' : 'silver'}
                                             logoUrl={item.image}
                                             isDraggable={false}
                                         />
