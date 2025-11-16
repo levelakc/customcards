@@ -2,7 +2,7 @@ import React from 'react';
 import { useRouter } from '../contexts/RouterContext';
 import CreditCardPreview from './CreditCardPreview';
 
-export default function ProductCard({ product, cardColorKey, engravingColorKey, disableClick = false }) {
+const ProductCard = ({ product, cardColorKey, engravingColorKey, disableClick = false }) => {
     const { navigate } = useRouter();
 
     if (!product) {
@@ -58,4 +58,6 @@ export default function ProductCard({ product, cardColorKey, engravingColorKey, 
             </div>
         </div>
     );
-}
+};
+
+export default React.memo(ProductCard);
