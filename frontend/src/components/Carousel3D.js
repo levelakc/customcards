@@ -176,6 +176,7 @@ export default function Carousel3D({ items }) {
                                     transform: `rotateY(${i * itemAngle}deg) translateZ(${radius}px)`,
                                     backfaceVisibility: 'hidden',
                                     WebkitBackfaceVisibility: 'hidden',
+                                    transformStyle: 'preserve-3d',
                                     top: '50%', 
                                     left: '50%', 
                                     marginTop: `${cardMarginTop}px`, 
