@@ -7,7 +7,7 @@ import AboutUs from '../components/AboutUs';
 import Reviews from '../components/Reviews';
 import RealLifeGallery from '../components/RealLifeGallery'; // FIX: The missing import is now added.
 
-const MAX_CAROUSEL_ITEMS = 10;
+const MAX_CAROUSEL_ITEMS = 8;
 const MOBILE_BREAKPOINT = 768;
 
 export default function HomePage() {
@@ -18,15 +18,6 @@ export default function HomePage() {
     const [videoOpacity, setVideoOpacity] = useState(0.3);
     const designsSectionRef = useRef(null);
     const personalDesignSectionRef = useRef(null);
-    const [isMobile, setIsMobile] = useState(window.innerWidth < MOBILE_BREAKPOINT);
-
-    useEffect(() => {
-        const handleResize = () => {
-            setIsMobile(window.innerWidth < MOBILE_BREAKPOINT);
-        };
-        window.addEventListener('resize', handleResize);
-        return () => window.removeEventListener('resize', handleResize);
-    }, []);
 
     useEffect(() => {
         const fetchInitialData = async () => {
@@ -100,8 +91,6 @@ export default function HomePage() {
         personalDesignSectionRef.current?.scrollIntoView({ behavior: 'smooth' });
     };
 
-    const carouselItems = isMobile ? featured.slice(0, 8) : featured;
-
     return (
         <div>
             <div className="relative h-screen flex items-center justify-center text-white text-center overflow-hidden">
@@ -173,7 +162,7 @@ export default function HomePage() {
             <div ref={designsSectionRef} className="py-20">
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                     <h2 className="text-3xl font-extrabold text-white text-center mb-16">העיצובים שלנו</h2>
-                    {featured.length > 0 ? <Carousel3D items={carouselItems} /> : <div className="text-center text-gray-400 py-10">טוען עיצובים...</div>}
+                    {featured.length > 0 ? <Carousel3D items={featured} /> : <div className="text-center text-gray-400 py-10">טוען עיצובים...</div>}
                 </div>
             </div>
 
