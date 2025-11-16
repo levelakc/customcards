@@ -148,8 +148,16 @@ export default function Carousel3D({ items }) {
             onMouseMove={handleDragMove}
             onTouchMove={handleDragMove}
             onMouseUp={handleDragEnd}
-            onMouseLeave={handleDragEnd}
             onTouchEnd={handleDragEnd}
+            onMouseEnter={() => {
+                clearTimeout(idleTimer.current);
+                autoRotate.current = false;
+            }}
+            onMouseLeave={() => {
+                if (!isDragging.current) { // Only reset idle timer if not currently dragging
+                    resetIdleTimer();
+                }
+            }}
         >
             <div className="w-full h-full" style={{ perspective: '1500px' }}>
                 <div 
