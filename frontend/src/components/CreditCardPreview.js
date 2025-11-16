@@ -32,6 +32,9 @@ const X_RATIO = SVG_WIDTH / CARD_WIDTH_MM;
 const Y_RATIO = SVG_HEIGHT / CARD_HEIGHT_MM;
 // Removed unused variable: MOBILE_BREAKPOINT
 
+// Simple in-memory cache for SVG content
+const svgCache = new Map();
+
 const CreditCardPreview = React.memo(function CreditCardPreview({
     cardColor = 'black',
     engravingColor = 'silver',
@@ -80,14 +83,21 @@ const CreditCardPreview = React.memo(function CreditCardPreview({
 
     useEffect(() => {
         if (finalLogoUrl && finalLogoUrl.endsWith('.svg')) {
+            if (svgCache.has(finalLogoUrl)) {
+                const { svgText, ratio } = svgCache.get(finalLogoUrl);
+                setSvgContent(svgText);
+                setSvgRatio(ratio);
+                return;
+            }
+
             fetch(finalLogoUrl)
                 .then(response => response.text())
                 .then(svgText => {
                     const parser = new DOMParser();
                     const svgDoc = parser.parseFromString(svgText, "image/svg+xml").documentElement;
 
-                    const viewBox = svgDoc.getAttribute('viewBox');
                     let ratio = 1;
+                    const viewBox = svgDoc.getAttribute('viewBox');
                     if (viewBox) {
                         const parts = viewBox.split(' ').map(parseFloat);
                         if (parts.length === 4 && parts[2] > 0 && parts[3] > 0) {
@@ -101,13 +111,15 @@ const CreditCardPreview = React.memo(function CreditCardPreview({
                             svgDoc.setAttribute('viewBox', `0 0 ${w} ${h}`);
                         }
                     }
-                    setSvgRatio(ratio);
-
+                    
                     svgDoc.setAttribute('width', '100%');
                     svgDoc.setAttribute('height', '100%');
                     svgDoc.setAttribute('preserveAspectRatio', 'xMidYMid meet');
 
-                    setSvgContent(svgDoc.outerHTML);
+                    const finalSvgContent = svgDoc.outerHTML;
+                    setSvgContent(finalSvgContent);
+                    setSvgRatio(ratio);
+                    svgCache.set(finalLogoUrl, { svgText: finalSvgContent, ratio });
                 })
                 .catch(error => {
                     console.error("Error fetching SVG:", error);
