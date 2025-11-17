@@ -46,7 +46,7 @@ const ProductCard = ({ product, cardColorKey, engravingColorKey, disableClick = 
             </div>
             
             <div className="p-6 pt-2 flex-grow flex flex-col text-center">
-                <h3 className="text-xl font-semibold text-white mb-2">{product.name}</h3>
+                <h3 className="text-xl font-semibold text-white mb-2">{product.name.replace(/<br\s*\/?>/gi, ' ')}</h3>
                 <div className="flex-grow"></div>
                 <p className="text-indigo-400 font-bold text-lg mb-4">₪{product.price}</p>
                 <button 
