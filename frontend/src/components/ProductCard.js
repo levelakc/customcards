@@ -16,13 +16,13 @@ const ProductCard = ({ product, cardColorKey, engravingColorKey, disableClick = 
         // Stop propagation to prevent carousel drag from triggering navigation
         e.stopPropagation(); 
         if (!disableClick) {
-            navigate('category', { id: product.category._id });
+            navigate('product', { id: product._id });
         }
     };
     
     const handleButtonClick = (e) => {
         e.stopPropagation();
-        navigate('category', { id: product.category._id });
+        navigate('product', { id: product._id });
     }
 
     return (
