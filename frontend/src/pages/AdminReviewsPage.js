@@ -3,38 +3,51 @@ import { useAuth } from '../contexts/AuthContext';
 import { useRouter } from '../contexts/RouterContext';
 
 const AdminReviewsPage = () => {
-    const { userInfo, token, isAdmin } = useAuth();
+    const { userInfo, token, isAdmin, loading: authLoading } = useAuth();
     const { navigate } = useRouter();
-    const [loading, setLoading] = useState(true); // Add loading state
+    // Remove local loading state, use authLoading instead
+    // const [loading, setLoading] = useState(true); 
 
     useEffect(() => {
         console.log("AdminReviewsPage useEffect triggered.");
         console.log("userInfo:", userInfo);
         console.log("isAdmin from useAuth:", isAdmin);
+        console.log("authLoading:", authLoading);
 
-        if (isAdmin === false) { // Explicitly check if not admin
-            console.log("Redirecting to home: User is not an admin.");
+        if (authLoading) {
+            // Still loading auth context, do nothing yet
+            return;
+        }
+
+        if (!authLoading && !userInfo) {
+            // If auth is done loading and userInfo is null, it means user is not logged in
+            console.log("Redirecting to login: User not logged in.");
+            navigate('login'); // Or 'home', depending on desired behavior for non-logged-in users
+            return;
+        }
+
+        if (!authLoading && userInfo && !isAdmin) {
+            // If auth is done loading, user is logged in but not an admin
+            console.log("Redirecting to home: User is logged in but not an admin.");
             navigate('home');
-        } else if (isAdmin === true && userInfo) { // Explicitly check if admin and userInfo is present
-            setLoading(false); // Auth status determined and user is admin
+            return;
+        }
+
+        if (!authLoading && userInfo && isAdmin) {
+            // If auth is done loading, user is logged in and is an admin
             console.log("User is admin. Displaying Admin Reviews Page content.");
             // In a real scenario, you would fetch reviews here.
-        } else if (isAdmin === true && !userInfo) {
-            // This is an inconsistent state: isAdmin is true but userInfo is null/undefined.
-            // This might indicate a loading issue or a problem with the AuthContext.
-            // For now, we'll keep loading, or you might choose to redirect or show an error.
-            console.log("Inconsistent state: isAdmin is true but userInfo is missing. Still loading or potential issue.");
         }
-        // If isAdmin is undefined, it means the auth context is still loading, so we remain in loading state.
+        // The previous inconsistent state check is no longer needed due to authLoading
+    }, [userInfo, isAdmin, authLoading, navigate]);
 
-    }, [userInfo, isAdmin, navigate]);
-
-    if (loading) {
+    if (authLoading) {
         return <div className="text-white text-center p-4">Loading authentication status...</div>; // Loading spinner or message
     }
 
+    // If not loading and not admin (should have been redirected by useEffect, but as a fallback)
     if (!userInfo || !isAdmin) {
-        return null; // Should not be reached if loading is handled, but as a fallback
+        return null; 
     }
 
     return (

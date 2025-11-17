@@ -9,12 +9,13 @@ const userInfoFromStorage = localStorage.getItem('userInfo')
 
 export const AuthProvider = ({ children }) => {
     const [user, setUser] = useState(userInfoFromStorage);
+    const [loading, setLoading] = useState(true); // Add loading state
 
     useEffect(() => {
-        if (userInfoFromStorage) {
-            setUser(userInfoFromStorage);
-        }
+        // Once the component mounts and user state is initialized, set loading to false
+        setLoading(false);
     }, []);
+    
     
     const login = async (email, password) => {
         try {
@@ -54,7 +55,8 @@ export const AuthProvider = ({ children }) => {
         login,
         register,
         logout,
-        updateUserState, // Expose the new function
+        updateUserState,
+        loading, // Expose loading state
     };
 
     return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
