@@ -96,7 +96,7 @@ export default function ProductPage() {
                             <CreditCardPreview 
                                 cardColorKey={selectedCardColorKey} 
                                 engravingColorKey={selectedEngravingColor} 
-                                logoUrl={product.logo} 
+                                logoUrl={product.image} 
                             />
                         </div>
                     </div>
