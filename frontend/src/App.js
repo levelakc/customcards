@@ -24,6 +24,7 @@ import AccessibilityPage from './pages/AccessibilityPage';
 import PolicyPage from './pages/PolicyPage';
 import CheckoutPage from './pages/CheckoutPage';
 import SearchPage from './pages/SearchPage';
+import AllCategoriesPage from './pages/AllCategoriesPage'; // NEW: Import AllCategoriesPage
 
 const GOOGLE_ANALYTICS_ID = 'YOUR_GOOGLE_ANALYTICS_ID'; // Replace with your Google Analytics ID
 const FACEBOOK_PIXEL_ID = 'YOUR_FACEBOOK_PIXEL_ID'; // Replace with your Facebook Pixel ID
@@ -56,6 +57,7 @@ function AppContent() {
             case 'policy': return <PolicyPage />;
             case 'checkout': return <CheckoutPage />;
             case 'search': return <SearchPage />;
+            case 'all-categories': return <AllCategoriesPage />; // NEW: Add AllCategoriesPage route
             default: return <HomePage />;
         }
     };

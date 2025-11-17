@@ -87,79 +87,16 @@ export default function ProductPage() {
     return (
         <div className="bg-gray-900 min-h-screen text-white">
             <div className="max-w-6xl mx-auto py-12 px-4 sm:px-6 lg:px-8">
-                <div className="mb-8 text-center">
-                    <button 
-                        onClick={() => navigate('categories')} 
-                        className="bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 px-8 rounded-full text-lg transition duration-300 transform hover:scale-105"
-                    >
-                        חזור לקטגוריות
-                    </button>
-                </div>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-12 items-start">
-                    <div>
-                        <CreditCardPreview 
-                            cardColor={selectedCardColorKey} 
-                            engravingColor={selectedEngravingColor}
-                            logoUrl={product.image}
-                            position={product.customization?.position}
-                            scale={product.customization?.scale}
-                            rotation={product.customization?.rotation}
-                            isDraggable={false}
-                        />
-                    </div>
-                    <div className="flex flex-col space-y-6">
-                        <h1 className="text-4xl font-extrabold">{product.name}</h1>
-                        <p className="text-gray-300 text-lg">{product.description}</p>
-                        <p className="text-4xl font-bold text-indigo-400">₪{product.price}</p>
-                        
-                        <div>
-                            <h3 className="text-lg font-semibold mb-3">בחר צבע מתכת:</h3>
-                            <div className="flex flex-wrap gap-3">
-                                {sortedColorNames.map(colorName => (
-                                    <button 
-                                        key={colorName} 
-                                        onClick={() => handleCardColorChange(colorName)} 
-                                        className={`px-4 py-2 rounded-md text-sm font-medium border-2 transition-all ${selectedCardColorKey === nameToKeyMap[colorName] ? 'border-indigo-500 bg-indigo-500 bg-opacity-20' : 'border-gray-600 hover:border-gray-400'}`}
-                                    >
-                                        {colorName}
-                                    </button>
-                                ))}
-                            </div>
-                        </div>
-
-                        <div>
-                            <h3 className="text-lg font-semibold mb-3">בחר צבע חריטה:</h3>
-                            <div className="flex flex-wrap gap-3">
-                                {currentEngravingOptions.map(engraveColorKey => (
-                                    <button 
-                                        key={engraveColorKey} 
-                                        onClick={() => setSelectedEngravingColor(engraveColorKey)} 
-                                        className={`px-4 py-2 rounded-md text-sm font-medium border-2 transition-all ${selectedEngravingColor === engraveColorKey ? 'border-indigo-500 bg-indigo-500 bg-opacity-20' : 'border-gray-600 hover:border-gray-400'}`}
-                                    >
-                                        {engravingColorNames[engraveColorKey]}
-                                    </button>
-                                ))}
-                            </div>
-                        </div>
-                        
-                        <div className="border-t border-b border-gray-700 py-4 space-y-2 text-sm text-gray-300">
-                            <p>✓ זמן אספקה: עד 7 ימי עסקים.</p>
-                            <p>✓ לאחר ביצוע ההזמנה, ניצור עמך קשר ב-WhatsApp לשליחת תמונה של המוצר הסופי לאישור לפני המשלוח.</p>
-                        </div>
-
-                        <button onClick={handleAddToCart} className="w-full bg-green-600 hover:bg-green-700 text-white font-bold py-3 px-6 rounded-lg text-lg transition-transform transform hover:scale-105">
-                            הוסף לסל
-                        </button>
-                        {showSuccessMessage && (
-                            <div className="text-center text-green-400 font-bold">
-                                המוצר נוסף לסל בהצלחה!
-                            </div>
-                        )}
-                    </div>
-                </div>
+                <button 
+                    onClick={() => navigate('all-categories')}
+                    className="mb-10 px-6 py-3 bg-blue-600 text-white font-bold rounded-lg shadow-lg hover:bg-blue-700 transition duration-300 ease-in-out focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-75"
+                >
+                    כל הקטגוריות
+                </button>
 
                 {relatedProducts.length > 0 && (
                     <div className="mt-20">
+
                         <h2 className="text-3xl font-extrabold text-white text-center mb-10">מוצרים דומים שאולי תאהב</h2>
                         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-8">
                             {relatedProducts.map(relatedProduct => (
