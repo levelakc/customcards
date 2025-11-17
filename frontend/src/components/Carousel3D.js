@@ -101,6 +101,9 @@ export default function Carousel3D({ items }) {
         dragStart.current = { x: clientX, rotation: rotation, lastX: clientX, lastTime: Date.now() };
         document.body.style.userSelect = 'none';
         document.body.style.cursor = 'grabbing';
+        if (e.touches) {
+            e.preventDefault(); // Prevent default scrolling behavior on touch devices
+        }
     }, [rotation]);
 
     const handleDragMove = useCallback((e) => {
@@ -116,13 +119,13 @@ export default function Carousel3D({ items }) {
         const timeDelta = now - dragStart.current.lastTime;
         
         if (timeDelta > 0) {
-            velocity.current = (moveDelta / timeDelta) * 15;
+            velocity.current = (moveDelta / timeDelta) * 20; // Adjusted multiplier for velocity
         }
 
         dragStart.current.lastX = clientX;
         dragStart.current.lastTime = now;
         
-        setRotation(dragStart.current.rotation + (deltaX * DRAG_SENSITIVITY));
+        setRotation(dragStart.current.rotation + (deltaX * 0.35)); // Adjusted DRAG_SENSITIVITY
     }, []);
 
     const handleDragEnd = useCallback(() => {
