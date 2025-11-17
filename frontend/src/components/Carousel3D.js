@@ -140,7 +140,7 @@ export default function Carousel3D({ items }) {
     }
 
     const itemAngle = 360 / items.length;
-    const radius = isMobile ? Math.min(items.length * 40, window.innerWidth / 2 - cardWidth / 2 - 20) : 200 + (items.length * 20);
+    const radius = isMobile ? Math.min(items.length * 40, 250) : 200 + (items.length * 20);
     const cardWidth = isMobile ? Math.min(200, window.innerWidth * 0.8) : 260;
     const cardMarginTop = isMobile ? -120 : -200;
     const cardMarginLeft = isMobile ? -(cardWidth / 2) : -130;
@@ -148,7 +148,7 @@ export default function Carousel3D({ items }) {
     return (
         <div 
             ref={elementRef} 
-            className="w-full flex relative h-[400px] md:h-[500px] items-center justify-center cursor-grab active:cursor-grabbing"
+            className="w-full flex relative h-[400px] md:h-[500px] items-center justify-center cursor-grab active:cursor-grabbing overflow-x-hidden"
             onMouseDown={handleDragStart}
             onTouchStart={handleDragStart}
             onMouseMove={handleDragMove}
