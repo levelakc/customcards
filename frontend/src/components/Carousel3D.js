@@ -105,6 +105,9 @@ export default function Carousel3D({ items }) {
 
     const handleDragMove = useCallback((e) => {
         if (!isDragging.current) return;
+        if (e.touches) {
+            e.preventDefault(); // Prevent default scrolling behavior on touch devices
+        }
         const clientX = e.touches ? e.touches[0].clientX : e.clientX;
         const deltaX = clientX - dragStart.current.x;
         
