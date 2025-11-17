@@ -142,7 +142,6 @@ export default function Carousel3D({ items }) {
     const itemAngle = 360 / items.length;
     const radius = isMobile ? Math.min(items.length * 40, 250) : 200 + (items.length * 20);
     const cardWidth = isMobile ? Math.min(200, window.innerWidth * 0.8) : 260;
-    const cardMarginTop = isMobile ? -120 : -200;
     const cardMarginLeft = isMobile ? -(cardWidth / 2) : -130;
 
     return (
@@ -188,13 +187,12 @@ export default function Carousel3D({ items }) {
                                 className="absolute h-auto"
                                 style={{
                                     width: `${cardWidth}px`,
-                                    transform: `rotateY(${i * itemAngle}deg) translateZ(${radius}px)`,
+                                    transform: `rotateY(${i * itemAngle}deg) translateZ(${radius}px) translateY(-50%)`,
                                     backfaceVisibility: 'hidden',
                                     WebkitBackfaceVisibility: 'hidden',
                                     zIndex: items.length - i,
                                     top: '50%', 
                                     left: '50%', 
-                                    marginTop: `${cardMarginTop}px`, 
                                     marginLeft: `${cardMarginLeft}px`,
                                     willChange: 'transform'
                                 }}
