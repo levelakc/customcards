@@ -11,7 +11,7 @@ export default function SearchPage() {
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState(null);
 
-    const availableColors = ['שחור', 'כסף', 'זהב', 'רוז גולד', 'כחול', 'אדום']; // Example colors
+    const availableColors = ['שחור', 'כסף', 'זהב', 'רוז גולד', 'צבעוני']; // Corrected available colors
     const availableEngraveColors = ['לבן', 'שחור', 'כסף', 'זהב']; // Example engrave colors
 
     const handleSearch = async (e) => {
