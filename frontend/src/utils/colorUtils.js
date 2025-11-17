@@ -19,7 +19,7 @@ export const engravingColorNames = {
 };
 
 export const engravingColorClasses = {
-    black: 'text-black',
+    black: 'bg-black text-white',
     silver: 'text-gray-400',
     gold: 'text-yellow-500',
 };
@@ -37,9 +37,9 @@ export const engravingColorHex = {
 export const cardColorOptions = {
     gold:     { name: 'זהב',       engraving: ['black'],    bgColor: 'bg-yellow-500' },
     silver:   { name: 'כסף',       engraving: ['black'],    bgColor: 'bg-gray-300' },
-    roseGold: { name: 'רוז גולד',  engraving: ['black'],    bgColor: 'bg-pink-500' },
+    roseGold: { name: 'רוז גולד',  engraving: ['black'],    bgColor: 'gradient-roseGold' },
     colorful: { name: 'צבעוני',    engraving: ['silver'],   bgColor: 'bg-gradient-to-r from-purple-400 via-pink-500 to-red-500' },
-    black:    { name: 'שחור',       engraving: ['silver', 'gold'], bgColor: 'bg-black' },
+    black:    { name: 'שחור',       engraving: ['silver', 'gold'], bgColor: 'gradient-black' },
 };
 
 /**

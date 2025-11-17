@@ -376,6 +376,10 @@ const CreditCardPreview = React.memo(function CreditCardPreview({
             switch (cardColorKey) {
                 case 'colorful':
                     return `url(#${uniqueIds.colorfulGradient})`;
+                case 'roseGold':
+                    return `url(#${uniqueIds.roseGoldGradient})`;
+                case 'black':
+                    return `url(#${uniqueIds.blackGradient})`;
                 case 'visa': // Assuming 'visa' might be a cardColorKey with a specific gradient
                     return `url(#${uniqueIds.visaGradient})`;
                 default:
@@ -386,8 +390,6 @@ const CreditCardPreview = React.memo(function CreditCardPreview({
             switch (option.bgColor) {
                 case 'bg-yellow-500': return '#D4AF37'; // Gold
                 case 'bg-gray-300': return '#D1D5DB'; // Silver
-                case 'bg-pink-300': return '#FBCFE8'; // Rose Gold (Tailwind pink-300)
-                case 'bg-gray-800': return '#1F2937'; // Black (Tailwind gray-800)
                 case 'bg-white': return '#FFFFFF'; // White
                 case 'bg-blue-500': return '#3B82F6'; // Blue
                 case 'bg-red-500': return '#EF4444'; // Red

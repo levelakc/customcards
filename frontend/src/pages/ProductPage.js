@@ -58,11 +58,13 @@ export default function ProductPage() {
     useEffect(() => {
         if (!selectedCardColorKey) return;
 
+        console.log('selectedCardColorKey changed:', selectedCardColorKey); // Log 1
         const validEngravings = cardColorOptions[selectedCardColorKey]?.engraving || [];
+        console.log('Valid engravings for current card:', validEngravings); // Log 3
         if (!validEngravings.includes(selectedEngravingColor)) {
             setSelectedEngravingColor(validEngravings[0]);
         }
-    }, [selectedCardColorKey]);
+    }, [selectedCardColorKey, selectedEngravingColor]); // Added selectedEngravingColor to dependency array to log changes
 
     const handleCardColorChange = (colorName) => {
         const colorKey = nameToKeyMap[colorName];
@@ -84,6 +86,10 @@ export default function ProductPage() {
 
     const currentEngravingOptions = cardColorOptions[selectedCardColorKey]?.engraving || [];
     const sortedColorNames = getSortedColors(product.availableColors);
+
+    console.log('Current selected card color:', selectedCardColorKey); // Log 1
+    console.log('Current selected engraving color:', selectedEngravingColor); // Log 2
+    console.log('Available engraving options:', currentEngravingOptions); // Log 3
 
     return (
         <div className="bg-gray-900 min-h-screen text-white">
@@ -145,7 +151,10 @@ export default function ProductPage() {
                                         <button
                                             key={engravingKey}
                                             className={`px-3 py-1 rounded-md border-2 ${selectedEngravingColor === engravingKey ? 'border-blue-500' : 'border-transparent'} ${engravingClass}`}
-                                            onClick={() => setSelectedEngravingColor(engravingKey)}
+                                            onClick={() => {
+                                                console.log('Engraving button clicked:', engravingKey); // Log 4
+                                                setSelectedEngravingColor(engravingKey);
+                                            }}
                                         >
                                             {engravingName}
                                         </button>
