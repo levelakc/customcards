@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
-import { useSelector } from 'react-redux';
-import { useNavigate } from 'react-router-dom';
+import { useAuth } from '../contexts/AuthContext';
+import { useRouter } from '../contexts/RouterContext';
 import { getReviews, deleteReview } from '../api/api'; // Assuming getReviews is also in api.js
 // Removed unused imports: Loader, Message
 
@@ -10,10 +10,8 @@ const AdminReviewsPage = () => {
     const [error, setError] = useState(null);
     const [deleteSuccess, setDeleteSuccess] = useState(false);
 
-    const userLogin = useSelector((state) => state.userLogin);
-    const { userInfo } = userLogin;
-
-    const navigate = useNavigate();
+    const { userInfo, token } = useAuth();
+    const { navigate } = useRouter();
 
     useEffect(() => {
         if (!userInfo || !userInfo.isAdmin) {
@@ -26,7 +24,7 @@ const AdminReviewsPage = () => {
     const fetchReviews = async () => {
         try {
             setLoading(true);
-            const data = await getReviews();
+            const data = await getReviews(token);
             setReviews(data);
             setLoading(false);
         } catch (err) {
@@ -39,7 +37,7 @@ const AdminReviewsPage = () => {
         if (window.confirm('Are you sure you want to delete this review?')) {
             try {
                 setLoading(true);
-                await deleteReview(id, userInfo.token);
+                await deleteReview(id, token);
                 setDeleteSuccess(true); // Trigger re-fetch
                 setLoading(false);
                 // Optionally, clear deleteSuccess after a short delay or next fetch
