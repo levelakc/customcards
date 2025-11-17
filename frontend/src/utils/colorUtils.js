@@ -18,6 +18,12 @@ export const engravingColorNames = {
     gold: 'מוזהבת',
 };
 
+export const engravingColorClasses = {
+    black: 'text-black',
+    silver: 'text-gray-400',
+    gold: 'text-yellow-500',
+};
+
 /**
  * The core business logic for the application.
  * This object defines the available engraving options for each card color.

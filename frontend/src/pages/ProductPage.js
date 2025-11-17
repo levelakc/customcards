@@ -8,6 +8,7 @@ import {
     cardColorOptions, 
     nameToKeyMap, 
     engravingColorNames, 
+    engravingColorClasses, // Added this import
     getSortedColors 
 } from '../utils/colorUtils';
 
@@ -138,7 +139,7 @@ export default function ProductPage() {
                             <div className="mt-2 flex items-center space-x-3">
                                 {currentEngravingOptions.map((engravingKey) => {
                                     const engravingName = engravingColorNames[engravingKey];
-                                    const engravingClass = cardColorOptions[selectedCardColorKey]?.engravingColors[engravingKey] || 'text-gray-400';
+                                    const engravingClass = engravingColorClasses[engravingKey] || 'text-gray-400';
                                     return (
                                         <button
                                             key={engravingKey}
