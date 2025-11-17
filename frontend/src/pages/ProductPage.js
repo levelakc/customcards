@@ -87,16 +87,100 @@ export default function ProductPage() {
     return (
         <div className="bg-gray-900 min-h-screen text-white">
             <div className="max-w-6xl mx-auto py-12 px-4 sm:px-6 lg:px-8">
+                {/* Main Product Details Section */}
+                <div className="lg:grid lg:grid-cols-2 lg:gap-x-8 lg:items-start">
+                    {/* Image gallery */}
+                    <div className="flex flex-col-reverse">
+                        <div className="mt-6 w-full max-w-2xl mx-auto sm:px-6 lg:max-w-none lg:px-0">
+                            <CreditCardPreview 
+                                cardColorKey={selectedCardColorKey} 
+                                engravingColorKey={selectedEngravingColor} 
+                            />
+                        </div>
+                    </div>
+
+                    {/* Product info */}
+                    <div className="mt-10 px-4 sm:px-0 sm:mt-16 lg:mt-0">
+                        <h1 className="text-3xl font-extrabold tracking-tight text-white">{product.name}</h1>
+                        <div className="mt-3">
+                            <h2 className="sr-only">Product information</h2>
+                            <p className="text-3xl text-white">{product.price} ₪</p>
+                        </div>
+
+                        <div className="mt-6">
+                            <h3 className="sr-only">Description</h3>
+                            <div
+                                className="text-base text-gray-300 space-y-6"
+                                dangerouslySetInnerHTML={{ __html: product.description }}
+                            />
+                        </div>
+
+                        <div className="mt-6">
+                            <h3 className="text-lg font-medium text-white">צבע כרטיס</h3>
+                            <div className="mt-2 flex items-center space-x-3">
+                                {sortedColorNames.map((colorName) => {
+                                    const colorKey = nameToKeyMap[colorName];
+                                    const colorClass = cardColorOptions[colorKey]?.bgColor || 'bg-gray-700';
+                                    return (
+                                        <button
+                                            key={colorKey}
+                                            className={`w-8 h-8 rounded-full border-2 ${selectedCardColorKey === colorKey ? 'border-blue-500' : 'border-transparent'} ${colorClass}`}
+                                            onClick={() => handleCardColorChange(colorName)}
+                                            aria-label={`בחר צבע ${colorName}`}
+                                        ></button>
+                                    );
+                                })}
+                            </div>
+                        </div>
+
+                        <div className="mt-6">
+                            <h3 className="text-lg font-medium text-white">צבע חריטה</h3>
+                            <div className="mt-2 flex items-center space-x-3">
+                                {currentEngravingOptions.map((engravingKey) => {
+                                    const engravingName = engravingColorNames[engravingKey];
+                                    const engravingClass = cardColorOptions[selectedCardColorKey]?.engravingColors[engravingKey] || 'text-gray-400';
+                                    return (
+                                        <button
+                                            key={engravingKey}
+                                            className={`px-3 py-1 rounded-md border-2 ${selectedEngravingColor === engravingKey ? 'border-blue-500' : 'border-transparent'} ${engravingClass}`}
+                                            onClick={() => setSelectedEngravingColor(engravingKey)}
+                                        >
+                                            {engravingName}
+                                        </button>
+                                    );
+                                })}
+                            </div>
+                        </div>
+
+                        <form className="mt-10">
+                            <button
+                                type="button"
+                                onClick={handleAddToCart}
+                                className="mt-6 w-full bg-blue-600 border border-transparent rounded-md py-3 px-8 flex items-center justify-center text-base font-medium text-white hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+                            >
+                                הוסף לעגלה
+                            </button>
+                        </form>
+
+                        {showSuccessMessage && (
+                            <div className="mt-4 text-green-500 text-center">
+                                המוצר נוסף לעגלה בהצלחה!
+                            </div>
+                        )}
+                    </div>
+                </div>
+
+                {/* All Categories Button */}
                 <button 
                     onClick={() => navigate('all-categories')}
-                    className="mb-10 px-6 py-3 bg-blue-600 text-white font-bold rounded-lg shadow-lg hover:bg-blue-700 transition duration-300 ease-in-out focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-75"
+                    className="mt-10 mb-10 px-6 py-3 bg-blue-600 text-white font-bold rounded-lg shadow-lg hover:bg-blue-700 transition duration-300 ease-in-out focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-75"
                 >
                     כל הקטגוריות
                 </button>
 
+                {/* Related Products Section */}
                 {relatedProducts.length > 0 && (
                     <div className="mt-20">
-
                         <h2 className="text-3xl font-extrabold text-white text-center mb-10">מוצרים דומים שאולי תאהב</h2>
                         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-8">
                             {relatedProducts.map(relatedProduct => (
