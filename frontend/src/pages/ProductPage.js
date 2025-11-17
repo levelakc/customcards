@@ -96,6 +96,7 @@ export default function ProductPage() {
                             <CreditCardPreview 
                                 cardColorKey={selectedCardColorKey} 
                                 engravingColorKey={selectedEngravingColor} 
+                                logoUrl={product.logo} 
                             />
                         </div>
                     </div>
@@ -174,7 +175,7 @@ export default function ProductPage() {
                 {/* All Categories Button */}
                 <button 
                     onClick={() => navigate('all-categories')}
-                    className="mt-10 mb-10 px-6 py-3 bg-blue-600 text-white font-bold rounded-lg shadow-lg hover:bg-blue-700 transition duration-300 ease-in-out focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-75"
+                    className="block mx-auto mt-10 mb-10 px-6 py-3 bg-blue-600 text-white font-bold rounded-full shadow-lg hover:bg-blue-700 transition duration-300 ease-in-out focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-75"
                 >
                     כל הקטגוריות
                 </button>

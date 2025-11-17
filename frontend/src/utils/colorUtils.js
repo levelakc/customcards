@@ -29,11 +29,11 @@ export const engravingColorClasses = {
  * This object defines the available engraving options for each card color.
  */
 export const cardColorOptions = {
-    gold:     { name: 'זהב',       engraving: ['black'] },
-    silver:   { name: 'כסף',       engraving: ['black'] },
-    roseGold: { name: 'רוז גולד',  engraving: ['black'] },
-    colorful: { name: 'צבעוני',    engraving: ['silver'] },
-    black:    { name: 'שחור',       engraving: ['silver', 'gold'] },
+    gold:     { name: 'זהב',       engraving: ['black'],    bgColor: 'bg-yellow-500' },
+    silver:   { name: 'כסף',       engraving: ['black'],    bgColor: 'bg-gray-300' },
+    roseGold: { name: 'רוז גולד',  engraving: ['black'],    bgColor: 'bg-pink-300' },
+    colorful: { name: 'צבעוני',    engraving: ['silver'],   bgColor: 'bg-gradient-to-r from-purple-400 via-pink-500 to-red-500' },
+    black:    { name: 'שחור',       engraving: ['silver', 'gold'], bgColor: 'bg-gray-800' },
 };
 
 /**
