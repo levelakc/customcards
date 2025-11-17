@@ -15,6 +15,7 @@ export default function ProductPage() {
     const { addToCart } = useCart();
     const { id } = route.params;
     const [product, setProduct] = useState(null);
+    const [relatedProducts, setRelatedProducts] = useState([]);
     const [loading, setLoading] = useState(true);
     
     const [selectedCardColorKey, setSelectedCardColorKey] = useState('');
@@ -23,7 +24,7 @@ export default function ProductPage() {
     const [showSuccessMessage, setShowSuccessMessage] = useState(false);
 
     useEffect(() => {
-        const fetchProduct = async () => {
+        const fetchProductAndRelated = async () => {
             try {
                 setLoading(true);
                 const currentProduct = await api.getProductById(id);
@@ -35,13 +36,21 @@ export default function ProductPage() {
                     const initialColorKey = nameToKeyMap[initialColorName];
                     setSelectedCardColorKey(initialColorKey);
                 }
+
+                // Fetch all products to find related ones
+                const allProducts = await api.getProducts();
+                const filteredRelated = allProducts.filter(
+                    (p) => p.category?._id === currentProduct.category?._id && p._id !== currentProduct._id
+                );
+                setRelatedProducts(filteredRelated);
+
             } catch (error) {
-                console.error("Failed to fetch product:", error);
+                console.error("Failed to fetch product or related products:", error);
             } finally {
                 setLoading(false);
             }
         };
-        fetchProduct();
+        fetchProductAndRelated();
     }, [id]);
     
     useEffect(() => {
@@ -77,6 +86,14 @@ export default function ProductPage() {
     return (
         <div className="bg-gray-900 min-h-screen text-white">
             <div className="max-w-6xl mx-auto py-12 px-4 sm:px-6 lg:px-8">
+                <div className="mb-8 text-center">
+                    <button 
+                        onClick={() => navigate('categories')} 
+                        className="bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 px-8 rounded-full text-lg transition duration-300 transform hover:scale-105"
+                    >
+                        חזור לקטגוריות
+                    </button>
+                </div>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-12 items-start">
                     <div>
                         <CreditCardPreview 
@@ -139,6 +156,22 @@ export default function ProductPage() {
                         )}
                     </div>
                 </div>
+
+                {relatedProducts.length > 0 && (
+                    <div className="mt-20">
+                        <h2 className="text-3xl font-extrabold text-white text-center mb-10">מוצרים דומים שאולי תאהב</h2>
+                        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-8">
+                            {relatedProducts.map(relatedProduct => (
+                                <ProductCard 
+                                    key={relatedProduct._id} 
+                                    product={relatedProduct}
+                                    cardColorKey={nameToKeyMap[getSortedColors(relatedProduct.availableColors)[0]] || 'black'}
+                                    engravingColorKey={cardColorOptions[nameToKeyMap[getSortedColors(relatedProduct.availableColors)[0]] || 'black']?.engraving[0] || 'silver'}
+                                />
+                            ))}
+                        </div>
+                    </div>
+                )}
             </div>
         </div>
     );
