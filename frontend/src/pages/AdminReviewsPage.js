@@ -14,8 +14,8 @@ const AdminReviewsPage = () => {
 
         if (userInfo !== undefined && isAdmin !== undefined) { // Check if auth context has loaded
             setLoading(false); // Auth status determined
-            if (!userInfo || !isAdmin) {
-                console.log("Redirecting to home: userInfo or isAdmin is false.");
+            if (!isAdmin) { // Only redirect if isAdmin is explicitly false
+                console.log("Redirecting to home: User is not an admin.");
                 navigate('home');
             } else {
                 console.log("User is admin. Displaying Admin Reviews Page content.");
