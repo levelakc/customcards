@@ -147,7 +147,7 @@ export default function Carousel3D({ items }) {
     return (
         <div 
             ref={elementRef} 
-            className="w-full flex relative h-[400px] md:h-[500px] items-center justify-center cursor-grab active:cursor-grabbing overflow-x-hidden"
+            className="w-full flex relative min-h-[400px] md:min-h-[500px] max-h-screen items-center justify-center cursor-grab active:cursor-grabbing overflow-x-hidden"
             onMouseDown={handleDragStart}
             onTouchStart={handleDragStart}
             onMouseMove={handleDragMove}
