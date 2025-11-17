@@ -3,6 +3,7 @@ import { useRouter } from '../contexts/RouterContext';
 import { useCart } from '../contexts/CartContext';
 import * as api from '../api/api';
 import CreditCardPreview from '../components/CreditCardPreview';
+import ProductCard from '../components/ProductCard'; // Added this import
 import { 
     cardColorOptions, 
     nameToKeyMap, 
@@ -11,7 +12,7 @@ import {
 } from '../utils/colorUtils';
 
 export default function ProductPage() {
-    const { route } = useRouter();
+    const { route, navigate } = useRouter(); // Modified this line
     const { addToCart } = useCart();
     const { id } = route.params;
     const [product, setProduct] = useState(null);

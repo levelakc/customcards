@@ -122,8 +122,7 @@ export default function CartPage() {
                                             svgRotation={item.customization?.rotation}
                                         />
                                     ) : (
-                                        {/* Parse the full description to get the correct card and engraving colors */}
-                                        {(() => {
+                                        (() => {
                                             const { cardColorKey, engravingColorKey } = parseFullDescription(item.selectedColor);
                                             return (
                                                 <CreditCardPreview
@@ -133,7 +132,7 @@ export default function CartPage() {
                                                     isDraggable={false}
                                                 />
                                             );
-                                        })()}
+                                        })()
                                     )}
                                 </div>
                                 <div className="flex-grow">
