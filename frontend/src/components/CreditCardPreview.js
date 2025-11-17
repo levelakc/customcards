@@ -1,7 +1,6 @@
 import React, { useState, useRef, useEffect, useMemo, useCallback } from 'react';
 import * as api from '../api/api'; // Import the api file
-// Removed unused import: cardColorOptions
-// import { cardColorOptions } from '../utils/colorUtils'; 
+import { cardColorOptions, engravingColorHex } from '../utils/colorUtils';
 
 // Helper function to check if a string is a valid CSS color
 const isValidCssColor = (color) => {
@@ -36,8 +35,8 @@ const Y_RATIO = SVG_HEIGHT / CARD_HEIGHT_MM;
 const svgCache = new Map();
 
 const CreditCardPreview = React.memo(function CreditCardPreview({
-    cardColor = 'black',
-    engravingColor = 'silver',
+    cardColorKey = 'black',
+    engravingColorKey = 'silver',
     logoUrl = null,
     position = { x: 0, y: 0 },
     scale = 1,
@@ -284,36 +283,32 @@ const CreditCardPreview = React.memo(function CreditCardPreview({
         };
     }, [isResizing, handleCornerDragMove]);
 
-    // FIX: Wrapped in useMemo to stabilize the object reference
-    const engravingFillColors = useMemo(() => ({
-        silver: '#D1D5DB',
-        gold: '#D4AF37',
-        black: '#000000',
-    }), []);
+    const getContrastingEngravingColor = useCallback((cardKey, engravingKey) => {
+        let effectiveEngravingKey = engravingKey;
 
+        // Get the actual hex color for the card
+        const cardHex = cardColorOptions[cardKey]?.hex || '#000000'; // Default to black if not found
 
-    // FIX: Added 'engravingFillColors' to the dependency array
-    const getContrastingEngravingColor = useCallback((cardColor, requestedEngravingColor) => {
-        let effectiveEngravingColor = requestedEngravingColor;
-
-        if (cardColor === 'black' && requestedEngravingColor === 'black') {
-            effectiveEngravingColor = 'silver';
-        } else if (cardColor === 'gold' && requestedEngravingColor === 'gold') {
-            effectiveEngravingColor = 'black';
-        } else if (cardColor === 'silver' && requestedEngravingColor === 'silver') {
-            effectiveEngravingColor = 'black';
+        // Logic to ensure contrast
+        if (cardKey === 'black' && engravingKey === 'black') {
+            effectiveEngravingKey = 'silver';
+        } else if (cardKey === 'gold' && engravingKey === 'gold') {
+            effectiveEngravingKey = 'black';
+        } else if (cardKey === 'silver' && engravingKey === 'silver') {
+            effectiveEngravingKey = 'black';
         }
+        // Add more contrast logic if needed based on cardHex
 
-        return engravingFillColors[effectiveEngravingColor] || effectiveEngravingColor;
-    }, [engravingFillColors]);
+        return engravingColorHex[effectiveEngravingKey] || engravingColorHex.silver; // Default to silver if not found
+    }, []);
 
 
     const logoWidth = CARD_WIDTH_MM;
     const logoHeight = CARD_WIDTH_MM / svgRatio;
 
     const effectiveEngravingColor = useMemo(() => {
-        return getContrastingEngravingColor(cardColor, engravingColor);
-    }, [cardColor, engravingColor, getContrastingEngravingColor]);
+        return getContrastingEngravingColor(cardColorKey, engravingColorKey);
+    }, [cardColorKey, engravingColorKey, getContrastingEngravingColor]);
 
 
     const logoX = position.x * X_RATIO;
@@ -372,14 +367,34 @@ const CreditCardPreview = React.memo(function CreditCardPreview({
         
     }, [logoX, logoY, currentLogoSvgWidth, currentLogoSvgHeight, rotation]);
 
-    const gradientMap = {
-        silver: `url(#${uniqueIds.silverGradient})`,
-        gold: `url(#${uniqueIds.goldGradient})`,
-        black: `url(#${uniqueIds.blackGradient})`,
-        roseGold: `url(#${uniqueIds.roseGoldGradient})`,
-        colorful: `url(#${uniqueIds.colorfulGradient})`,
-        visa: `url(#${uniqueIds.visaGradient})`,
-    };
+    const cardFill = useMemo(() => {
+        const option = cardColorOptions[cardColorKey];
+        if (!option) return 'black'; // Default fallback
+
+        if (option.bgColor.includes('gradient')) {
+            // Map to existing SVG gradients based on the key
+            switch (cardColorKey) {
+                case 'colorful':
+                    return `url(#${uniqueIds.colorfulGradient})`;
+                case 'visa': // Assuming 'visa' might be a cardColorKey with a specific gradient
+                    return `url(#${uniqueIds.visaGradient})`;
+                default:
+                    return 'black'; // Fallback for unknown gradients
+            }
+        } else {
+            // Map Tailwind classes to hex codes
+            switch (option.bgColor) {
+                case 'bg-yellow-500': return '#D4AF37'; // Gold
+                case 'bg-gray-300': return '#D1D5DB'; // Silver
+                case 'bg-pink-300': return '#FBCFE8'; // Rose Gold (Tailwind pink-300)
+                case 'bg-gray-800': return '#1F2937'; // Black (Tailwind gray-800)
+                case 'bg-white': return '#FFFFFF'; // White
+                case 'bg-blue-500': return '#3B82F6'; // Blue
+                case 'bg-red-500': return '#EF4444'; // Red
+                default: return 'black'; // Default fallback
+            }
+        }
+    }, [cardColorKey, uniqueIds]);
 
     return (
         <div className="w-full md:perspective-1000">
@@ -459,12 +474,9 @@ const CreditCardPreview = React.memo(function CreditCardPreview({
                             width={SVG_WIDTH}
                             height={SVG_HEIGHT}
                             rx="20"
-                            fill={
-                                gradientMap[cardColor] ||
-                                (isValidCssColor(cardColor) ? cardColor : gradientMap.black)
-                            }
-                            stroke={cardColor === 'visa' ? '#CCCCCC' : 'none'}
-                            strokeWidth={cardColor === 'visa' ? '1' : '0'}
+                            fill={cardFill}
+                            stroke={cardColorKey === 'visa' ? '#CCCCCC' : 'none'}
+                            strokeWidth={cardColorKey === 'visa' ? '1' : '0'}
                         />
                     </g>
                     
@@ -505,9 +517,9 @@ const CreditCardPreview = React.memo(function CreditCardPreview({
                     )}
 
                     {/* 3. Spotlight Effects (Draw OVER the logo) */}
-                    {cardColor === 'black' && ( <rect width={SVG_WIDTH} height={SVG_HEIGHT} rx="20" fill={`url(#${uniqueIds.blackSpotlight})`} /> )}
-                    {cardColor === 'silver' && ( <rect width={SVG_WIDTH} height={SVG_HEIGHT} rx="20" fill={`url(#${uniqueIds.silverSpotlight})`} /> )}
-                    {cardColor !== 'black' && cardColor !== 'silver' && ( <rect width={SVG_WIDTH} height={SVG_HEIGHT} rx="20" fill={`url(#${uniqueIds.spotlight})`} /> )}
+                    {cardColorKey === 'black' && ( <rect width={SVG_WIDTH} height={SVG_HEIGHT} rx="20" fill={`url(#${uniqueIds.blackSpotlight})`} /> )}
+                    {cardColorKey === 'silver' && ( <rect width={SVG_WIDTH} height={SVG_HEIGHT} rx="20" fill={`url(#${uniqueIds.silverSpotlight})`} /> )}
+                    {cardColorKey !== 'black' && cardColorKey !== 'silver' && ( <rect width={SVG_WIDTH} height={SVG_HEIGHT} rx="20" fill={`url(#${uniqueIds.spotlight})`} /> )}
 
                 </g>
                 <path d="M40,85 h30 a5,5 0 0 1 5,5 v20 a5,5 0 0 1 -5,5 h-30 a5,5 0 0 1 -5,-5 v-20 a5,5 0 0 1 5,-5 z" fill={`url(#${uniqueIds.simStripes})`} opacity="0.9" stroke="black" strokeWidth="0.5" />

@@ -35,8 +35,8 @@ const ProductCard = ({ product, cardColorKey, engravingColorKey, disableClick = 
                 style={{ transform: 'translateZ(0)' }}
             >
                 <CreditCardPreview 
-                    cardColor={finalCardColor}
-                    engravingColor={finalEngravingColor}
+                    cardColorKey={finalCardColor}
+                    engravingColorKey={finalEngravingColor}
                     logoUrl={product.image}
                     position={product.customization?.position}
                     scale={product.customization?.scale}

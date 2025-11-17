@@ -24,6 +24,12 @@ export const engravingColorClasses = {
     gold: 'text-yellow-500',
 };
 
+export const engravingColorHex = {
+    black: '#000000',
+    silver: '#D1D5DB', // A light gray for silver
+    gold: '#D4AF37',   // A golden yellow
+};
+
 /**
  * The core business logic for the application.
  * This object defines the available engraving options for each card color.
