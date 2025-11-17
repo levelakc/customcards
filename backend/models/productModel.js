@@ -20,7 +20,8 @@ const productSchema = mongoose.Schema({
     customization: {
         position: { x: { type: Number, default: 45 }, y: { type: Number, default: 10 } },
         scale: { type: Number, default: 1 },
-        rotation: { type: Number, default: 0 }
+        rotation: { type: Number, default: 0 },
+        engraveColors: [{ type: String }] // Added engraveColors
     },
     isUpsellProduct: { type: Boolean, default: false },
     
