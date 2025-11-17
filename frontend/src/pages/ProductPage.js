@@ -62,7 +62,7 @@ export default function ProductPage() {
         if (!validEngravings.includes(selectedEngravingColor)) {
             setSelectedEngravingColor(validEngravings[0]);
         }
-    }, [selectedCardColorKey, selectedEngravingColor]);
+    }, [selectedCardColorKey]);
 
     const handleCardColorChange = (colorName) => {
         const colorKey = nameToKeyMap[colorName];
@@ -169,6 +169,29 @@ export default function ProductPage() {
                                 המוצר נוסף לעגלה בהצלחה!
                             </div>
                         )}
+
+                        {/* Delivery, Security, and Product Highlights */}
+                        <div className="mt-10 border-t border-gray-700 pt-10">
+                            <h3 className="text-lg font-medium text-white mb-4">מידע נוסף</h3>
+                            <ul className="space-y-4 text-gray-300">
+                                <li className="flex items-start">
+                                    <svg className="flex-shrink-0 h-6 w-6 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                                    <span className="ml-3">זמן אספקה: עד 5 ימי עסקים.</span>
+                                </li>
+                                <li className="flex items-start">
+                                    <svg className="flex-shrink-0 h-6 w-6 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                                    <span className="ml-3">קנייה מאובטחת באמצעות צד שלישי.</span>
+                                </li>
+                                <li className="flex items-start">
+                                    <svg className="flex-shrink-0 h-6 w-6 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                                    <span className="ml-3">חומרים איכותיים ועמידים לאורך זמן.</span>
+                                </li>
+                                <li className="flex items-start">
+                                    <svg className="flex-shrink-0 h-6 w-6 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                                    <span className="ml-3">עיצוב אישי וייחודי לכל לקוח.</span>
+                                </li>
+                            </ul>
+                        </div>
                     </div>
                 </div>
 
