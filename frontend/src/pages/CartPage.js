@@ -6,6 +6,7 @@ import * as api from '../api/api';
 import CreditCardPreview from '../components/CreditCardPreview';
 import WalletPreview from '../components/WalletPreview';
 import Modal from '../components/Modal';
+import { parseFullDescription } from '../utils/colorUtils'; // Import the new utility function
 
 export default function CartPage() {
     const { cartItems, removeFromCart, updateQuantity, addToCart } = useCart();
@@ -121,19 +122,18 @@ export default function CartPage() {
                                             svgRotation={item.customization?.rotation}
                                         />
                                     ) : (
-                                        <CreditCardPreview
-                                            cardColor={
-                                                (() => {
-                                                    const color = item.selectedColor?.toLowerCase().split(' ')[0];
-                                                    if (color === 'rose') return 'roseGold';
-                                                    if (color === 'golden') return 'gold';
-                                                    return color || 'black';
-                                                })()
-                                            }
-                                            engravingColor={item.selectedColor?.toLowerCase().includes('black') ? 'black' : item.selectedColor?.toLowerCase().includes('gold') ? 'gold' : 'silver'}
-                                            logoUrl={item.image}
-                                            isDraggable={false}
-                                        />
+                                        {/* Parse the full description to get the correct card and engraving colors */}
+                                        {(() => {
+                                            const { cardColorKey, engravingColorKey } = parseFullDescription(item.selectedColor);
+                                            return (
+                                                <CreditCardPreview
+                                                    cardColor={cardColorKey}
+                                                    engravingColor={engravingColorKey}
+                                                    logoUrl={item.image}
+                                                    isDraggable={false}
+                                                />
+                                            );
+                                        })()}
                                     )}
                                 </div>
                                 <div className="flex-grow">

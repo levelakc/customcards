@@ -22,6 +22,16 @@ export default function AboutUs() {
                         <p className="text-gray-400">לאחר אישורכם, שליח יגיע עד אליכם תוך 7 ימי עסקים עם הכרטיס החדש שלכם!</p>
                     </div>
                 </div>
+
+                {/* New Security Section */}
+                <div className="mt-12 flex flex-col items-center">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor" className="w-12 h-12 text-green-500 mb-4">
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M16.5 10.5V6.75a4.5 4.5 0 1 0-9 0v3.75m-.75 11.25h10.5a2.25 2.25 0 0 0 2.25-2.25v-6.75a2.25 2.25 0 0 0-2.25-2.25H6.75a2.25 2.25 0 0 0-2.25 2.25v6.75a2.25 2.25 0 0 0 2.25 2.25Z" />
+                    </svg>
+                    <p className="text-gray-300 text-xl">
+                        אנו לא שומרים נתוני רכישה. כל התשלומים מאובטחים ומעובדים על ידי <a href="https://stripe.com" target="_blank" rel="noopener noreferrer" className="text-indigo-400 hover:underline">Stripe.com</a> ו-<a href="https://www.bit.co.il/" target="_blank" rel="noopener noreferrer" className="text-indigo-400 hover:underline">Bit</a>.
+                    </p>
+                </div>
             </div>
         </div>
     );

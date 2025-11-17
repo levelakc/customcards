@@ -68,6 +68,58 @@ export const getDefaultEngraving = (cardColorKey) => {
 };
 
 /**
+ * Parses a full description string (e.g., "זהב עם חריטת שחורה")
+ * into its corresponding card color key and engraving color key.
+ * @param {string} fullDescription - The descriptive string from the cart item.
+ * @returns {{cardColorKey: string, engravingColorKey: string}} An object containing the parsed keys.
+ */
+export const parseFullDescription = (fullDescription) => {
+    let cardColorKey = 'black'; // Default fallback
+    let engravingColorKey = 'silver'; // Default fallback
+
+    if (!fullDescription) {
+        return { cardColorKey, engravingColorKey };
+    }
+
+    // Regex to extract card color name and engraving color name
+    const match = fullDescription.match(/(.*) עם חריטת (.*)/);
+
+    if (match && match.length === 3) {
+        const hebrewCardColorName = match[1].trim();
+        const hebrewEngravingColorName = match[2].trim();
+
+        // Map Hebrew card color name to key
+        for (const hebrewName in nameToKeyMap) {
+            if (nameToKeyMap.hasOwnProperty(hebrewName) && hebrewCardColorName.includes(hebrewName)) {
+                cardColorKey = nameToKeyMap[hebrewName];
+                break;
+            }
+        }
+
+        // Map Hebrew engraving color name to key
+        for (const key in engravingColorNames) {
+            if (engravingColorNames.hasOwnProperty(key) && engravingColorNames[key] === hebrewEngravingColorName) {
+                engravingColorKey = key;
+                break;
+            }
+        }
+    } else {
+        // Handle cases where the description might just be a card color name (e.g., for upsell wallet)
+        const hebrewCardColorName = fullDescription.trim();
+        for (const hebrewName in nameToKeyMap) {
+            if (nameToKeyMap.hasOwnProperty(hebrewName) && hebrewCardColorName.includes(hebrewName)) {
+                cardColorKey = nameToKeyMap[hebrewName];
+                // If only card color is specified, use its default engraving
+                engravingColorKey = getDefaultEngraving(cardColorKey);
+                break;
+            }
+        }
+    }
+
+    return { cardColorKey, engravingColorKey };
+};
+
+/**
  * A constant array of all available card color names.
  */
 export const ALL_CARD_COLORS = Object.values(cardColorOptions).map(option => option.name);
