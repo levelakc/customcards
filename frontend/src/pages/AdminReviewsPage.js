@@ -3,25 +3,33 @@ import { useAuth } from '../contexts/AuthContext';
 import { useRouter } from '../contexts/RouterContext';
 
 const AdminReviewsPage = () => {
-    const { userInfo, token, isAdmin } = useAuth(); // Destructure isAdmin directly
+    const { userInfo, token, isAdmin } = useAuth();
     const { navigate } = useRouter();
+    const [loading, setLoading] = useState(true); // Add loading state
 
     useEffect(() => {
         console.log("AdminReviewsPage useEffect triggered.");
         console.log("userInfo:", userInfo);
         console.log("isAdmin from useAuth:", isAdmin);
 
-        if (!userInfo || !isAdmin) { // Use isAdmin from useAuth directly
-            console.log("Redirecting to home: userInfo or isAdmin is false.");
-            navigate('home');
-        } else {
-            console.log("User is admin. Displaying Admin Reviews Page content.");
-            // In a real scenario, you would fetch reviews here.
+        if (userInfo !== undefined && isAdmin !== undefined) { // Check if auth context has loaded
+            setLoading(false); // Auth status determined
+            if (!userInfo || !isAdmin) {
+                console.log("Redirecting to home: userInfo or isAdmin is false.");
+                navigate('home');
+            } else {
+                console.log("User is admin. Displaying Admin Reviews Page content.");
+                // In a real scenario, you would fetch reviews here.
+            }
         }
-    }, [userInfo, isAdmin, navigate]); // Add isAdmin to dependency array
+    }, [userInfo, isAdmin, navigate]);
+
+    if (loading) {
+        return <div className="text-white text-center p-4">Loading authentication status...</div>; // Loading spinner or message
+    }
 
     if (!userInfo || !isAdmin) {
-        return null; // Or a loading spinner, as the redirect will happen in useEffect
+        return null; // Should not be reached if loading is handled, but as a fallback
     }
 
     return (
