@@ -41,4 +41,24 @@ const deleteReview = async (req, res) => {
     }
 };
 
-export { createReview, getReviews, deleteReview };
+// @desc    Update a review
+// @route   PUT /api/reviews/:id
+// @access  Private/Admin
+const updateReview = async (req, res) => {
+    const { rating, comment, name } = req.body;
+
+    const review = await Review.findById(req.params.id);
+
+    if (review) {
+        review.rating = rating !== undefined ? rating : review.rating;
+        review.comment = comment !== undefined ? comment : review.comment;
+        review.name = name !== undefined ? name : review.name; // Allow admin to change name
+
+        const updatedReview = await review.save();
+        res.json(updatedReview);
+    } else {
+        res.status(404).json({ message: 'Review not found' });
+    }
+};
+
+export { createReview, getReviews, deleteReview, updateReview };

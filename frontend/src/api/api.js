@@ -292,6 +292,16 @@ export const deleteReview = async (id, token) => {
     return await response.json();
 };
 
+export const updateReview = async (id, reviewData, token) => {
+    const response = await fetch(`${BASE_URL}/api/reviews/${id}`, {
+        method: 'PUT',
+        headers: getAuthHeaders(token),
+        body: JSON.stringify(reviewData),
+    });
+    if (!response.ok) throw new Error('Could not update review');
+    return await response.json();
+};
+
 // --- SITE SETTINGS ---
 export const getSiteSettings = async () => {
     const response = await fetch(`${BASE_URL}/api/settings`);

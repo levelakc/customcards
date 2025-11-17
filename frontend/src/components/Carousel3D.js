@@ -140,7 +140,13 @@ export default function Carousel3D({ items }) {
     }
 
     const itemAngle = 360 / items.length;
-    const radius = isMobile ? Math.min(items.length * 40, 250) : 200 + (items.length * 20);
+    
+    // The minimum radius needed to prevent cards from overlapping is (cardWidth / 2) / tan(PI / itemCount).
+    // We add a little extra padding.
+    const cardWidthForCalc = isMobile ? 200 : 260;
+    const minRadius = (cardWidthForCalc / 2) / Math.tan(Math.PI / items.length);
+    const radius = isMobile ? Math.min(minRadius + 50, 400) : minRadius + 100;
+
     const cardWidth = isMobile ? Math.min(200, window.innerWidth * 0.8) : 260;
     const cardMarginLeft = isMobile ? -(cardWidth / 2) : -130;
 

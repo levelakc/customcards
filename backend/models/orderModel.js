@@ -11,6 +11,7 @@ const orderSchema = mongoose.Schema({
         // FIX: The product field is no longer required.
         product: { type: mongoose.Schema.Types.ObjectId, ref: 'Product' }
     }],
+    messageToDesigner: { type: String }, // New field
     totalPrice: { type: Number, required: true, default: 0.0 },
     isPaid: { type: Boolean, required: true, default: false },
     paidAt: { type: Date },
