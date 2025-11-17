@@ -12,16 +12,21 @@ const AdminReviewsPage = () => {
         console.log("userInfo:", userInfo);
         console.log("isAdmin from useAuth:", isAdmin);
 
-        if (userInfo !== undefined && isAdmin !== undefined) { // Check if auth context has loaded
-            setLoading(false); // Auth status determined
-            if (!isAdmin) { // Only redirect if isAdmin is explicitly false
-                console.log("Redirecting to home: User is not an admin.");
-                navigate('home');
-            } else {
-                console.log("User is admin. Displaying Admin Reviews Page content.");
-                // In a real scenario, you would fetch reviews here.
-            }
+        if (isAdmin === false) { // Explicitly check if not admin
+            console.log("Redirecting to home: User is not an admin.");
+            navigate('home');
+        } else if (isAdmin === true && userInfo) { // Explicitly check if admin and userInfo is present
+            setLoading(false); // Auth status determined and user is admin
+            console.log("User is admin. Displaying Admin Reviews Page content.");
+            // In a real scenario, you would fetch reviews here.
+        } else if (isAdmin === true && !userInfo) {
+            // This is an inconsistent state: isAdmin is true but userInfo is null/undefined.
+            // This might indicate a loading issue or a problem with the AuthContext.
+            // For now, we'll keep loading, or you might choose to redirect or show an error.
+            console.log("Inconsistent state: isAdmin is true but userInfo is missing. Still loading or potential issue.");
         }
+        // If isAdmin is undefined, it means the auth context is still loading, so we remain in loading state.
+
     }, [userInfo, isAdmin, navigate]);
 
     if (loading) {
