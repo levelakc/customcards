@@ -15,7 +15,7 @@ const AdminReviewsPage = () => {
 
     useEffect(() => {
         if (!userInfo || !userInfo.isAdmin) {
-            navigate('/login');
+            navigate('home');
         } else {
             fetchReviews();
         }

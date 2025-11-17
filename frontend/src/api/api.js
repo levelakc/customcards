@@ -264,8 +264,10 @@ export const deleteUser = async (id, token) => {
 };
 
 // --- REVIEWS ---
-export const getReviews = async () => {
-    const response = await fetch(`${BASE_URL}/api/reviews`);
+export const getReviews = async (token) => {
+    const response = await fetch(`${BASE_URL}/api/reviews`, {
+        headers: getAuthHeaders(token),
+    });
     if (!response.ok) throw new Error('Could not fetch reviews');
     return await response.json();
 };
