@@ -8,7 +8,7 @@ import AdminUsersPage from './AdminUsersPage';
 import AdminDashboardPage from './AdminDashboardPage';
 import CreditCardPreview from '../components/CreditCardPreview';
 import WalletPreview from '../components/WalletPreview'; // 1. Import WalletPreview
-import { ALL_CARD_COLORS } from '../utils/colorUtils';
+import { ALL_CARD_COLORS, cardColorOptions } from '../utils/colorUtils';
 
 function SiteSettingsPage() {
     const { token } = useAuth();
@@ -240,6 +240,8 @@ export default function AdminPage() {
         rotation: 0,
     });
 
+    const [previewColorKey, setPreviewColorKey] = useState('black');
+
     useEffect(() => {
         if (selectedFile) {
             setPreviewUrl(URL.createObjectURL(selectedFile));
@@ -447,6 +449,23 @@ export default function AdminPage() {
                     <form onSubmit={handleProductFormSubmit}>
                         <div className="mb-6 p-4 bg-gray-900 rounded-lg">
                             <h3 className="text-lg font-semibold mb-2 text-center">תצוגה מקדימה</h3>
+                            
+                            {!productForm.isUpsellProduct && (
+                                <div className="flex justify-center items-center gap-2 mb-4 flex-wrap">
+                                    <span className="text-sm font-medium">צבע תצוגה:</span>
+                                    {Object.keys(cardColorOptions).map(colorKey => (
+                                        <button
+                                            key={colorKey}
+                                            type="button"
+                                            onClick={() => setPreviewColorKey(colorKey)}
+                                            className={`px-2 py-1 text-xs rounded ${previewColorKey === colorKey ? 'bg-indigo-600 text-white' : 'bg-gray-700 text-gray-300'}`}
+                                        >
+                                            {cardColorOptions[colorKey].name}
+                                        </button>
+                                    ))}
+                                </div>
+                            )}
+
                             {/* THE FIX: Conditional rendering for the preview */}
                             {productForm.isUpsellProduct ? (
                                 <WalletPreview
@@ -457,7 +476,7 @@ export default function AdminPage() {
                                 />
                             ) : (
                                 <CreditCardPreview
-                                    cardColor="black"
+                                    cardColorKey={previewColorKey}
                                     engravingColor="silver"
                                     logoUrl={previewUrl}
                                     position={customization.position}
