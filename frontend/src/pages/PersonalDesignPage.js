@@ -59,8 +59,8 @@ export default function PersonalDesignPage() {
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-12 items-start">
                     <div>
                         <CreditCardPreview 
-                            cardColor={cardColor}
-                            engravingColor={engravingColor}
+                            cardColorKey={cardColor}
+                            engravingColorKey={engravingColor}
                             logoUrl={uploadedImage}
                             scale={scale}
                             rotation={rotation}
