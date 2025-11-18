@@ -120,6 +120,16 @@ const searchProducts = async (req, res) => {
     }
 };
 
+async function deleteProduct(req, res) {
+    const product = await Product.findById(req.params.id);
+    if (product) {
+        await product.deleteOne();
+        res.json({ message: 'Product removed' });
+    } else {
+        res.status(404).json({ message: 'Product not found' });
+    }
+}
+
 // @desc    Create new review
 // @route   POST /api/products/:id/reviews
 const createProductReview = async (req, res) => {
