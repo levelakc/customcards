@@ -223,3 +223,4 @@ export default function Carousel3D({ items }) {
             </div>
         </div>
     );
+}
