@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef, useCallback, useMemo } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import ProductCard from './ProductCard';
 import { nameToKeyMap, getDefaultEngraving } from '../utils/colorUtils';
 
@@ -9,18 +9,17 @@ const IDLE_TIMEOUT = 5000;
 const MOBILE_BREAKPOINT = 768;
 
 export default function Carousel3D({ items }) {
+    const [rotation, setRotation] = useState(0);
     const [colorIndexes, setColorIndexes] = useState({});
     const [isMobile, setIsMobile] = useState(window.innerWidth < MOBILE_BREAKPOINT);
 
     const elementRef = useRef(null);
-    const rotationRef = useRef(0);
     const isDragging = useRef(false);
     const dragStart = useRef({ x: 0, rotation: 0, lastX: 0, lastTime: 0 });
     const velocity = useRef(0);
     const animationFrameId = useRef(null);
     const idleTimer = useRef(null);
     const autoRotate = useRef(true);
-    const carouselRef = useRef(null);
 
     useEffect(() => {
         const handleResize = () => {
@@ -38,23 +37,20 @@ export default function Carousel3D({ items }) {
     }, [items]);
     
     const animate = useCallback(() => {
-        let newRotation = rotationRef.current;
-        if (!isDragging.current && Math.abs(velocity.current) > 0.01) {
-            velocity.current *= INERTIA_DAMPING;
-            newRotation += velocity.current;
-        } else if (!isDragging.current) {
-            velocity.current = 0;
-        }
+        setRotation(prev => {
+            let newRotation = prev;
+            if (!isDragging.current && Math.abs(velocity.current) > 0.01) {
+                velocity.current *= INERTIA_DAMPING;
+                newRotation += velocity.current;
+            } else if (!isDragging.current) {
+                velocity.current = 0;
+            }
 
-        if (autoRotate.current && !isDragging.current && velocity.current === 0) {
-            newRotation += AUTO_ROTATE_SPEED;
-        }
-        
-        rotationRef.current = newRotation;
-        if (carouselRef.current) {
-            carouselRef.current.style.transform = `rotateY(${newRotation}deg)`;
-        }
-
+            if (autoRotate.current && !isDragging.current && velocity.current === 0) {
+                newRotation += AUTO_ROTATE_SPEED;
+            }
+            return newRotation;
+        });
         animationFrameId.current = requestAnimationFrame(animate);
     }, []);
 
@@ -102,13 +98,13 @@ export default function Carousel3D({ items }) {
         autoRotate.current = false; // Disable auto-rotate immediately
 
         const clientX = e.touches ? e.touches[0].clientX : e.clientX;
-        dragStart.current = { x: clientX, rotation: rotationRef.current, lastX: clientX, lastTime: Date.now() };
+        dragStart.current = { x: clientX, rotation: rotation, lastX: clientX, lastTime: Date.now() };
         document.body.style.userSelect = 'none';
         document.body.style.cursor = 'grabbing';
         if (e.touches) {
             e.preventDefault(); // Prevent default scrolling behavior on touch devices
         }
-    }, []);
+    }, [rotation]);
 
     const handleDragMove = useCallback((e) => {
         if (!isDragging.current) return;
@@ -122,18 +118,14 @@ export default function Carousel3D({ items }) {
         const moveDelta = clientX - dragStart.current.lastX;
         const timeDelta = now - dragStart.current.lastTime;
         
-        if (timeDelta > 0) {
+        if (.timeDelta > 0) {
             velocity.current = (moveDelta / timeDelta) * 20; // Adjusted multiplier for velocity
         }
 
         dragStart.current.lastX = clientX;
         dragStart.current.lastTime = now;
         
-        const newRotation = dragStart.current.rotation + (deltaX * 0.35); // Adjusted DRAG_SENSITIVITY
-        rotationRef.current = newRotation;
-        if (carouselRef.current) {
-            carouselRef.current.style.transform = `rotateY(${newRotation}deg)`;
-        }
+        setRotation(dragStart.current.rotation + (deltaX * 0.35)); // Adjusted DRAG_SENSITIVITY
     }, []);
 
     const handleDragEnd = useCallback(() => {
@@ -143,22 +135,20 @@ export default function Carousel3D({ items }) {
         document.body.style.cursor = '';
     }, []);
     
-    const { itemAngle, radius, cardWidth, cardMarginLeft } = useMemo(() => {
-        if (!items || items.length === 0) {
-            return { itemAngle: 0, radius: 0, cardWidth: 0, cardMarginLeft: 0 };
-        }
-        const itemAngle = 360 / items.length;
-        const cardWidthForCalc = isMobile ? 200 : 260;
-        const minRadius = (cardWidthForCalc / 2) / Math.tan(Math.PI / items.length);
-        const radius = isMobile ? Math.min(minRadius + 50, 400) : minRadius + 100;
-        const cardWidth = isMobile ? Math.min(200, window.innerWidth * 0.8) : 260;
-        const cardMarginLeft = isMobile ? -(cardWidth / 2) : -130;
-        return { itemAngle, radius, cardWidth, cardMarginLeft };
-    }, [items, isMobile]);
-
     if (!items || items.length === 0) {
         return <div className="text-center text-white py-10">טוען מוצרים...</div>;
     }
+
+    const itemAngle = 360 / items.length;
+    
+    // The minimum radius needed to prevent cards from overlapping is (cardWidth / 2) / tan(PI / itemCount).
+    // We add a little extra padding.
+    const cardWidthForCalc = isMobile ? 200 : 260;
+    const minRadius = (cardWidthForCalc / 2) / Math.tan(Math.PI / items.length);
+    const radius = isMobile ? Math.min(minRadius + 50, 400) : minRadius + 100;
+
+    const cardWidth = isMobile ? Math.min(200, window.innerWidth * 0.8) : 260;
+    const cardMarginLeft = isMobile ? -(cardWidth / 2) : -130;
 
     return (
         <div 
@@ -182,10 +172,10 @@ export default function Carousel3D({ items }) {
         >
             <div className="w-full h-full" style={{ perspective: '1500px' }}>
                 <div 
-                    ref={carouselRef}
                     className="relative w-full h-full" 
                     style={{ 
-                        transformStyle: 'preserve-3d',
+                        transformStyle: 'preserve-3d', 
+                        transform: `rotateY(${rotation}deg)`,
                     }}
                 >
                     {items.map((item, i) => {

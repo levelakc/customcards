@@ -307,8 +307,8 @@ const CreditCardPreview = React.memo(function CreditCardPreview({
     const logoHeight = CARD_WIDTH_MM / svgRatio;
 
     const effectiveEngravingColor = useMemo(() => {
-        return getContrastingEngravingColor(cardColorKey, engravingColorKey);
-    }, [cardColorKey, engravingColorKey, getContrastingEngravingColor]);
+        return getContrastingEngravingColor(cardColorKey, engravingKey);
+    }, [cardColorKey, engravingKey, getContrastingEngravingColor]);
 
 
     const logoX = position.x * X_RATIO;
