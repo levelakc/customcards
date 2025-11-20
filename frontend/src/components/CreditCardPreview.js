@@ -406,6 +406,7 @@ const CreditCardPreview = React.memo(function CreditCardPreview({
                 viewBox={`0 0 ${SVG_WIDTH} ${SVG_HEIGHT}`}
                 className={`w-full object-cover md:transform-style-3d md:rotate-x-5 md:-rotate-y-10 ${isDraggable ? (isDragging ? 'cursor-grabbing' : 'cursor-grab') : ''}`}
                 style={{
+                    filter: 'drop-shadow(0 10px 10px rgba(0,0,0,0.4))',
                     touchAction: 'none'
                 }}
                 onMouseDown={handleDragStart}
@@ -425,10 +426,22 @@ const CreditCardPreview = React.memo(function CreditCardPreview({
                         <stop offset="100%" stopColor="#1565C0" />
                     </linearGradient>
                     
+                    <filter id={uniqueIds.shimmerFilter} x="-20%" y="-20%" width="140%" height="140%">
+                        <feDistantLight azimuth="225" elevation="30" />
+                        <feSpecularLighting in="SourceAlpha" surfaceScale="3" specularConstant="0.5" specularExponent="15" lightingColor="white" result="specular" />
+                        <feComposite in="SourceGraphic" in2="specular" operator="arithmetic" k1="0" k2="1" k3="1" k4="0" />
+                    </filter>
+                    
                     <radialGradient id={uniqueIds.spotlight} cx="25%" cy="25%" r="60%"><stop offset="0%" stopColor="white" stopOpacity="0.35" /><stop offset="100%" stopColor="white" stopOpacity="0" /></radialGradient>
                     <radialGradient id={uniqueIds.blackSpotlight} cx="25%" cy="25%" r="60%"><stop offset="0%" stopColor="white" stopOpacity="0.15" /><stop offset="100%" stopColor="white" stopOpacity="0" /></radialGradient>
                     <radialGradient id={uniqueIds.silverSpotlight} cx="25%" cy="25%" r="60%"><stop offset="0%" stopColor="white" stopOpacity="0.9" /><stop offset="100%" stopColor="white" stopOpacity="0" /></radialGradient>
 
+                    <filter id="white-mask-filter">
+                        <feColorMatrix type="matrix" values="0 0 0 0 1
+                                                              0 0 0 0 1
+                                                              0 0 0 0 1
+                                                              0 0 0 1 0" />
+                    </filter>
                                         <linearGradient id={uniqueIds.simStripes} x1="0" y1="0" x2="1" y2="0">
                                             <stop offset="30%" stopColor="#D4AF37" />
                                             <stop offset="30.5%" stopColor="#A9A9A9" />
@@ -443,13 +456,14 @@ const CreditCardPreview = React.memo(function CreditCardPreview({
                     {finalLogoUrl && (
                         <mask id={uniqueIds.mask}>
                             {svgContent ? (
-                                <g dangerouslySetInnerHTML={{ __html: svgContent }} />
+                                <g dangerouslySetInnerHTML={{ __html: svgContent }} filter="url(#white-mask-filter)" />
                             ) : (
                                 <image 
                                     href={finalLogoUrl} 
                                     x="0" y="0" 
                                     width="100%" height="100%" 
                                     preserveAspectRatio="xMidYMid meet" 
+                                    filter="url(#white-mask-filter)"
                                 />
                             )}
                         </mask>
