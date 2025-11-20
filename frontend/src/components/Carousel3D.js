@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef, useCallback } from 'react';
+import React, { useState, useEffect, useRef, useCallback, useMemo } from 'react';
 import ProductCard from './ProductCard';
 import { nameToKeyMap, getDefaultEngraving } from '../utils/colorUtils';
 
@@ -143,11 +143,10 @@ export default function Carousel3D({ items }) {
         document.body.style.cursor = '';
     }, []);
     
-    if (!items || items.length === 0) {
-        return <div className="text-center text-white py-10">טוען מוצרים...</div>;
-    }
-
     const { itemAngle, radius, cardWidth, cardMarginLeft } = useMemo(() => {
+        if (!items || items.length === 0) {
+            return { itemAngle: 0, radius: 0, cardWidth: 0, cardMarginLeft: 0 };
+        }
         const itemAngle = 360 / items.length;
         const cardWidthForCalc = isMobile ? 200 : 260;
         const minRadius = (cardWidthForCalc / 2) / Math.tan(Math.PI / items.length);
@@ -155,7 +154,11 @@ export default function Carousel3D({ items }) {
         const cardWidth = isMobile ? Math.min(200, window.innerWidth * 0.8) : 260;
         const cardMarginLeft = isMobile ? -(cardWidth / 2) : -130;
         return { itemAngle, radius, cardWidth, cardMarginLeft };
-    }, [items.length, isMobile]);
+    }, [items, isMobile]);
+
+    if (!items || items.length === 0) {
+        return <div className="text-center text-white py-10">טוען מוצרים...</div>;
+    }
 
     return (
         <div 
