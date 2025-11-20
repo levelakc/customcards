@@ -118,7 +118,7 @@ export default function Carousel3D({ items }) {
         const moveDelta = clientX - dragStart.current.lastX;
         const timeDelta = now - dragStart.current.lastTime;
         
-        if (.timeDelta > 0) {
+        if (timeDelta > 0) {
             velocity.current = (moveDelta / timeDelta) * 20; // Adjusted multiplier for velocity
         }
 
