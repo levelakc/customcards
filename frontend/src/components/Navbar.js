@@ -6,11 +6,12 @@ import { useCart } from '../contexts/CartContext';
 import { useSiteSettings } from '../contexts/SiteSettingsContext';
 import * as api from '../api/api';
 import { ShoppingCartIcon, MenuIcon, XIcon, SearchIcon } from './Icons';
+import LanguageSwitcher from './LanguageSwitcher';
 
 
 
 export default function Navbar() {
-    const { t, i18n } = useTranslation();
+    const { t } = useTranslation();
     const { navigate } = useRouter();
     const { isAuthenticated, isAdmin, logout, user } = useAuth();
     const { cartItems } = useCart();
@@ -42,10 +43,6 @@ export default function Navbar() {
         setIsMenuOpen(false);
         navigate('home');
     }
-
-    const changeLanguage = (lng) => {
-        i18n.changeLanguage(lng);
-    };
 
     // Construct the full logo URL
     let finalLogoUrl = settings.logoUrl;
@@ -81,10 +78,7 @@ export default function Navbar() {
                     <div className="flex items-center">
                         <div className="hidden md:flex items-center">
                             
-                            <div>
-                                <button onClick={() => changeLanguage('en')} className="bg-gray-700 hover:bg-gray-600 text-white font-bold py-2 px-4 rounded-l">EN</button>
-                                <button onClick={() => changeLanguage('he')} className="bg-gray-700 hover:bg-gray-600 text-white font-bold py-2 px-4 rounded-r">HE</button>
-                            </div>
+                            <LanguageSwitcher />
 
                             <button onClick={() => navigate('search')} className="relative p-2 rounded-full hover:bg-gray-700 hover:bg-opacity-50 focus:outline-none ml-4">
                                 <SearchIcon />
@@ -137,10 +131,7 @@ export default function Navbar() {
                         {isAdmin && (
                             <button onClick={() => { navigate('admin'); setIsMenuOpen(false); }} className="text-gray-300 bg-indigo-600 hover:bg-indigo-700 block w-full text-right px-3 py-2 rounded-md text-base font-medium">{t('adminPanel')}</button>
                         )}
-                         <div>
-                                <button onClick={() => {changeLanguage('en'); setIsMenuOpen(false);}} className="bg-gray-700 hover:bg-gray-600 text-white font-bold py-2 px-4 rounded-l">EN</button>
-                                <button onClick={() => {changeLanguage('he'); setIsMenuOpen(false);}} className="bg-gray-700 hover:bg-gray-600 text-white font-bold py-2 px-4 rounded-r">HE</button>
-                            </div>
+                         <LanguageSwitcher />
                     </div>
                     <div className="pt-4 pb-3 border-t border-gray-700">
                         {isAuthenticated ? (
