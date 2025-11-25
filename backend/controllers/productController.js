@@ -1,26 +1,27 @@
+import asyncHandler from 'express-async-handler';
 import Product from '../models/productModel.js';
 
 // @desc    Fetch all products
 // @route   GET /api/products
-const getProducts = async (req, res) => {
+const getProducts = asyncHandler(async (req, res) => {
     const products = await Product.find({}).populate('category', 'name');
     res.json(products);
-};
+});
 
 // @desc    Fetch single product
 // @route   GET /api/products/:id
-const getProductById = async (req, res) => {
+const getProductById = asyncHandler(async (req, res) => {
     const product = await Product.findById(req.params.id).populate('category', 'name');
     if (product) {
         res.json(product);
     } else {
         res.status(404).json({ message: 'Product not found' });
     }
-};
+});
 
 // @desc    Create a product
 // @route   POST /api/products
-const createProduct = async (req, res) => {
+const createProduct = asyncHandler(async (req, res) => {
     // Destructure the new customization field from the request body
     const { name, price, description, image, category, availableColors, customization, isUpsellProduct } = req.body;
 
@@ -41,11 +42,11 @@ const createProduct = async (req, res) => {
     });
     const createdProduct = await product.save();
     res.status(201).json(createdProduct);
-};
+});
 
 // @desc    Update a product
 // @route   PUT /api/products/:id
-const updateProduct = async (req, res) => {
+const updateProduct = asyncHandler(async (req, res) => {
     // Destructure the new customization field from the request body
     const { name, price, description, image, category, availableColors, customization, isUpsellProduct } = req.body;
     const product = await Product.findById(req.params.id);
@@ -70,11 +71,11 @@ const updateProduct = async (req, res) => {
     } else {
         res.status(404).json({ message: 'Product not found' });
     }
-};
+});
 
 // @desc    Get the single upsell product
 // @route   GET /api/products/upsell
-const getUpsellProduct = async (req, res) => {
+const getUpsellProduct = asyncHandler(async (req, res) => {
     const upsellProduct = await Product.findOne({ isUpsellProduct: true });
     if (upsellProduct) {
         res.json(upsellProduct);
@@ -82,11 +83,11 @@ const getUpsellProduct = async (req, res) => {
         // It's okay if none is found, the frontend can handle this
         res.status(404).json({ message: 'No upsell product found' });
     }
-};
+});
 
 // @desc    Search products
 // @route   GET /api/products/search
-const searchProducts = async (req, res) => {
+const searchProducts = asyncHandler(async (req, res) => {
     const { keyword, minPrice, maxPrice, color, engraveColor } = req.query;
     let query = {};
 
@@ -112,15 +113,11 @@ const searchProducts = async (req, res) => {
         query['customization.engraveColors'] = { $in: [engraveColor] };
     }
 
-    try {
-        const products = await Product.find(query).populate('category', 'name');
-        res.json(products);
-    } catch (error) {
-        res.status(500).json({ message: error.message });
-    }
-};
+    const products = await Product.find(query).populate('category', 'name');
+    res.json(products);
+});
 
-async function deleteProduct(req, res) {
+const deleteProduct = asyncHandler(async (req, res) => {
     const product = await Product.findById(req.params.id);
     if (product) {
         await product.deleteOne();
@@ -128,11 +125,11 @@ async function deleteProduct(req, res) {
     } else {
         res.status(404).json({ message: 'Product not found' });
     }
-}
+});
 
 // @desc    Create new review
 // @route   POST /api/products/:id/reviews
-const createProductReview = async (req, res) => {
+const createProductReview = asyncHandler(async (req, res) => {
     const { rating, comment } = req.body;
     const product = await Product.findById(req.params.id);
 
@@ -165,7 +162,7 @@ const createProductReview = async (req, res) => {
         res.status(404);
         throw new Error('Product not found');
     }
-};
+});
 
 export { 
     getProducts, 
@@ -175,5 +172,5 @@ export {
     deleteProduct,
     createProductReview,
     getUpsellProduct,
-    searchProducts // Export the new searchProducts function
+    searchProducts
 };
