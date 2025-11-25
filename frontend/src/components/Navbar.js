@@ -4,7 +4,7 @@ import { useRouter } from '../contexts/RouterContext';
 import { useAuth } from '../contexts/AuthContext';
 import { useCart } from '../contexts/CartContext';
 import { useSiteSettings } from '../contexts/SiteSettingsContext';
-import *s api from '../api/api';
+import * as api from '../api/api';
 import { ShoppingCartIcon, MenuIcon, XIcon, SearchIcon } from './Icons';
 import LanguageSwitcher from './LanguageSwitcher';
 
