@@ -16,11 +16,18 @@ export default function CategoryPage() {
         const fetchData = async () => {
             try {
                 setLoading(true);
+                console.log("CategoryPage: Fetching data for ID:", id);
                 const allProducts = await api.getProducts();
                 const allCategories = await api.getCategories();
                 
-                const currentCategory = allCategories.find(c => c._id === id);
-                const productsInCategory = allProducts.filter(p => p.category?._id === id);
+                console.log("CategoryPage: Fetched allCategories:", allCategories);
+                console.log("CategoryPage: Fetched allProducts:", allProducts);
+
+                const currentCategory = allCategories.find(c => String(c._id) === String(id));
+                const productsInCategory = allProducts.filter(p => String(p.category?._id) === String(id));
+
+                console.log("CategoryPage: currentCategory found:", currentCategory);
+                console.log("CategoryPage: productsInCategory found:", productsInCategory);
 
                 setCategory(currentCategory);
                 setProducts(productsInCategory);
