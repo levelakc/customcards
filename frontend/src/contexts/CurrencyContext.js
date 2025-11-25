@@ -1,9 +1,19 @@
-import React, { createContext, useState, useContext } from 'react';
+import React, { createContext, useState, useContext, useEffect } from 'react';
+import { getIlsToUsdtRate } from '../utils/currencyUtils';
 
 const CurrencyContext = createContext();
 
 export const CurrencyProvider = ({ children }) => {
   const [currency, setCurrency] = useState('ILS');
+  const [ilsToUsdRate, setIlsToUsdRate] = useState(null);
+
+  useEffect(() => {
+    const fetchRate = async () => {
+      const rate = await getIlsToUsdtRate();
+      setIlsToUsdRate(rate);
+    };
+    fetchRate();
+  }, []);
 
   const switchCurrency = (newCurrency) => {
     setCurrency(newCurrency);
@@ -14,8 +24,8 @@ export const CurrencyProvider = ({ children }) => {
   };
 
   const convert = (amount) => {
-    if (currency === 'USD') {
-      return amount / 3.7; // Assuming a static exchange rate
+    if (currency === 'USD' && ilsToUsdRate) {
+      return amount * ilsToUsdRate;
     }
     return amount;
   };

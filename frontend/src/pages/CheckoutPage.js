@@ -7,7 +7,8 @@ import { useCart } from '../contexts/CartContext';
 import { useRouter } from '../contexts/RouterContext';
 import { useAuth } from '../contexts/AuthContext';
 import { useCurrency } from '../contexts/CurrencyContext';
-import { getIlsToUsdtRate, convertIlsToUsdt } from '../utils/currencyUtils'; // Import currency utilities
+import LanguageSwitcher from '../components/LanguageSwitcher';
+import CurrencySwitcher from '../components/CurrencySwitcher';
 
 const DELIVERY_FEE_ILS = 50; // Fixed delivery fee in ILS
 
@@ -82,13 +83,12 @@ const CheckoutForm = ({ guestInfo }) => {
 
 // --- The Parent Page Component ---
 export default function CheckoutPage() {
-    const { t, i18n } = useTranslation();
-    const { currency, switchCurrency, getSymbol, convert } = useCurrency();
+    const { t } = useTranslation();
+    const { getSymbol, convert } = useCurrency();
     const [stripePromise, setStripePromise] = useState(null);
     const [clientSecret, setClientSecret] = useState('');
     const { cartItems } = useCart();
     const { user, token } = useAuth();
-    const [ilsToUsdtRate, setIlsToUsdtRate] = useState(null); // New state for exchange rate
     const [guestInfo, setGuestInfo] = useState({
         name: '',
         email: '',
@@ -102,22 +102,10 @@ export default function CheckoutPage() {
         setGuestInfo({ ...guestInfo, [e.target.name]: e.target.value });
     };
 
-    const changeLanguage = (lng) => {
-        i18n.changeLanguage(lng);
-    };
-
     useEffect(() => {
         api.getStripeApiKey().then(data => {
             setStripePromise(loadStripe(data.publishableKey));
         });
-    }, []);
-
-    useEffect(() => {
-        const fetchRate = async () => {
-            const rate = await getIlsToUsdtRate();
-            setIlsToUsdtRate(rate);
-        };
-        fetchRate();
     }, []);
 
     useEffect(() => {
@@ -148,11 +136,9 @@ export default function CheckoutPage() {
     return (
         <div className="bg-gray-900 min-h-screen text-white">
             <div className="max-w-xl mx-auto py-12 px-4 sm:px-6 lg:px-8">
-                <div className="flex justify-end mb-4">
-                    <button onClick={() => changeLanguage('en')} className="bg-gray-700 hover:bg-gray-600 text-white font-bold py-2 px-4 rounded-l">EN</button>
-                    <button onClick={() => changeLanguage('he')} className="bg-gray-700 hover:bg-gray-600 text-white font-bold py-2 px-4 rounded-r">HE</button>
-                    <button onClick={() => switchCurrency('ILS')} className="bg-gray-700 hover:bg-gray-600 text-white font-bold py-2 px-4 rounded-l">ILS</button>
-                    <button onClick={() => switchCurrency('USD')} className="bg-gray-700 hover:bg-gray-600 text-white font-bold py-2 px-4 rounded-r">USD</button>
+                <div className="flex justify-end mb-4 space-x-4">
+                    <LanguageSwitcher />
+                    <CurrencySwitcher />
                 </div>
                 <h1 className="text-4xl font-extrabold mb-8 text-center font-dancing">{t('checkout')}</h1>
                 <div className="bg-gray-800 p-8 rounded-lg shadow-xl">
@@ -187,7 +173,7 @@ export default function CheckoutPage() {
                             </div>
                         </div>
                     )}
-                    {/* Order Summary with Delivery Fee and USDT Conversion */}
+                    {/* Order Summary with Delivery Fee */}
                     <div className="mb-6">
                         <h2 className="text-2xl font-bold text-white mb-4">{t('orderSummary')}</h2>
                         <div className="flex justify-between text-lg font-medium text-gray-300">
@@ -212,12 +198,6 @@ export default function CheckoutPage() {
                             <span>{t('total')}:</span>
                             <span>{getSymbol()}{convert(finalIlsTotal).toFixed(2)}</span>
                         </div>
-                        {ilsToUsdtRate && (
-                            <div className="flex justify-between text-lg font-medium text-gray-400 mt-2">
-                                <span>(בערך ב-USDT):</span>
-                                <span>${convertIlsToUsdt(finalIlsTotal, ilsToUsdtRate).toFixed(2)}</span>
-                            </div>
-                        )}
                     </div>
 
                     {clientSecret && stripePromise && (
