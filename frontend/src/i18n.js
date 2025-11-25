@@ -19,6 +19,7 @@ i18n
     resources: {
       en: {
         translation: {
+          more: 'More',
           homePage: 'Home Page',
           hello: 'Hello',
           myProfile: 'My Profile',
@@ -158,6 +159,7 @@ i18n
       },
       he: {
         translation: {
+          more: 'עוד',
           homePage: 'דף הבית',
           hello: 'שלום',
           myProfile: 'הפרופיל שלי',
@@ -238,7 +240,7 @@ i18n
           newCustomersToday: 'לקוחות חדשים היום',
           allTimeRevenue: 'סה"כ הכנסות',
           allTimeOrders: 'סה"כ הזמנות',
-          revenueTrend: 'מגמת הכנסות (30 הימים האחרונים)',
+          revenueTrend: 'מגמת הכנסות (30 הימים האחרוונים)',
           noSalesData: 'אין נתוני מכירות זמינים עבור 30 הימים האחרונים.',
           top5Products: '5 המוצרים הנמכרים ביותר',
           noTopProducts: 'אין נתונים על המוצרים הנמכרים ביותר.',

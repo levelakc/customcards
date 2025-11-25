@@ -4,19 +4,20 @@ import { useRouter } from '../contexts/RouterContext';
 import { useAuth } from '../contexts/AuthContext';
 import { useCart } from '../contexts/CartContext';
 import { useSiteSettings } from '../contexts/SiteSettingsContext';
-import * as api from '../api/api';
+import *s api from '../api/api';
 import { ShoppingCartIcon, MenuIcon, XIcon, SearchIcon } from './Icons';
 import LanguageSwitcher from './LanguageSwitcher';
 
 
 
 export default function Navbar() {
-    const { t } = useTranslation();
+    const { t, i18n } = useTranslation();
     const { navigate } = useRouter();
     const { isAuthenticated, isAdmin, logout, user } = useAuth();
     const { cartItems } = useCart();
     const { settings } = useSiteSettings();
     const [isMenuOpen, setIsMenuOpen] = useState(false);
+    const [isMoreMenuOpen, setIsMoreMenuOpen] = useState(false);
     const [categories, setCategories] = useState([]);
 
     useEffect(() => {
@@ -31,10 +32,13 @@ export default function Navbar() {
         fetchData();
     }, []);
 
-    const navLinks = [
+    const allNavLinks = [
         { name: t('homePage'), page: 'home' },
-        ...categories.map(c => ({ name: c.name, page: 'category', params: { id: c._id } }))
+        ...categories.map(c => ({ name: c.name[i18n.language], page: 'category', params: { id: c._id } }))
     ];
+
+    const mainLinks = allNavLinks.slice(0, 6);
+    const moreLinks = allNavLinks.slice(6);
     
     const cartItemCount = cartItems.reduce((sum, item) => sum + item.quantity, 0);
 
@@ -65,9 +69,23 @@ export default function Navbar() {
                         </div>
                         <div className="hidden md:block">
                             <div className="mr-10 flex items-baseline space-x-4 space-x-reverse">
-                                {navLinks.map(link => (
+                                {mainLinks.map(link => (
                                     <button key={link.name} onClick={() => navigate(link.page, link.params)} className="hover:bg-gray-700 hover:bg-opacity-50 px-3 py-2 rounded-md text-sm font-medium transition-colors">{link.name}</button>
                                 ))}
+                                {moreLinks.length > 0 && (
+                                    <div className="relative group">
+                                        <button onClick={() => setIsMoreMenuOpen(!isMoreMenuOpen)} className="hover:bg-gray-700 hover:bg-opacity-50 px-3 py-2 rounded-md text-sm font-medium">
+                                            {t('more')}
+                                        </button>
+                                        {isMoreMenuOpen && (
+                                            <div className="absolute left-0 mt-2 w-48 bg-gray-800 rounded-md shadow-lg py-1 z-20">
+                                                {moreLinks.map(link => (
+                                                    <button key={link.name} onClick={() => {navigate(link.page, link.params); setIsMoreMenuOpen(false);}} className="block w-full text-right px-4 py-2 text-sm text-gray-300 hover:bg-gray-700">{link.name}</button>
+                                                ))}
+                                            </div>
+                                        )}
+                                    </div>
+                                )}
                                 {isAdmin && (
                                     <button onClick={() => navigate('admin')} className="border border-indigo-500 hover:bg-indigo-500 hover:bg-opacity-25 px-3 py-2 rounded-md text-sm font-medium transition-colors">{t('adminPanel')}</button>
                                 )}
@@ -125,7 +143,7 @@ export default function Navbar() {
             {isMenuOpen && (
                 <div className="md:hidden">
                     <div className="px-2 pt-2 pb-3 space-y-1 sm:px-3">
-                        {navLinks.map(link => (
+                        {allNavLinks.map(link => (
                             <button key={link.name} onClick={() => { navigate(link.page, link.params); setIsMenuOpen(false); }} className="text-gray-300 hover:bg-gray-700 hover:text-white block w-full text-right px-3 py-2 rounded-md text-base font-medium">{link.name}</button>
                         ))}
                         {isAdmin && (

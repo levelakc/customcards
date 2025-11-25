@@ -233,20 +233,17 @@ export default function AdminPage() {
     const [editingId, setEditingId] = useState(null);
 
     const [productForm, setProductForm] = useState({ name: '', description: '', price: '', image: '', category: '', availableColors: new Set(ALL_CARD_COLORS), isUpsellProduct: false });
-    const [categoryName, setCategoryName] = useState('');
+    const [categoryName, setCategoryName] = useState({ en: '', he: '' });
 
     const [uploading, setUploading] = useState(false);
     const [selectedFile, setSelectedFile] = useState(null);
     const [previewUrl, setPreviewUrl] = useState('');
-
     const [customization, setCustomization] = useState({
         position: { x: 45, y: 10 }, // Set initial position to match default preview
         scale: 1,
         rotation: 0,
     });
-
     const [previewColorKey, setPreviewColorKey] = useState('black');
-
     useEffect(() => {
         if (selectedFile) {
             setPreviewUrl(URL.createObjectURL(selectedFile));
@@ -254,7 +251,6 @@ export default function AdminPage() {
             setPreviewUrl(productForm.image);
         }
     }, [selectedFile, productForm.image]);
-
     const fetchData = useCallback(async () => {
         try {
             setLoading(true);
@@ -272,7 +268,6 @@ export default function AdminPage() {
             setLoading(false);
         }
     }, [token]); // Added token to dependency array
-
     useEffect(() => {
         if (isAdmin) {
             fetchData();
@@ -288,7 +283,6 @@ export default function AdminPage() {
             [name]: type === 'checkbox' ? checked : value
         }));
     };
-
     const handleColorToggle = (color) => {
         setProductForm(prev => {
             const updatedColors = new Set(prev.availableColors);
@@ -306,7 +300,6 @@ export default function AdminPage() {
         setEditingId(null);
         setSelectedFile(null);
     };
-
     const handleSelectProductToEdit = (product) => {
         setIsEditing(true);
         setEditingId(product._id);
@@ -328,9 +321,8 @@ export default function AdminPage() {
         setEditingId(category._id);
         setCategoryName(category.name);
     };
-
     const resetCategoryForm = () => {
-        setCategoryName('');
+        setCategoryName({ en: '', he: '' });
         setIsEditing(false);
         setEditingId(null);
     };
@@ -338,7 +330,6 @@ export default function AdminPage() {
     const handleProductFormSubmit = async (e) => {
         e.preventDefault();
         let imageUrl = productForm.image;
-
         if (selectedFile) {
             const formData = new FormData();
             formData.append('image', selectedFile);
@@ -353,12 +344,10 @@ export default function AdminPage() {
             }
             setUploading(false);
         }
-
         if (!imageUrl) {
             alert(t('provideLogoLink'));
             return;
         }
-
         const productData = { 
             ...productForm, 
             image: imageUrl, 
@@ -382,7 +371,6 @@ export default function AdminPage() {
             alert(`${t('error')} ${err.message}. ${err.response?.data?.message || ''}`); // Improved error message
         }
     };
-
     const handleDeleteProduct = async (productId) => {
         if (window.confirm(t('deleteProductConfirmation'))) {
             try {
@@ -393,7 +381,6 @@ export default function AdminPage() {
             }
         }
     };
-
     const handleCategoryFormSubmit = async (e) => {
         e.preventDefault();
         try {
@@ -407,7 +394,6 @@ export default function AdminPage() {
             alert(`${t('error')} ${err.message}`);
         }
     };
-
     const handleDeleteCategory = async (categoryId) => {
         if (window.confirm(t('deleteCategoryConfirmation'))) {
             try {
@@ -418,10 +404,8 @@ export default function AdminPage() {
             }
         }
     };
-
     if (loading) return <div className="text-center p-10 text-white bg-gray-900 min-h-screen">{t('loadingData')}...</div>;
     if (error) return <div className="text-center p-10 text-red-400 bg-gray-900 min-h-screen">{t('error')} {error}</div>;
-
     return (
       <div className="bg-gray-900 min-h-screen text-white p-4 md:p-8">
         <div className="flex justify-between items-center mb-8">
@@ -437,9 +421,7 @@ export default function AdminPage() {
             <button type="button" onClick={() => setActiveTab('reviews')} className={`py-2 px-4 ${activeTab === 'reviews' ? 'border-b-2 border-indigo-500' : 'text-gray-400'}`}>{t('reviewManagement')}</button>
             <button type="button" onClick={() => setActiveTab('settings')} className={`py-2 px-4 ${activeTab === 'settings' ? 'border-b-2 border-indigo-500' : 'text-gray-400'}`}>{t('siteSettings')}</button>
         </div>
-
         {activeTab === 'dashboard' && <AdminDashboardPage />}
-
         {activeTab === 'products' && (
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
                 <div className="lg:col-span-2">
@@ -447,7 +429,7 @@ export default function AdminPage() {
                     <div className="bg-gray-800 rounded-lg overflow-x-auto">
                         <table className="w-full text-sm text-right text-gray-300">
                             <thead className="text-xs text-gray-400 uppercase bg-gray-700"><tr><th scope="col" className="px-6 py-3">{t('productName')}</th><th scope="col" className="px-6 py-3 hidden md:table-cell">{t('category')}</th><th scope="col" className="px-6 py-3">{t('price')}</th><th scope="col" className="px-6 py-3">{t('actions')}</th></tr></thead>
-                            <tbody>{products.map(p => (<tr key={p._id} className="border-b border-gray-700 hover:bg-gray-600"><th scope="row" className="px-6 py-4 font-medium text-white whitespace-nowrap">{p.name}</th><td className="px-6 py-4 hidden md:table-cell">{p.category?.name}</td><td className="px-6 py-4">₪{p.price}</td><td className="px-6 py-4 space-x-2 space-x-reverse"><button type="button" onClick={() => handleSelectProductToEdit(p)} className="font-medium text-blue-500 hover:underline">{t('edit')}</button><button type="button" onClick={() => handleDeleteProduct(p._id)} className="font-medium text-red-500 hover:underline">{t('delete')}</button></td></tr>))}</tbody>
+                            <tbody>{products.map(p => (<tr key={p._id} className="border-b border-gray-700 hover:bg-gray-600"><th scope="row" className="px-6 py-4 font-medium text-white whitespace-nowrap">{p.name}</th><td className="px-6 py-4 hidden md:table-cell">{p.category?.name[i18n.language]}</td><td className="px-6 py-4">₪{p.price}</td><td className="px-6 py-4 space-x-2 space-x-reverse"><button type="button" onClick={() => handleSelectProductToEdit(p)} className="font-medium text-blue-500 hover:underline">{t('edit')}</button><button type="button" onClick={() => handleDeleteProduct(p._id)} className="font-medium text-red-500 hover:underline">{t('delete')}</button></td></tr>))}</tbody>
                         </table>
                     </div>
                 </div>
@@ -473,7 +455,6 @@ export default function AdminPage() {
                                     ))}
                                 </div>
                             )}
-
                             {/* THE FIX: Conditional rendering for the preview */}
                             {productForm.isUpsellProduct ? (
                                 <WalletPreview
@@ -517,7 +498,6 @@ export default function AdminPage() {
                                         className="w-full h-2 bg-gray-700 rounded-lg appearance-none cursor-pointer range-lg"
                                     />
                                 </div>
-
                                 {/* ROTATION SLIDER - ADDED */}
                                 <div>
                                     <label htmlFor="rotation-slider" className="block text-sm font-medium mb-1">
@@ -558,7 +538,7 @@ export default function AdminPage() {
                             </div>
                             
                             
-                            <div><label className="block mb-1">{t('category')}</label><select name="category" value={productForm.category} onChange={handleProductInputChange} className="w-full bg-gray-700 rounded p-2 border border-gray-600">{categories.map(c => <option key={c._id} value={c._id}>{c.name}</option>)}</select></div>
+                            <div><label className="block mb-1">{t('category')}</label><select name="category" value={productForm.category} onChange={handleProductInputChange} className="w-full bg-gray-700 rounded p-2 border border-gray-600">{categories.map(c => <option key={c._id} value={c._id}>{c.name[i18n.language]}</option>)}</select></div>
                             
                             <div className="flex items-center pt-2">
                                 <input 
@@ -571,7 +551,6 @@ export default function AdminPage() {
                                 />
                                 <label htmlFor="isUpsellProduct" className="mr-2 text-sm font-medium text-gray-300">{t('isUpsell')}</label>
                             </div>
-
                             {/* Conditionally hide the color options if it's an upsell product */}
                             {!productForm.isUpsellProduct && (
                                 <div>
@@ -600,26 +579,25 @@ export default function AdminPage() {
                 </div>
             </div>
         )}
-
         {activeTab === 'categories' && (
             <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                 <div>
                     <h2 className="text-2xl font-bold mb-4">{t('categoryList')}</h2>
                     <div className="bg-gray-800 rounded-lg">
-                        <ul className="divide-y divide-gray-700">{categories.map(c => <li key={c._id} className="p-4 flex justify-between items-center"><span>{c.name}</span><div className="space-x-2 space-x-reverse"><button type="button" onClick={() => handleSelectCategoryToEdit(c)} className="font-medium text-blue-500 hover:underline">{t('edit')}</button><button type="button" onClick={() => handleDeleteCategory(c._id)} className="font-medium text-red-500 hover:underline">{t('delete')}</button></div></li>)}</ul>
+                        <ul className="divide-y divide-gray-700">{categories.map(c => <li key={c._id} className="p-4 flex justify-between items-center"><span>{c.name[i18n.language]}</span><div className="space-x-2 space-x-reverse"><button type="button" onClick={() => handleSelectCategoryToEdit(c)} className="font-medium text-blue-500 hover:underline">{t('edit')}</button><button type="button" onClick={() => handleDeleteCategory(c._id)} className="font-medium text-red-500 hover:underline">{t('delete')}</button></div></li>)}</ul>
                     </div>
                 </div>
                  <div>
                     <h2 className="text-2xl font-bold mb-4">{isEditing ? t('editCategory') : t('addNewCategory')}</h2>
                     <form onSubmit={handleCategoryFormSubmit} className="bg-gray-800 p-6 rounded-lg space-y-4">
-                        <div><label className="block mb-1">{t('categoryName')}</label><input type="text" value={categoryName} onChange={e => setCategoryName(e.target.value)} required className="w-full bg-gray-700 rounded p-2 border border-gray-600"/></div>
+                        <div><label className="block mb-1">{t('categoryName')} (EN)</label><input type="text" value={categoryName.en} onChange={e => setCategoryName(prev => ({...prev, en: e.target.value}))} required className="w-full bg-gray-700 rounded p-2 border border-gray-600"/></div>
+                        <div><label className="block mb-1">{t('categoryName')} (HE)</label><input type="text" value={categoryName.he} onChange={e => setCategoryName(prev => ({...prev, he: e.target.value}))} required className="w-full bg-gray-700 rounded p-2 border border-gray-600"/></div>
                         <button type="submit" className="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2 px-4 rounded">{isEditing ? t('updateCategory') : t('addCategory')}</button>
                         {isEditing && <button type="button" onClick={resetCategoryForm} className="w-full mt-2 bg-gray-600 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded">{t('cancelEdit')}</button>}
                     </form>
                 </div>
             </div>
         )}
-
         
         {activeTab === 'gallery' && <GallerySettingsPage />}
         {activeTab === 'orders' && <AdminOrdersPage />}
