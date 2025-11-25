@@ -6,6 +6,7 @@
   "type": "module",
   "scripts": {
     "data:import": "node seeder",
+    "category:migrate": "node migration.js",
     "start": "node server.js",
     "server": "nodemon server.js"
   },
