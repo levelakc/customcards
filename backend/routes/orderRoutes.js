@@ -1,10 +1,10 @@
 import express from 'express';
 const router = express.Router();
 import { addOrderItems, getOrders, updateOrderStatus, deleteOrder, deleteOrders, updateOrder } from '../controllers/orderController.js';
-import { protect, admin } from '../middleware/authMiddleware.js';
+import { protect, admin, guestOrProtect } from '../middleware/authMiddleware.js';
 
 router.route('/')
-    .post(protect, addOrderItems)
+    .post(guestOrProtect, addOrderItems)
     .get(protect, admin, getOrders)
     .delete(protect, admin, deleteOrders); // For bulk delete
 

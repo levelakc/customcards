@@ -1,12 +1,12 @@
 import Order from '../models/orderModel.js';
 import User from '../models/userModel.js';
 
-const DELIVERY_FEE_ILS = 100; // New constant for delivery fee
+const DELIVERY_FEE_ILS = 50; // New constant for delivery fee
 
 // @desc    Create new order
 // @route   POST /api/orders
 const addOrderItems = async (req, res) => {
-    const { orderItems, messageToDesigner } = req.body; // Removed totalPrice from destructuring as it will be calculated
+    const { orderItems, messageToDesigner, guestInfo } = req.body; // Removed totalPrice from destructuring as it will be calculated
 
     if (orderItems && orderItems.length === 0) {
         res.status(400).json({ message: 'No order items' });
@@ -16,13 +16,23 @@ const addOrderItems = async (req, res) => {
         const itemsPrice = orderItems.reduce((acc, item) => acc + item.qty * item.price, 0);
         const finalTotalPrice = itemsPrice + DELIVERY_FEE_ILS;
 
-        const order = new Order({
-            // When creating an order, we link it to the logged-in user's ID
-            user: req.user._id,
+        let orderData = {
             orderItems,
             totalPrice: finalTotalPrice, // Use finalTotalPrice
             messageToDesigner, // Include messageToDesigner
-        });
+        };
+
+        if (req.user) {
+            orderData.user = req.user._id;
+            orderData.shippingAddress = req.body.shippingAddress;
+        } else if (guestInfo) {
+            orderData.guestInfo = guestInfo;
+        } else {
+            res.status(400).json({ message: 'User information is missing' });
+            return;
+        }
+
+        const order = new Order(orderData);
         const createdOrder = await order.save();
         
         // Emit a new order event to all connected clients

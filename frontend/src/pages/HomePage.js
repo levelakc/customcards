@@ -151,7 +151,7 @@ export default function HomePage() {
 
                 <div className="z-10 p-5">
                     <h1 
-                        className="text-5xl md:text-7xl font-extrabold mb-4 drop-shadow-lg"
+                        className="text-5xl md:text-7xl font-extrabold mb-4 drop-shadow-lg font-dancing"
                         style={{
                             transition: 'transform 0.2s ease-out'
                         }}

@@ -73,7 +73,7 @@ export default function PersonalDesignPage() {
                         />
                     </div>
                     <div className="flex flex-col space-y-6">
-                        <h1 className="text-4xl font-extrabold text-center">עצב את הכרטיס שלך</h1>
+                        <h1 className="text-4xl font-extrabold text-center font-dancing">עצב את הכרטיס שלך</h1>
                         
                         <div>
                             <h3 className="text-lg font-semibold mb-3">1. בחר צבע כרטיס:</h3>

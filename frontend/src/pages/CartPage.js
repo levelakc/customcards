@@ -54,10 +54,6 @@ export default function CartPage() {
     const subtotal = cartItems.reduce((sum, item) => sum + item.price * item.quantity, 0);
 
     const handleProceedToCheckout = () => {
-        if (!user) {
-            navigate('login');
-            return;
-        }
         // Only show the modal if there is an upsell product and it's not already in the cart
         if (upsellProduct && !cartItems.some(item => item._id === upsellProduct._id)) {
             setIsUpsellModalOpen(true);
@@ -92,7 +88,7 @@ export default function CartPage() {
     if (cartItems.length === 0) {
         return (
             <div className="bg-gray-900 min-h-screen text-white flex flex-col items-center justify-center">
-                <h1 className="text-4xl font-extrabold mb-4">הסל שלך ריק</h1>
+                <h1 className="text-4xl font-extrabold mb-4 font-dancing">הסל שלך ריק</h1>
                 <p className="text-xl text-gray-400 mb-8">נראה שעדיין לא הוספת מוצרים.</p>
                 <button 
                     onClick={() => navigate('home')} 
@@ -107,7 +103,7 @@ export default function CartPage() {
     return (
         <div className="bg-gray-900 min-h-screen text-white">
             <div className="max-w-4xl mx-auto py-12 px-4 sm:px-6 lg:px-8">
-                <h1 className="text-4xl font-extrabold mb-8">סל הקניות שלך</h1>
+                <h1 className="text-4xl font-extrabold mb-8 font-dancing">סל הקניות שלך</h1>
                 <div className="bg-gray-800 rounded-lg shadow-xl">
                     <ul className="divide-y divide-gray-700">
                         {cartItems.map(item => (

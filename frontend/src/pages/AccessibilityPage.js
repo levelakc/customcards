@@ -4,7 +4,7 @@ export default function AccessibilityPage() {
     return (
         <div className="bg-gray-900 min-h-screen text-white">
             <div className="max-w-4xl mx-auto py-12 px-4 sm:px-6 lg:px-8">
-                <h1 className="text-4xl font-extrabold mb-8">הצהרת נגישות</h1>
+                <h1 className="text-4xl font-extrabold mb-8 font-dancing">הצהרת נגישות</h1>
                 <div className="prose prose-invert text-gray-300">
                     <p>אנו ב-VIPCard רואים חשיבות עליונה בהנגשת אתר האינטרנט שלנו לאנשים עם מוגבלויות, על מנת לאפשר לכלל האוכלוסייה, לרבות אנשים עם מוגבלויות, לגלוש באתר בקלות ובנוחות.</p>
                     <p>האתר נבנה בהתאם להוראות הנגישות המופיעות בתקן הישראלי 5568 - "קווים מנחים לנגישות תכנים באינטרנט" לרמה AA.</p>

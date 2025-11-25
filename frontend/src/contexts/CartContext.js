@@ -45,7 +45,7 @@ export const CartProvider = ({ children }) => {
         setCartItems([]);
     };
 
-    const createOrder = async (token, messageToDesigner) => { // Add messageToDesigner parameter
+    const createOrder = async (token, messageToDesigner, guestInfo) => { // Add messageToDesigner and guestInfo parameter
         try {
             const orderItems = cartItems.map(item => ({
                 name: item.name,
@@ -62,6 +62,7 @@ export const CartProvider = ({ children }) => {
                 orderItems,
                 totalPrice,
                 messageToDesigner, // Include messageToDesigner
+                guestInfo, // Include guestInfo
             };
 
             await api.addOrder(orderData, token);
