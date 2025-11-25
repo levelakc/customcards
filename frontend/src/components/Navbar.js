@@ -81,14 +81,9 @@ export default function Navbar() {
                     <div className="flex items-center">
                         <div className="hidden md:flex items-center">
                             
-                            <div className="relative group">
-                                <button className="hover:bg-gray-700 hover:bg-opacity-50 px-3 py-2 rounded-md text-sm font-medium">
-                                    {i18n.language === 'en' ? 'Language' : 'שפה'}
-                                </button>
-                                <div className="absolute left-0 mt-2 w-48 bg-gray-800 rounded-md shadow-lg py-1 z-20 opacity-0 group-hover:opacity-100 transition-opacity duration-200">
-                                    <button onClick={() => changeLanguage('en')} className="block w-full text-right px-4 py-2 text-sm text-gray-300 hover:bg-gray-700">English</button>
-                                    <button onClick={() => changeLanguage('he')} className="block w-full text-right px-4 py-2 text-sm text-gray-300 hover:bg-gray-700">עברית</button>
-                                </div>
+                            <div>
+                                <button onClick={() => changeLanguage('en')} className="bg-gray-700 hover:bg-gray-600 text-white font-bold py-2 px-4 rounded-l">EN</button>
+                                <button onClick={() => changeLanguage('he')} className="bg-gray-700 hover:bg-gray-600 text-white font-bold py-2 px-4 rounded-r">HE</button>
                             </div>
 
                             <button onClick={() => navigate('search')} className="relative p-2 rounded-full hover:bg-gray-700 hover:bg-opacity-50 focus:outline-none ml-4">
@@ -142,14 +137,9 @@ export default function Navbar() {
                         {isAdmin && (
                             <button onClick={() => { navigate('admin'); setIsMenuOpen(false); }} className="text-gray-300 bg-indigo-600 hover:bg-indigo-700 block w-full text-right px-3 py-2 rounded-md text-base font-medium">{t('adminPanel')}</button>
                         )}
-                         <div className="relative group">
-                                <button className="text-gray-300 hover:bg-gray-700 hover:text-white block w-full text-right px-3 py-2 rounded-md text-base font-medium">
-                                    {i18n.language === 'en' ? 'Language' : 'שפה'}
-                                </button>
-                                <div className="absolute left-0 mt-2 w-48 bg-gray-800 rounded-md shadow-lg py-1 z-20 opacity-0 group-hover:opacity-100 transition-opacity duration-200">
-                                    <button onClick={() => {changeLanguage('en'); setIsMenuOpen(false);}} className="block w-full text-right px-4 py-2 text-sm text-gray-300 hover:bg-gray-700">English</button>
-                                    <button onClick={() => {changeLanguage('he'); setIsMenuOpen(false);}} className="block w-full text-right px-4 py-2 text-sm text-gray-300 hover:bg-gray-700">עברית</button>
-                                </div>
+                         <div>
+                                <button onClick={() => {changeLanguage('en'); setIsMenuOpen(false);}} className="bg-gray-700 hover:bg-gray-600 text-white font-bold py-2 px-4 rounded-l">EN</button>
+                                <button onClick={() => {changeLanguage('he'); setIsMenuOpen(false);}} className="bg-gray-700 hover:bg-gray-600 text-white font-bold py-2 px-4 rounded-r">HE</button>
                             </div>
                     </div>
                     <div className="pt-4 pb-3 border-t border-gray-700">

@@ -247,10 +247,6 @@ export default function AdminPage() {
 
     const [previewColorKey, setPreviewColorKey] = useState('black');
 
-    const changeLanguage = (lng) => {
-        i18n.changeLanguage(lng);
-    };
-
     useEffect(() => {
         if (selectedFile) {
             setPreviewUrl(URL.createObjectURL(selectedFile));
@@ -430,10 +426,6 @@ export default function AdminPage() {
       <div className="bg-gray-900 min-h-screen text-white p-4 md:p-8">
         <div className="flex justify-between items-center mb-8">
             <h1 className="text-4xl font-extrabold font-dancing">{t('adminPanel')}</h1>
-            <div>
-                <button onClick={() => changeLanguage('en')} className="bg-gray-700 hover:bg-gray-600 text-white font-bold py-2 px-4 rounded-l">EN</button>
-                <button onClick={() => changeLanguage('he')} className="bg-gray-700 hover:bg-gray-600 text-white font-bold py-2 px-4 rounded-r">HE</button>
-            </div>
         </div>
         <div className="flex flex-wrap space-x-4 space-x-reverse border-b border-gray-700 mb-8">
             <button type="button" onClick={() => setActiveTab('dashboard')} className={`py-2 px-4 ${activeTab === 'dashboard' ? 'border-b-2 border-indigo-500' : 'text-gray-400'}`}>{t('dashboard')}</button>
