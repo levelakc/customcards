@@ -19,6 +19,11 @@ i18n
     resources: {
       en: {
         translation: {
+          homePage: 'Home Page',
+          hello: 'Hello',
+          myProfile: 'My Profile',
+          logout: 'Logout',
+          loginRegister: 'Login / Register',
           checkout: 'Checkout',
           orderSummary: 'Order Summary',
           itemsTotal: 'Items total',
@@ -153,6 +158,11 @@ i18n
       },
       he: {
         translation: {
+          homePage: 'דף הבית',
+          hello: 'שלום',
+          myProfile: 'הפרופיל שלי',
+          logout: 'התנתק',
+          loginRegister: 'כניסה / הרשמה',
           checkout: 'תשלום',
           orderSummary: 'סיכום הזמנה',
           itemsTotal: 'סה"כ פריטים',

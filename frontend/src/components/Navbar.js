@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useRouter } from '../contexts/RouterContext';
 import { useAuth } from '../contexts/AuthContext';
 import { useCart } from '../contexts/CartContext';
@@ -9,7 +10,7 @@ import { ShoppingCartIcon, MenuIcon, XIcon, SearchIcon } from './Icons';
 
 
 export default function Navbar() {
-    
+    const { t, i18n } = useTranslation();
     const { navigate } = useRouter();
     const { isAuthenticated, isAdmin, logout, user } = useAuth();
     const { cartItems } = useCart();
@@ -30,7 +31,7 @@ export default function Navbar() {
     }, []);
 
     const navLinks = [
-        { name: 'דף הבית', page: 'home' },
+        { name: t('homePage'), page: 'home' },
         ...categories.map(c => ({ name: c.name, page: 'category', params: { id: c._id } }))
     ];
     
@@ -41,6 +42,10 @@ export default function Navbar() {
         setIsMenuOpen(false);
         navigate('home');
     }
+
+    const changeLanguage = (lng) => {
+        i18n.changeLanguage(lng);
+    };
 
     // Construct the full logo URL
     let finalLogoUrl = settings.logoUrl;
@@ -67,7 +72,7 @@ export default function Navbar() {
                                     <button key={link.name} onClick={() => navigate(link.page, link.params)} className="hover:bg-gray-700 hover:bg-opacity-50 px-3 py-2 rounded-md text-sm font-medium transition-colors">{link.name}</button>
                                 ))}
                                 {isAdmin && (
-                                    <button onClick={() => navigate('admin')} className="border border-indigo-500 hover:bg-indigo-500 hover:bg-opacity-25 px-3 py-2 rounded-md text-sm font-medium transition-colors">פאנל ניהול</button>
+                                    <button onClick={() => navigate('admin')} className="border border-indigo-500 hover:bg-indigo-500 hover:bg-opacity-25 px-3 py-2 rounded-md text-sm font-medium transition-colors">{t('adminPanel')}</button>
                                 )}
                             </div>
                         </div>
@@ -76,21 +81,31 @@ export default function Navbar() {
                     <div className="flex items-center">
                         <div className="hidden md:flex items-center">
                             
+                            <div className="relative group">
+                                <button className="hover:bg-gray-700 hover:bg-opacity-50 px-3 py-2 rounded-md text-sm font-medium">
+                                    {i18n.language === 'en' ? 'Language' : 'שפה'}
+                                </button>
+                                <div className="absolute left-0 mt-2 w-48 bg-gray-800 rounded-md shadow-lg py-1 z-20 opacity-0 group-hover:opacity-100 transition-opacity duration-200">
+                                    <button onClick={() => changeLanguage('en')} className="block w-full text-right px-4 py-2 text-sm text-gray-300 hover:bg-gray-700">English</button>
+                                    <button onClick={() => changeLanguage('he')} className="block w-full text-right px-4 py-2 text-sm text-gray-300 hover:bg-gray-700">עברית</button>
+                                </div>
+                            </div>
+
                             <button onClick={() => navigate('search')} className="relative p-2 rounded-full hover:bg-gray-700 hover:bg-opacity-50 focus:outline-none ml-4">
                                 <SearchIcon />
                             </button>
                             {isAuthenticated ? (
                                 <div className="relative group">
                                     <button className="hover:bg-gray-700 hover:bg-opacity-50 px-3 py-2 rounded-md text-sm font-medium">
-                                        שלום, {user.name}
+                                        {t('hello')}, {user.name}
                                     </button>
                                     <div className="absolute left-0 mt-2 w-48 bg-gray-800 rounded-md shadow-lg py-1 z-20 opacity-0 group-hover:opacity-100 transition-opacity duration-200">
-                                        <button onClick={() => navigate('profile')} className="block w-full text-right px-4 py-2 text-sm text-gray-300 hover:bg-gray-700">הפרופיל שלי</button>
-                                        <button onClick={handleLogout} className="block w-full text-right px-4 py-2 text-sm text-gray-300 hover:bg-gray-700">התנתק</button>
+                                        <button onClick={() => navigate('profile')} className="block w-full text-right px-4 py-2 text-sm text-gray-300 hover:bg-gray-700">{t('myProfile')}</button>
+                                        <button onClick={handleLogout} className="block w-full text-right px-4 py-2 text-sm text-gray-300 hover:bg-gray-700">{t('logout')}</button>
                                     </div>
                                 </div>
                             ) : (
-                                <button onClick={() => navigate('login')} className="hover:bg-gray-700 hover:bg-opacity-50 px-3 py-2 rounded-md text-sm font-medium">כניסה / הרשמה</button>
+                                <button onClick={() => navigate('login')} className="hover:bg-gray-700 hover:bg-opacity-50 px-3 py-2 rounded-md text-sm font-medium">{t('loginRegister')}</button>
                             )}
                             <button onClick={() => navigate('cart')} className="relative p-2 rounded-full hover:bg-gray-700 hover:bg-opacity-50 focus:outline-none ml-4">
                                 <ShoppingCartIcon />
@@ -125,8 +140,17 @@ export default function Navbar() {
                             <button key={link.name} onClick={() => { navigate(link.page, link.params); setIsMenuOpen(false); }} className="text-gray-300 hover:bg-gray-700 hover:text-white block w-full text-right px-3 py-2 rounded-md text-base font-medium">{link.name}</button>
                         ))}
                         {isAdmin && (
-                            <button onClick={() => { navigate('admin'); setIsMenuOpen(false); }} className="text-gray-300 bg-indigo-600 hover:bg-indigo-700 block w-full text-right px-3 py-2 rounded-md text-base font-medium">פאנל ניהול</button>
+                            <button onClick={() => { navigate('admin'); setIsMenuOpen(false); }} className="text-gray-300 bg-indigo-600 hover:bg-indigo-700 block w-full text-right px-3 py-2 rounded-md text-base font-medium">{t('adminPanel')}</button>
                         )}
+                         <div className="relative group">
+                                <button className="text-gray-300 hover:bg-gray-700 hover:text-white block w-full text-right px-3 py-2 rounded-md text-base font-medium">
+                                    {i18n.language === 'en' ? 'Language' : 'שפה'}
+                                </button>
+                                <div className="absolute left-0 mt-2 w-48 bg-gray-800 rounded-md shadow-lg py-1 z-20 opacity-0 group-hover:opacity-100 transition-opacity duration-200">
+                                    <button onClick={() => {changeLanguage('en'); setIsMenuOpen(false);}} className="block w-full text-right px-4 py-2 text-sm text-gray-300 hover:bg-gray-700">English</button>
+                                    <button onClick={() => {changeLanguage('he'); setIsMenuOpen(false);}} className="block w-full text-right px-4 py-2 text-sm text-gray-300 hover:bg-gray-700">עברית</button>
+                                </div>
+                            </div>
                     </div>
                     <div className="pt-4 pb-3 border-t border-gray-700">
                         {isAuthenticated ? (
@@ -136,13 +160,13 @@ export default function Navbar() {
                                         <div className="text-base font-medium leading-none text-white">{user.name}</div>
                                         <div className="text-sm font-medium leading-none text-gray-400">{user.email}</div>
                                     </div>
-                                </div>
-                                <button onClick={() => {navigate('profile'); setIsMenuOpen(false);}} className="block w-full text-right rounded-md px-3 py-2 text-base font-medium text-gray-400 hover:text-white hover:bg-gray-700">הפרופיל שלי</button>
-                                <button onClick={handleLogout} className="block w-full text-right rounded-md px-3 py-2 text-base font-medium text-gray-400 hover:text-white hover:bg-gray-700">התנתק</button>
+.                                </div>
+                                <button onClick={() => {navigate('profile'); setIsMenuOpen(false);}} className="block w-full text-right rounded-md px-3 py-2 text-base font-medium text-gray-400 hover:text-white hover:bg-gray-700">{t('myProfile')}</button>
+                                <button onClick={handleLogout} className="block w-full text-right rounded-md px-3 py-2 text-base font-medium text-gray-400 hover:text-white hover:bg-gray-700">{t('logout')}</button>
                             </div>
                         ) : (
                             <div className="px-2">
-                                <button onClick={() => { navigate('login'); setIsMenuOpen(false); }} className="w-full text-right text-gray-300 hover:bg-gray-700 hover:text-white block px-3 py-2 rounded-md text-base font-medium">כניסה / הרשמה</button>
+                                <button onClick={() => { navigate('login'); setIsMenuOpen(false); }} className="w-full text-right text-gray-300 hover:bg-gray-700 hover:text-white block px-3 py-2 rounded-md text-base font-medium">{t('loginRegister')}</button>
                             </div>
                         )}
                     </div>
