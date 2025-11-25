@@ -34,7 +34,7 @@ export default function Navbar() {
 
     const allNavLinks = [
         { name: t('homePage'), page: 'home' },
-        ...categories.map(c => ({ name: c.name[i18n.language], page: 'category', params: { id: c._id } }))
+        ...categories.map(c => ({ name: c.name, page: 'category', params: { id: c._id } }))
     ];
 
     const mainLinks = allNavLinks.slice(0, 6);
