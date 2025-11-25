@@ -5,7 +5,11 @@ import Category from '../models/categoryModel.js';
 // @route   GET /api/categories
 const getCategories = asyncHandler(async (req, res) => {
     const categories = await Category.find({});
-    res.json(categories);
+    const categoriesWithFallbackNames = categories.map(category => ({
+        ...category.toObject(),
+        name: category.name.en || category.name.he,
+    }));
+    res.json(categoriesWithFallbackNames);
 });
 
 // @desc    Create a category

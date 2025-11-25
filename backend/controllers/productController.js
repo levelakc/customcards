@@ -4,16 +4,36 @@ import Product from '../models/productModel.js';
 // @desc    Fetch all products
 // @route   GET /api/products
 const getProducts = asyncHandler(async (req, res) => {
-    const products = await Product.find({}).populate('category', 'name');
-    res.json(products);
+    const products = await Product.find({}).populate('category'); // Removed 'name' from populate to handle it manually
+
+    const productsWithFallbackNames = products.map(product => {
+        const categoryName = product.category ? (product.category.name.en || product.category.name.he) : undefined;
+        return {
+            ...product.toObject(),
+            name: product.name.en || product.name.he,
+            category: categoryName ? {
+                ...product.category.toObject(),
+                name: categoryName
+            } : undefined
+        };
+    });
+    res.json(productsWithFallbackNames);
 });
 
 // @desc    Fetch single product
 // @route   GET /api/products/:id
 const getProductById = asyncHandler(async (req, res) => {
-    const product = await Product.findById(req.params.id).populate('category', 'name');
+    const product = await Product.findById(req.params.id).populate('category'); // Removed 'name' from populate to handle it manually
     if (product) {
-        res.json(product);
+        const categoryName = product.category ? (product.category.name.en || product.category.name.he) : undefined;
+        res.json({
+            ...product.toObject(),
+            name: product.name.en || product.name.he,
+            category: categoryName ? {
+                ...product.category.toObject(),
+                name: categoryName
+            } : undefined
+        });
     } else {
         res.status(404).json({ message: 'Product not found' });
     }
@@ -31,7 +51,10 @@ const createProduct = asyncHandler(async (req, res) => {
     }
 
     const product = new Product({
-        name,
+        name: {
+            en: name.en || name.he, // Use en if available, otherwise he
+            he: name.he
+        },
         price,
         description,
         image,
@@ -41,7 +64,10 @@ const createProduct = asyncHandler(async (req, res) => {
         isUpsellProduct,
     });
     const createdProduct = await product.save();
-    res.status(201).json(createdProduct);
+    res.status(201).json({
+        ...createdProduct.toObject(),
+        name: createdProduct.name.en || createdProduct.name.he,
+    });
 });
 
 // @desc    Update a product
@@ -57,7 +83,10 @@ const updateProduct = asyncHandler(async (req, res) => {
             await Product.updateMany({ _id: { $ne: product._id } }, { $set: { isUpsellProduct: false } });
         }
 
-        product.name = name;
+        product.name = {
+            en: name.en || name.he, // Use en if available, otherwise he
+            he: name.he
+        };
         product.price = price;
         product.description = description;
         product.image = image;
@@ -67,7 +96,10 @@ const updateProduct = asyncHandler(async (req, res) => {
         product.isUpsellProduct = isUpsellProduct;
         
         const updatedProduct = await product.save();
-        res.json(updatedProduct);
+        res.json({
+            ...updatedProduct.toObject(),
+            name: updatedProduct.name.en || updatedProduct.name.he,
+        });
     } else {
         res.status(404).json({ message: 'Product not found' });
     }
@@ -76,9 +108,17 @@ const updateProduct = asyncHandler(async (req, res) => {
 // @desc    Get the single upsell product
 // @route   GET /api/products/upsell
 const getUpsellProduct = asyncHandler(async (req, res) => {
-    const upsellProduct = await Product.findOne({ isUpsellProduct: true });
+    const upsellProduct = await Product.findOne({ isUpsellProduct: true }).populate('category'); // Removed 'name' from populate
     if (upsellProduct) {
-        res.json(upsellProduct);
+        const categoryName = upsellProduct.category ? (upsellProduct.category.name.en || upsellProduct.category.name.he) : undefined;
+        res.json({
+            ...upsellProduct.toObject(),
+            name: upsellProduct.name.en || upsellProduct.name.he,
+            category: categoryName ? {
+                ...upsellProduct.category.toObject(),
+                name: categoryName
+            } : undefined
+        });
     } else {
         // It's okay if none is found, the frontend can handle this
         res.status(404).json({ message: 'No upsell product found' });
@@ -93,7 +133,8 @@ const searchProducts = asyncHandler(async (req, res) => {
 
     if (keyword) {
         query.$or = [
-            { name: { $regex: keyword, $options: 'i' } },
+            { 'name.en': { $regex: keyword, $options: 'i' } },
+            { 'name.he': { $regex: keyword, $options: 'i' } },
             { description: { $regex: keyword, $options: 'i' } }
         ];
     }
@@ -113,8 +154,20 @@ const searchProducts = asyncHandler(async (req, res) => {
         query['customization.engraveColors'] = { $in: [engraveColor] };
     }
 
-    const products = await Product.find(query).populate('category', 'name');
-    res.json(products);
+    const products = await Product.find(query).populate('category'); // Removed 'name' from populate to handle it manually
+
+    const productsWithFallbackNames = products.map(product => {
+        const categoryName = product.category ? (product.category.name.en || product.category.name.he) : undefined;
+        return {
+            ...product.toObject(),
+            name: product.name.en || product.name.he,
+            category: categoryName ? {
+                ...product.category.toObject(),
+                name: categoryName
+            } : undefined
+        };
+    });
+    res.json(productsWithFallbackNames);
 });
 
 const deleteProduct = asyncHandler(async (req, res) => {
