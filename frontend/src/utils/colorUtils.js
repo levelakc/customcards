@@ -1,22 +1,26 @@
 /**
- * A map from Hebrew color names (from the database) to CSS-friendly keys.
+ * A map from engraving color keys back to translation keys for display on the UI.
  */
-export const nameToKeyMap = {
-    'זהב': 'gold',
-    'כסף': 'silver',
-    'שחור': 'black',
-    'רוז גולד': 'roseGold',
-    'צבעוני': 'colorful',
+export const engravingColorNameKeys = {
+    black: 'engravingBlack',
+    silver: 'engravingSilver',
+    gold: 'engravingGold',
 };
 
-/**
- * A map from engraving color keys back to Hebrew names for display on the UI.
- */
-export const engravingColorNames = {
-    black: 'שחורה',
-    silver: 'כסופה',
-    gold: 'מוזהבת',
+export const nameToKeyMap = {
+    gold: 'gold',
+    silver: 'silver',
+    black: 'black',
+    roseGold: 'roseGold',
+    colorful: 'colorful',
 };
+
+export const engravingColorNames = {
+    black: 'engravingBlack',
+    silver: 'engravingSilver',
+    gold: 'engravingGold',
+};
+
 
 export const engravingColorClasses = {
     black: 'bg-black text-white',
@@ -35,23 +39,23 @@ export const engravingColorHex = {
  * This object defines the available engraving options for each card color.
  */
 export const cardColorOptions = {
-    gold:     { name: 'זהב',       engraving: ['black'],    bgColor: 'bg-yellow-500' },
-    silver:   { name: 'כסף',       engraving: ['black'],    bgColor: 'bg-gray-300' },
-    roseGold: { name: 'רוז גולד',  engraving: ['black'],    bgColor: 'gradient-roseGold' },
-    colorful: { name: 'צבעוני',    engraving: ['silver'],   bgColor: 'bg-gradient-to-r from-purple-400 via-pink-500 to-red-500' },
-    black:    { name: 'שחור',       engraving: ['silver', 'gold'], bgColor: 'gradient-black' },
+    gold:     { nameKey: 'gold',       engraving: ['black'],    bgColor: 'bg-yellow-500' },
+    silver:   { nameKey: 'silver',       engraving: ['black'],    bgColor: 'bg-gray-300' },
+    roseGold: { nameKey: 'roseGold',  engraving: ['black'],    bgColor: 'gradient-roseGold' },
+    colorful: { nameKey: 'colorful',    engraving: ['silver'],   bgColor: 'bg-gradient-to-r from-purple-400 via-pink-500 to-red-500' },
+    black:    { nameKey: 'black',       engraving: ['silver', 'gold'], bgColor: 'gradient-black' },
 };
 
 /**
- * A centralized utility to sort color names based on a preferred order.
- * This ensures 'Gold' and 'Silver' appear first in the UI.
- * @param {string[]} colors - An array of color names (e.g., ['שחור', 'זהב']).
- * @returns {string[]} The sorted array of color names.
+ * A centralized utility to sort color keys based on a preferred order.
+ * This ensures 'gold' and 'silver' appear first in the UI.
+ * @param {string[]} colors - An array of color keys (e.g., ['black', 'gold']).
+ * @returns {string[]} The sorted array of color keys.
  */
 export const getSortedColors = (colors) => {
     if (!colors || colors.length === 0) return [];
     
-    const preferredOrder = ['זהב', 'כסף', 'שחור', 'רוז גולד', 'צבעוני'];
+    const preferredOrder = ['gold', 'silver', 'black', 'roseGold', 'colorful'];
     
     return [...colors].sort((a, b) => {
         const indexA = preferredOrder.indexOf(a);
@@ -80,49 +84,52 @@ export const getDefaultEngraving = (cardColorKey) => {
 };
 
 /**
- * Parses a full description string (e.g., "זהב עם חריטת שחורה")
+ * Parses a full description string (e.g., "Gold with Black engraving")
  * into its corresponding card color key and engraving color key.
+ * This function is designed to be language-agnostic, working with translated strings.
  * @param {string} fullDescription - The descriptive string from the cart item.
+ * @param {function} t - The translation function from i18next.
  * @returns {{cardColorKey: string, engravingColorKey: string}} An object containing the parsed keys.
  */
-export const parseFullDescription = (fullDescription) => {
+export const parseFullDescription = (fullDescription, t) => {
     let cardColorKey = 'black'; // Default fallback
     let engravingColorKey = 'silver'; // Default fallback
 
-    if (!fullDescription) {
+    if (!fullDescription || !t) {
         return { cardColorKey, engravingColorKey };
     }
 
-    // Regex to extract card color name and engraving color name
-    const match = fullDescription.match(/(.*) עם חריטת (.*)/);
+    const descriptionTemplate = t('personalDesignDescription', { cardColor: '{{cardColor}}', engravingColor: '{{engravingColor}}' });
+    const regexString = descriptionTemplate
+        .replace('{{cardColor}}', '(.*)')
+        .replace('{{engravingColor}}', '(.*)');
+    const match = fullDescription.match(new RegExp(regexString));
 
     if (match && match.length === 3) {
-        const hebrewCardColorName = match[1].trim();
-        const hebrewEngravingColorName = match[2].trim();
+        const translatedCardColor = match[1].trim();
+        const translatedEngravingColor = match[2].trim();
 
-        // Map Hebrew card color name to key
-        for (const hebrewName in nameToKeyMap) {
-            if (nameToKeyMap.hasOwnProperty(hebrewName) && hebrewCardColorName.includes(hebrewName)) {
-                cardColorKey = nameToKeyMap[hebrewName];
+        // Find cardColorKey
+        for (const key in cardColorOptions) {
+            if (t(cardColorOptions[key].nameKey) === translatedCardColor) {
+                cardColorKey = key;
                 break;
             }
         }
 
-        // Map Hebrew engraving color name to key
-        for (const key in engravingColorNames) {
-            if (engravingColorNames.hasOwnProperty(key) && engravingColorNames[key] === hebrewEngravingColorName) {
+        // Find engravingColorKey
+        for (const key in engravingColorNameKeys) {
+            if (t(engravingColorNameKeys[key]) === translatedEngravingColor) {
                 engravingColorKey = key;
                 break;
             }
         }
     } else {
-        // Handle cases where the description might just be a card color name (e.g., for upsell wallet)
-        const hebrewCardColorName = fullDescription.trim();
-        for (const hebrewName in nameToKeyMap) {
-            if (nameToKeyMap.hasOwnProperty(hebrewName) && hebrewCardColorName.includes(hebrewName)) {
-                cardColorKey = nameToKeyMap[hebrewName];
-                // If only card color is specified, use its default engraving
-                engravingColorKey = getDefaultEngraving(cardColorKey);
+        // Fallback for descriptions that might only contain the card color
+        for (const key in cardColorOptions) {
+            if (t(cardColorOptions[key].nameKey) === fullDescription.trim()) {
+                cardColorKey = key;
+                engravingColorKey = getDefaultEngraving(key);
                 break;
             }
         }
@@ -132,6 +139,6 @@ export const parseFullDescription = (fullDescription) => {
 };
 
 /**
- * A constant array of all available card color names.
+ * A constant array of all available card color name keys.
  */
-export const ALL_CARD_COLORS = Object.values(cardColorOptions).map(option => option.name);
+export const ALL_CARD_COLORS = Object.values(cardColorOptions).map(option => option.nameKey);

@@ -30,7 +30,7 @@ export default function Navbar() {
             }
         };
         fetchData();
-    }, []);
+    }, [i18n.language]);
 
     const allNavLinks = [
         { name: t('homePage'), page: 'home' },
@@ -68,9 +68,9 @@ export default function Navbar() {
                             )}
                         </div>
                         <div className="hidden md:block">
-                            <div className="mr-10 flex items-baseline space-x-4 space-x-reverse">
+                            <div className="mr-10 flex flex-wrap items-center space-x-4">
                                 {mainLinks.map(link => (
-                                    <button key={link.name} onClick={() => navigate(link.page, link.params)} className="hover:bg-gray-700 hover:bg-opacity-50 px-3 py-2 rounded-md text-sm font-medium transition-colors">{link.name}</button>
+                                    <button key={link.page === 'home' ? 'home' : link.params.id} onClick={() => navigate(link.page, link.params)} className="hover:bg-gray-700 hover:bg-opacity-50 px-3 py-2 rounded-md text-sm font-medium transition-colors whitespace-nowrap">{link.name}</button>
                                 ))}
                                 {moreLinks.length > 0 && (
                                     <div className="relative group">
@@ -78,9 +78,9 @@ export default function Navbar() {
                                             {t('more')}
                                         </button>
                                         {isMoreMenuOpen && (
-                                            <div className="absolute left-0 mt-2 w-48 bg-gray-800 rounded-md shadow-lg py-1 z-20">
+                                            <div className="absolute start-0 mt-2 w-48 bg-gray-800 rounded-md shadow-lg py-1 z-20">
                                                 {moreLinks.map(link => (
-                                                    <button key={link.name} onClick={() => {navigate(link.page, link.params); setIsMoreMenuOpen(false);}} className="block w-full text-right px-4 py-2 text-sm text-gray-300 hover:bg-gray-700">{link.name}</button>
+                                                    <button key={link.params.id} onClick={() => {navigate(link.page, link.params); setIsMoreMenuOpen(false);}} className="block w-full text-right px-4 py-2 text-sm text-gray-300 hover:bg-gray-700">{link.name}</button>
                                                 ))}
                                             </div>
                                         )}
@@ -98,15 +98,15 @@ export default function Navbar() {
                             
                             <LanguageSwitcher />
 
-                            <button onClick={() => navigate('search')} className="relative p-2 rounded-full hover:bg-gray-700 hover:bg-opacity-50 focus:outline-none ml-4">
+                            <button onClick={() => navigate('search')} className="relative p-2 rounded-full hover:bg-gray-700 hover:bg-opacity-50 focus:outline-none ms-4">
                                 <SearchIcon />
                             </button>
                             {isAuthenticated ? (
                                 <div className="relative group">
-                                    <button className="hover:bg-gray-700 hover:bg-opacity-50 px-3 py-2 rounded-md text-sm font-medium">
+                                    <button className="hover:bg-gray-700 hover:bg-opacity-50 px-3 py-2 rounded-md text-sm font-medium whitespace-nowrap">
                                         {t('hello')}, {user.name}
                                     </button>
-                                    <div className="absolute left-0 mt-2 w-48 bg-gray-800 rounded-md shadow-lg py-1 z-20 opacity-0 group-hover:opacity-100 transition-opacity duration-200">
+                                    <div className="absolute start-0 mt-2 w-48 bg-gray-800 rounded-md shadow-lg py-1 z-20 opacity-0 group-hover:opacity-100 transition-opacity duration-200">
                                         <button onClick={() => navigate('profile')} className="block w-full text-right px-4 py-2 text-sm text-gray-300 hover:bg-gray-700">{t('myProfile')}</button>
                                         <button onClick={handleLogout} className="block w-full text-right px-4 py-2 text-sm text-gray-300 hover:bg-gray-700">{t('logout')}</button>
                                     </div>
@@ -155,7 +155,7 @@ export default function Navbar() {
                         {isAuthenticated ? (
                             <div className="px-2 space-y-1">
                                 <div className="flex items-center px-3 mb-2">
-                                    <div className="ml-3 flex-grow text-right">
+                                    <div className="ms-3 flex-grow text-right">
                                         <div className="text-base font-medium leading-none text-white">{user.name}</div>
                                         <div className="text-sm font-medium leading-none text-gray-400">{user.email}</div>
                                     </div>

@@ -47,7 +47,7 @@ export default function AdminOrdersPage() {
             fetchOrders();
         } catch (error) {
             console.error("Failed to update order status:", error);
-            alert("Could not update status.");
+            alert(t('couldNotUpdateStatus'));
         }
     };
 
@@ -78,7 +78,7 @@ export default function AdminOrdersPage() {
                 setOrderToDelete(null);
             } catch (error) {
                 console.error("Failed to delete order:", error);
-                alert(`Could not delete order: ${error.message}`);
+                alert(`${t('couldNotDeleteOrder')} ${error.message}`);
             }
         }
     };
@@ -111,11 +111,10 @@ export default function AdminOrdersPage() {
             fetchOrders();
             setSelectedOrders([]);
             setIsBulkDeleteModalOpen(false);
-        } catch (error) {
-            console.error("Failed to delete orders:", error);
-            alert("Could not delete orders.");
-        }
-    };
+                    } catch (error) {
+                        console.error("Failed to delete orders:", error);
+                        alert(t('couldNotDeleteOrders'));
+                    }    };
 
     const handleInputChange = (e, field, index) => {
         const { name, value } = e.target;
@@ -151,7 +150,7 @@ export default function AdminOrdersPage() {
             closeModal();
         } catch (error) {
             console.error("Failed to update order:", error);
-            alert("Could not update order.");
+            alert(t('couldNotUpdateOrder'));
         }
     };
 
@@ -189,7 +188,7 @@ export default function AdminOrdersPage() {
                                     <input type="checkbox" onChange={() => handleSelectOrder(order._id)} checked={selectedOrders.includes(order._id)} />
                                 </td>
                                 <td className="px-6 py-4 font-mono text-xs">{order._id}</td>
-                                <td className="px-6 py-4 font-medium text-white">{order.user ? order.user.name : 'N/A'}</td>
+                                <td className="px-6 py-4 font-medium text-white">{order.user ? order.user.name : t('notApplicable')}</td>
                                 <td className="px-6 py-4">{new Date(order.createdAt).toLocaleDateString('he-IL')}</td>
                                 <td className="px-6 py-4">{getSymbol()}{convert(order.totalPrice).toFixed(2)}</td>
                                 <td className="px-6 py-4">

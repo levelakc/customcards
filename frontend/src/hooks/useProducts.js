@@ -2,6 +2,7 @@ import { useState, useEffect, useMemo } from 'react';
 import * as api from '../api/api';
 import { cardColorOptions, nameToKeyMap } from '../utils/colorUtils';
 import { designColorMap } from '../config/designConfig';
+import { useTranslation } from 'react-i18next';
 
 const getCompatibleDisplayData = (product) => {
     if (!product || !product.availableColors || product.availableColors.length === 0) {
@@ -30,6 +31,7 @@ const getCompatibleDisplayData = (product) => {
 };
 
 export const useProducts = () => {
+    const { i18n } = useTranslation();
     const [products, setProducts] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
@@ -52,7 +54,7 @@ export const useProducts = () => {
             }
         };
         fetchAndProcessProducts();
-    }, []);
+    }, [i18n.language]);
 
     const featuredProducts = useMemo(() => {
         const uniqueProductsByImage = Object.values(

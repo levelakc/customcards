@@ -4,32 +4,37 @@ import Product from '../models/productModel.js';
 // @desc    Fetch all products
 // @route   GET /api/products
 const getProducts = asyncHandler(async (req, res) => {
-    const products = await Product.find({}).populate('category'); // Removed 'name' from populate to handle it manually
+    const lang = req.headers['accept-language'] && req.headers['accept-language'].startsWith('he') ? 'he' : 'en';
+    const products = await Product.find({}).populate('category');
 
-    const productsWithFallbackNames = products.map(product => {
-        const categoryName = product.category ? (product.category.name.en || product.category.name.he) : undefined;
+    const productsWithLocalizedNames = products.map(product => {
+        const productName = product.name[lang] || product.name['en'] || product.name['he'] || '';
+        const categoryName = product.category ? (product.category.name[lang] || product.category.name['en'] || product.category.name['he'] || '') : '';
+        
         return {
             ...product.toObject(),
-            name: product.name.en || product.name.he,
-            category: categoryName ? {
+            name: productName,
+            category: product.category ? {
                 ...product.category.toObject(),
                 name: categoryName
             } : undefined
         };
     });
-    res.json(productsWithFallbackNames);
+    res.json(productsWithLocalizedNames);
 });
 
 // @desc    Fetch single product
 // @route   GET /api/products/:id
 const getProductById = asyncHandler(async (req, res) => {
-    const product = await Product.findById(req.params.id).populate('category'); // Removed 'name' from populate to handle it manually
+    const lang = req.headers['accept-language'] && req.headers['accept-language'].startsWith('he') ? 'he' : 'en';
+    const product = await Product.findById(req.params.id).populate('category');
     if (product) {
-        const categoryName = product.category ? (product.category.name.en || product.category.name.he) : undefined;
+        const productName = product.name[lang] || product.name['en'] || product.name['he'] || '';
+        const categoryName = product.category ? (product.category.name[lang] || product.category.name['en'] || product.category.name['he'] || '') : '';
         res.json({
             ...product.toObject(),
-            name: product.name.en || product.name.he,
-            category: categoryName ? {
+            name: productName,
+            category: product.category ? {
                 ...product.category.toObject(),
                 name: categoryName
             } : undefined
@@ -66,7 +71,7 @@ const createProduct = asyncHandler(async (req, res) => {
     const createdProduct = await product.save();
     res.status(201).json({
         ...createdProduct.toObject(),
-        name: createdProduct.name.en || createdProduct.name.he,
+        name: (createdProduct.name.en || createdProduct.name.he || ''),
     });
 });
 
@@ -98,7 +103,7 @@ const updateProduct = asyncHandler(async (req, res) => {
         const updatedProduct = await product.save();
         res.json({
             ...updatedProduct.toObject(),
-            name: updatedProduct.name.en || updatedProduct.name.he,
+            name: (updatedProduct.name.en || updatedProduct.name.he || ''),
         });
     } else {
         res.status(404).json({ message: 'Product not found' });
@@ -108,19 +113,20 @@ const updateProduct = asyncHandler(async (req, res) => {
 // @desc    Get the single upsell product
 // @route   GET /api/products/upsell
 const getUpsellProduct = asyncHandler(async (req, res) => {
-    const upsellProduct = await Product.findOne({ isUpsellProduct: true }).populate('category'); // Removed 'name' from populate
+    const lang = req.headers['accept-language'] && req.headers['accept-language'].startsWith('he') ? 'he' : 'en';
+    const upsellProduct = await Product.findOne({ isUpsellProduct: true }).populate('category');
     if (upsellProduct) {
-        const categoryName = upsellProduct.category ? (upsellProduct.category.name.en || upsellProduct.category.name.he) : undefined;
+        const productName = upsellProduct.name[lang] || upsellProduct.name['en'] || upsellProduct.name['he'] || '';
+        const categoryName = upsellProduct.category ? (upsellProduct.category.name[lang] || upsellProduct.category.name['en'] || upsellProduct.category.name['he'] || '') : '';
         res.json({
             ...upsellProduct.toObject(),
-            name: upsellProduct.name.en || upsellProduct.name.he,
-            category: categoryName ? {
+            name: productName,
+            category: upsellProduct.category ? {
                 ...upsellProduct.category.toObject(),
                 name: categoryName
             } : undefined
         });
     } else {
-        // It's okay if none is found, the frontend can handle this
         res.status(404).json({ message: 'No upsell product found' });
     }
 });
@@ -128,15 +134,19 @@ const getUpsellProduct = asyncHandler(async (req, res) => {
 // @desc    Search products
 // @route   GET /api/products/search
 const searchProducts = asyncHandler(async (req, res) => {
+    const lang = req.headers['accept-language'] && req.headers['accept-language'].startsWith('he') ? 'he' : 'en';
     const { keyword, minPrice, maxPrice, color, engraveColor } = req.query;
     let query = {};
 
     if (keyword) {
+        // Search in the requested language first, then fallback to English
         query.$or = [
-            { 'name.en': { $regex: keyword, $options: 'i' } },
-            { 'name.he': { $regex: keyword, $options: 'i' } },
+            { [`name.${lang}`]: { $regex: keyword, $options: 'i' } },
             { description: { $regex: keyword, $options: 'i' } }
         ];
+        if (lang !== 'en') { // If not English, also search in English name
+            query.$or.push({ 'name.en': { $regex: keyword, $options: 'i' } });
+        }
     }
 
     if (minPrice || maxPrice) {
@@ -154,20 +164,21 @@ const searchProducts = asyncHandler(async (req, res) => {
         query['customization.engraveColors'] = { $in: [engraveColor] };
     }
 
-    const products = await Product.find(query).populate('category'); // Removed 'name' from populate to handle it manually
+    const products = await Product.find(query).populate('category');
 
-    const productsWithFallbackNames = products.map(product => {
-        const categoryName = product.category ? (product.category.name.en || product.category.name.he) : undefined;
+    const productsWithLocalizedNames = products.map(product => {
+        const productName = product.name[lang] || product.name['en'] || product.name['he'] || '';
+        const categoryName = product.category ? (product.category.name[lang] || product.category.name['en'] || product.category.name['he'] || '') : '';
         return {
             ...product.toObject(),
-            name: product.name.en || product.name.he,
-            category: categoryName ? {
+            name: productName,
+            category: product.category ? {
                 ...product.category.toObject(),
                 name: categoryName
             } : undefined
         };
     });
-    res.json(productsWithFallbackNames);
+    res.json(productsWithLocalizedNames);
 });
 
 const deleteProduct = asyncHandler(async (req, res) => {

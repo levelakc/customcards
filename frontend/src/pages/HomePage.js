@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
+import { useTranslation } from 'react-i18next';
 import * as api from '../api/api';
 import Carousel3D from '../components/Carousel3D';
 import CategoryGallery from '../components/CategoryGallery';
@@ -11,9 +12,10 @@ const MAX_CAROUSEL_ITEMS = 12;
 const MOBILE_BREAKPOINT = 768;
 
 export default function HomePage() {
+    const { t, i18n } = useTranslation();
     const [featured, setFeatured] = useState([]);
     const [galleryItems, setGalleryItems] = useState([]);
-    const [scrollPosition, setScrollPosition] = useState(0);
+    const [allCategories, setAllCategories] = useState([]);
     const [backgroundVideoUrl, setBackgroundVideoUrl] = useState('');
     const [videoOpacity, setVideoOpacity] = useState(0.3);
     const designsSectionRef = useRef(null);
@@ -45,14 +47,24 @@ export default function HomePage() {
                 setBackgroundVideoUrl(settings.backgroundVideoUrl);
                 setVideoOpacity(settings.videoOpacity);
 
+                const fetchedCategories = await api.getCategories(); // Fetch categories
+                setAllCategories(fetchedCategories); // Set categories state
+
                 const allProducts = await api.getProducts();
-                const allCategories = await api.getCategories();
+                
+                // Filter products to ensure they have all necessary display information
+                const validProducts = allProducts.filter(product => 
+                    product.name && 
+                    product.description && 
+                    product.price !== undefined && 
+                    product.image
+                );
                 
                 const usedProductIds = new Set();
                 
                 const galleryProducts = [];
-                allCategories.forEach(category => {
-                    const productsInCategory = allProducts.filter(p => p.category?._id === category._id);
+                fetchedCategories.forEach(category => {
+                    const productsInCategory = validProducts.filter(p => p.category?._id === category._id);
                     if (productsInCategory.length > 0) {
                         const randomIndex = Math.floor(Math.random() * productsInCategory.length);
                         const product = productsInCategory[randomIndex];
@@ -65,7 +77,7 @@ export default function HomePage() {
                 setGalleryItems(galleryProducts);
 
                 const carouselProducts = [];
-                allCategories.forEach(category => {
+                fetchedCategories.forEach(category => {
                     const productsInCategory = allProducts.filter(p => p.category?._id === category._id);
                     if (productsInCategory.length > 0) {
                         let productToAdd = productsInCategory.find(p => !usedProductIds.has(p._id));
@@ -96,11 +108,7 @@ export default function HomePage() {
             }
         };
         fetchInitialData();
-
-        const handleScroll = () => setScrollPosition(window.pageYOffset);
-        window.addEventListener('scroll', handleScroll, { passive: true });
-        return () => window.removeEventListener('scroll', handleScroll);
-    }, []);
+    }, [i18n.language, t]);
 
     const handleScrollToDesigns = () => {
         designsSectionRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -157,22 +165,22 @@ export default function HomePage() {
                         }}
                     >
                         <span className="shimmer-text">
-                            כרטיסי אשראי ממתכת. העיצוב שלך.
+                            {t('heroTitle')}
                         </span>
                     </h1>
-                    <p className="text-xl md:text-2xl mb-8 drop-shadow-md">הפוך את כרטיס הפלסטיק המשעמם שלך ליצירת אומנות ממתכת יוקרתית.</p>
+                    <p className="text-xl md:text-2xl mb-8 drop-shadow-md">{t('heroDescription')}</p>
                     <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
                         <button 
                             onClick={handleScrollToDesigns} 
                             className="bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 px-8 rounded-full text-lg transition duration-300 transform hover:scale-105"
                         >
-                            צפה בקולקציה
+                            {t('viewCollectionButton')}
                         </button>
                         <button 
                             onClick={handleScrollToPersonalDesign} 
                             className="bg-green-600 hover:bg-green-700 text-white font-bold py-3 px-8 rounded-full text-lg transition duration-300 transform hover:scale-105"
                         >
-                            נסה לעצב בעצמך
+                            {t('tryDesignYourselfButton')}
                         </button>
                     </div>
                 </div>
@@ -182,8 +190,8 @@ export default function HomePage() {
 
             <div ref={designsSectionRef} className="py-20">
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                    <h2 className="text-3xl font-extrabold text-white text-center mb-16">העיצובים שלנו</h2>
-                    {featured.length > 0 ? <Carousel3D items={featured} /> : <div className="text-center text-gray-400 py-10">טוען עיצובים...</div>}
+                    <h2 className="text-3xl font-extrabold text-white text-center mb-16">{t('ourDesignsTitle')}</h2>
+                    {featured.length > 0 ? <Carousel3D items={featured} /> : <div className="text-center text-gray-400 py-10">{t('loadingDesigns')}</div>}
                 </div>
             </div>
 

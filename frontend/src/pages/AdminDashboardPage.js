@@ -363,7 +363,7 @@ export default function AdminDashboardPage() {
                             <li key={order._id} className="py-3 flex justify-between items-center">
                                 <div>
                                     <p className="font-medium">{t('orderId')} {order._id}</p>
-                                    <p className="text-sm text-gray-400">{t('user')} {order.user?.name || 'Guest'}</p>
+                                    <p className="text-sm text-gray-400">{t('user')} {order.user?.name || t('guestUser')}</p>
                                 </div>
                                 <p className="font-bold">{getSymbol()}{convert(order.totalPrice).toFixed(2)}</p>
                             </li>

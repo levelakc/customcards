@@ -4,25 +4,27 @@ import { useCart } from '../contexts/CartContext';
 import * as api from '../api/api';
 import CreditCardPreview from '../components/CreditCardPreview';
 import ProductCard from '../components/ProductCard'; // Added this import
-import { 
-    cardColorOptions, 
-    nameToKeyMap, 
-    engravingColorNames, 
+import { useTranslation } from 'react-i18next';
+import {
+    cardColorOptions,
+    nameToKeyMap,
+    engravingColorNames,
     engravingColorClasses, // Added this import
-    getSortedColors 
+    getSortedColors
 } from '../utils/colorUtils';
 
 export default function ProductPage() {
     const { route, navigate } = useRouter(); // Modified this line
     const { addToCart } = useCart();
     const { id } = route.params;
+    const { t, i18n } = useTranslation(); // Destructure t and i18n
     const [product, setProduct] = useState(null);
     const [relatedProducts, setRelatedProducts] = useState([]);
     const [loading, setLoading] = useState(true);
-    
+
     const [selectedCardColorKey, setSelectedCardColorKey] = useState('');
     const [selectedEngravingColor, setSelectedEngravingColor] = useState('');
-    
+
     const [showSuccessMessage, setShowSuccessMessage] = useState(false);
 
     useEffect(() => {
@@ -53,11 +55,10 @@ export default function ProductPage() {
             }
         };
         fetchProductAndRelated();
-    }, [id]);
-    
+    }, [id, i18n.language]);
+
     useEffect(() => {
         if (!selectedCardColorKey) return;
-
         console.log('selectedCardColorKey changed:', selectedCardColorKey); // Log 1
         const validEngravings = cardColorOptions[selectedCardColorKey]?.engraving || [];
         console.log('Valid engravings for current card:', validEngravings); // Log 3

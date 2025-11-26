@@ -1,6 +1,8 @@
 // --- TEMPORARY DEBUGGING FIX ---
 // This forces the production URL. If this works, the problem is the
 // environment variable configuration on Render.
+import i18n from 'i18next';
+
 export const BASE_URL = process.env.REACT_APP_API_URL || 'http://localhost:8000';
 const getAuthHeaders = (token) => {
     return {
@@ -9,11 +11,17 @@ const getAuthHeaders = (token) => {
     };
 };
 
+const getLanguageHeaders = () => {
+    return {
+        'Accept-Language': i18n.language || 'en', // Default to 'en' if not set
+    };
+};
+
 // --- AUTHENTICATION ---
 export const loginUser = async (email, password) => {
     const response = await fetch(`${BASE_URL}/api/users/login`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { ...getLanguageHeaders(), 'Content-Type': 'application/json' },
         body: JSON.stringify({ email, password }),
     });
     const data = await response.json();
@@ -25,7 +33,7 @@ export const loginUser = async (email, password) => {
 export const registerUser = async (registrationData) => {
     const response = await fetch(`${BASE_URL}/api/users`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { ...getLanguageHeaders(), 'Content-Type': 'application/json' },
         body: JSON.stringify(registrationData),
     });
     const data = await response.json();
@@ -36,25 +44,25 @@ export const registerUser = async (registrationData) => {
 
 // --- DATA FETCHING (Public) ---
 export const getProducts = async () => {
-    const response = await fetch(`${BASE_URL}/api/products`);
+    const response = await fetch(`${BASE_URL}/api/products`, { headers: getLanguageHeaders() });
     if (!response.ok) throw new Error('Could not fetch products');
     return await response.json();
 };
 
 export const getProductById = async (id) => {
-    const response = await fetch(`${BASE_URL}/api/products/${id}`);
+    const response = await fetch(`${BASE_URL}/api/products/${id}`, { headers: getLanguageHeaders() });
     if (!response.ok) throw new Error('Could not fetch product');
     return await response.json();
 };
 
 export const getCategories = async () => {
-    const response = await fetch(`${BASE_URL}/api/categories`);
+    const response = await fetch(`${BASE_URL}/api/categories`, { headers: getLanguageHeaders() });
     if (!response.ok) throw new Error('Could not fetch categories');
     return await response.json();
 };
 
 export const getUpsellProduct = async () => {
-    const response = await fetch(`${BASE_URL}/api/products/upsell`);
+    const response = await fetch(`${BASE_URL}/api/products/upsell`, { headers: getLanguageHeaders() });
     if (!response.ok) {
         // It's okay if it's not found, just return null
         if (response.status === 404) {
@@ -67,7 +75,7 @@ export const getUpsellProduct = async () => {
 
 export const searchProducts = async (params) => {
     const query = new URLSearchParams(params).toString();
-    const response = await fetch(`${BASE_URL}/api/products/search?${query}`);
+    const response = await fetch(`${BASE_URL}/api/products/search?${query}`, { headers: getLanguageHeaders() });
     if (!response.ok) throw new Error('Could not fetch search results');
     return await response.json();
 };
@@ -110,6 +118,17 @@ export const addCategory = async (categoryData, token) => {
         body: JSON.stringify(categoryData),
     });
     if (!response.ok) throw new Error('Could not create category');
+    return await response.json();
+};
+
+export const getCategoryById = async (id, token) => {
+    const response = await fetch(`${BASE_URL}/api/categories/${id}`, {
+        headers: getAuthHeaders(token),
+    });
+    if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.message || 'Could not fetch category by ID');
+    }
     return await response.json();
 };
 
@@ -207,7 +226,7 @@ export const uploadVideoFile = async (formData, token) => {
 export const addOrder = async (orderData, token) => {
     const response = await fetch(`${BASE_URL}/api/orders`, {
         method: 'POST',
-        headers: getAuthHeaders(token),
+        headers: { ...getAuthHeaders(token), ...getLanguageHeaders() },
         body: JSON.stringify(orderData),
     });
     if (!response.ok) throw new Error('Could not create order');
@@ -217,7 +236,7 @@ export const addOrder = async (orderData, token) => {
 // --- USER: Profile ---
 export const getUserProfile = async (token) => {
     const response = await fetch(`${BASE_URL}/api/users/profile`, {
-        headers: getAuthHeaders(token),
+        headers: { ...getAuthHeaders(token), ...getLanguageHeaders() },
     });
     if (!response.ok) throw new Error('Could not fetch user profile');
     return await response.json();
@@ -226,7 +245,7 @@ export const getUserProfile = async (token) => {
 export const updateUserProfile = async (userData, token) => {
     const response = await fetch(`${BASE_URL}/api/users/profile`, {
         method: 'PUT',
-        headers: getAuthHeaders(token),
+        headers: { ...getAuthHeaders(token), ...getLanguageHeaders() },
         body: JSON.stringify(userData),
     });
     const data = await response.json();
@@ -304,7 +323,7 @@ export const updateReview = async (id, reviewData, token) => {
 
 // --- SITE SETTINGS ---
 export const getSiteSettings = async () => {
-    const response = await fetch(`${BASE_URL}/api/settings`);
+    const response = await fetch(`${BASE_URL}/api/settings`, { headers: getLanguageHeaders() });
     if (!response.ok) throw new Error('Could not fetch site settings');
     return await response.json();
 };
@@ -321,7 +340,7 @@ export const updateSiteSettings = async (settingsData, token) => {
 
 // --- NEW PAYMENT FUNCTIONS ---
 export const getStripeApiKey = async () => {
-    const response = await fetch(`${BASE_URL}/api/config/stripe-key`);
+    const response = await fetch(`${BASE_URL}/api/config/stripe-key`, { headers: getLanguageHeaders() });
     if (!response.ok) throw new Error('Could not get Stripe key');
     return await response.json();
 };
@@ -329,7 +348,7 @@ export const getStripeApiKey = async () => {
 export const createPaymentIntent = async (paymentData, token) => {
     const response = await fetch(`${BASE_URL}/api/config/create-payment-intent`, {
         method: 'POST',
-        headers: getAuthHeaders(token),
+        headers: { ...getAuthHeaders(token), ...getLanguageHeaders() },
         body: JSON.stringify(paymentData),
     });
     const data = await response.json();
@@ -339,7 +358,7 @@ export const createPaymentIntent = async (paymentData, token) => {
 
 // --- NEW GALLERY IMAGES API FUNCTIONS ---
 export const getGalleryImages = async () => {
-    const response = await fetch(`${BASE_URL}/api/gallery`);
+    const response = await fetch(`${BASE_URL}/api/gallery`, { headers: getLanguageHeaders() });
     // It's okay if it's a 404, it might just not be created yet.
     if (!response.ok && response.status !== 404) {
         throw new Error('Could not fetch gallery images');

@@ -2,12 +2,14 @@ import React, { useState, useEffect } from 'react';
 import { useRouter } from '../contexts/RouterContext';
 import * as api from '../api/api';
 import ProductCard from '../components/ProductCard';
+import { useTranslation } from 'react-i18next';
 // NEW: Import our color utilities
 import { getSortedColors, nameToKeyMap, getDefaultEngraving } from '../utils/colorUtils';
 
 export default function CategoryPage() {
     const { route } = useRouter();
     const { id } = route.params;
+    const { t, i18n } = useTranslation();
     const [category, setCategory] = useState(null);
     const [products, setProducts] = useState([]);
     const [loading, setLoading] = useState(true);
@@ -38,7 +40,7 @@ export default function CategoryPage() {
             }
         };
         fetchData();
-    }, [id]);
+    }, [id, i18n.language]);
 
     if (loading) return <div className="text-center p-10 text-white bg-gray-900 min-h-screen">טוען קטגוריה...</div>;
     if (!category) return <div className="text-center p-10 text-white bg-gray-900 min-h-screen">קטגוריה לא נמצאה.</div>;

@@ -2,7 +2,8 @@ import React, { useState, useRef } from 'react';
 import { useCart } from '../contexts/CartContext';
 import { UploadIcon } from '../components/Icons';
 import CreditCardPreview from '../components/CreditCardPreview';
-import { cardColorOptions, engravingColorNames } from '../utils/colorUtils';
+import { cardColorOptions, engravingColorNameKeys } from '../utils/colorUtils';
+import { useTranslation } from 'react-i18next'; // Import useTranslation
 
 export default function PersonalDesignPage() {
     const { addToCart } = useCart();
@@ -10,6 +11,7 @@ export default function PersonalDesignPage() {
     const [engravingColor, setEngravingColor] = useState('silver');
     const [uploadedImage, setUploadedImage] = useState(null);
     const [showSuccessMessage, setShowSuccessMessage] = useState(false);
+    const { t } = useTranslation(); // Initialize useTranslation
     
     // This state is correctly managed here in the parent component
     const [scale, setScale] = useState(1);
@@ -36,18 +38,21 @@ export default function PersonalDesignPage() {
     
     const handleAddToCart = () => {
         if (!uploadedImage) {
-            alert('אנא העלה עיצוב SVG או PNG תחילה.');
+            alert(t('uploadDesignAlert'));
             return;
         }
         
         const customProduct = {
             _id: `custom-${Date.now()}`, // Use _id for consistency
-            name: 'כרטיס בעיצוב אישי',
+            name: t('personalDesignCardName'),
             price: 350,
             image: uploadedImage,
             customization: { position, scale, rotation }
         };
-        const fullDescription = `${cardColorOptions[cardColor].name} עם חריטת ${engravingColorNames[engravingColor]}`;
+        const fullDescription = t('personalDesignDescription', {
+            cardColor: t(cardColorOptions[cardColor].nameKey),
+            engravingColor: t(engravingColorNameKeys[engravingColor])
+        });
         addToCart(customProduct, 1, fullDescription);
         setShowSuccessMessage(true);
         setTimeout(() => setShowSuccessMessage(false), 2000);
@@ -73,10 +78,10 @@ export default function PersonalDesignPage() {
                         />
                     </div>
                     <div className="flex flex-col space-y-6">
-                        <h1 className="text-4xl font-extrabold text-center font-dancing">עצב את הכרטיס שלך</h1>
+                        <h1 className="text-4xl font-extrabold text-center font-dancing">{t('designYourCardTitle')}</h1>
                         
                         <div>
-                            <h3 className="text-lg font-semibold mb-3">1. בחר צבע כרטיס:</h3>
+                            <h3 className="text-lg font-semibold mb-3">{t('chooseCardColorTitle')}</h3>
                             <div className="flex flex-wrap gap-3">
                                 {Object.keys(cardColorOptions).map(colorKey => (
                                     <button 
@@ -84,14 +89,14 @@ export default function PersonalDesignPage() {
                                         onClick={() => handleCardColorChange(colorKey)} 
                                         className={`px-4 py-2 rounded-md text-sm font-medium border-2 transition-all ${cardColor === colorKey ? 'border-indigo-500 bg-indigo-500 bg-opacity-20' : 'border-gray-600 hover:border-gray-400'}`}
                                     >
-                                        {cardColorOptions[colorKey].name}
+                                        {t(cardColorOptions[colorKey].nameKey)}
                                     </button>
                                 ))}
                             </div>
                         </div>
 
                         <div>
-                            <h3 className="text-lg font-semibold mb-3">2. בחר צבע חריטה:</h3>
+                            <h3 className="text-lg font-semibold mb-3">{t('chooseEngravingColorTitle')}</h3>
                             <div className="flex flex-wrap gap-3">
                                 {cardColorOptions[cardColor].engraving.map(engraveColorKey => (
                                     <button 
@@ -99,14 +104,14 @@ export default function PersonalDesignPage() {
                                         onClick={() => setEngravingColor(engraveColorKey)} 
                                         className={`px-4 py-2 rounded-md text-sm font-medium border-2 transition-all ${engravingColor === engraveColorKey ? 'border-indigo-500 bg-indigo-500 bg-opacity-20' : 'border-gray-600 hover:border-gray-400'}`}
                                     >
-                                        {engravingColorNames[engraveColorKey]}
+                                        {t(engravingColorNameKeys[engraveColorKey])}
                                     </button>
                                 ))}
                             </div>
                         </div>
 
                         <div>
-                            <h3 className="text-lg font-semibold mb-3">3. העלה את העיצוב שלך (SVG/PNG):</h3>
+                            <h3 className="text-lg font-semibold mb-3">{t('uploadDesignTitle')}</h3>
                             <input 
                                 type="file" 
                                 accept="image/svg+xml,image/png,image/jpeg" 
@@ -116,19 +121,19 @@ export default function PersonalDesignPage() {
                             />
                             <button onClick={() => fileInputRef.current.click()} className="w-full flex items-center justify-center gap-2 bg-gray-700 hover:bg-gray-600 text-white font-bold py-3 px-4 rounded-md transition-colors">
                                 <UploadIcon />
-                                <span>{uploadedImage ? "החלף קובץ" : "בחר קובץ..."}</span>
+                                <span>{uploadedImage ? t('replaceFileButton') : t('selectFileButton')}</span>
                             </button>
                         </div>
                         
                         {uploadedImage && (
                             <div className="space-y-4 bg-gray-800 p-4 rounded-lg">
-                                <h3 className="text-lg font-semibold">4. התאם את העיצוב:</h3>
-                                <p className="text-sm text-gray-400 mb-3">גרור את פינות העיצוב כדי לשנות את גודלו וסיבובו, או השתמש במחוונים:</p>
+                                <h3 className="text-lg font-semibold">{t('adjustDesignTitle')}</h3>
+                                <p className="text-sm text-gray-400 mb-3">{t('adjustDesignDescription')}</p>
 
                                 {/* SCALE SLIDER */}
                                 <div>
                                     <label htmlFor="scale-slider" className="block text-sm font-medium mb-1">
-                                        גודל (Scale): {scale.toFixed(2)}x
+                                        {t('size')} {scale.toFixed(2)}x
                                     </label>
                                     <input
                                         id="scale-slider"
@@ -145,7 +150,7 @@ export default function PersonalDesignPage() {
                                 {/* ROTATION SLIDER */}
                                 <div>
                                     <label htmlFor="rotation-slider" className="block text-sm font-medium mb-1">
-                                        סיבוב (Rotation): {Math.round(rotation)}°
+                                        {t('rotation')} {Math.round(rotation)}°
                                     </label>
                                     <input
                                         id="rotation-slider"
@@ -162,9 +167,9 @@ export default function PersonalDesignPage() {
                         )}
                         
                         <button onClick={handleAddToCart} className="w-full bg-green-600 hover:bg-green-700 text-white font-bold py-3 px-6 rounded-lg text-lg transition-transform transform hover:scale-105">
-                            הוסף לסל
+                            {t('addToCartButton')}
                         </button>
-                        {showSuccessMessage && (<div className="text-center text-green-400 font-bold">המוצר נוסף לסל בהצלחה!</div>)}
+                        {showSuccessMessage && (<div className="text-center text-green-400 font-bold">{t('productAddedToCartSuccess')}</div>)}
                     </div>
                 </div>
             </div>

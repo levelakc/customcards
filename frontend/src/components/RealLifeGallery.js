@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import * as api from '../api/api';
+import { useTranslation } from 'react-i18next'; // Import useTranslation
 
 /**
  * A modal component for viewing an image in a larger overlay.
@@ -50,6 +51,7 @@ export default function RealLifeGallery() {
     const [images, setImages] = useState([]);
     const [loading, setLoading] = useState(true);
     const [selectedImage, setSelectedImage] = useState(null);
+    const { t } = useTranslation(); // Initialize useTranslation
 
     useEffect(() => {
         const fetchImages = async () => {
@@ -78,10 +80,10 @@ export default function RealLifeGallery() {
         <div className="bg-gray-800 py-20">
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                 <h2 className="text-3xl font-extrabold text-white text-center mb-16">
-                    העבודות שלנו בחיים האמיתיים
+                    {t('ourRealLifeWork')}
                 </h2>
                 {loading ? (
-                     <div className="text-center text-gray-400">טוען גלריה...</div>
+                     <div className="text-center text-gray-400">{t('loadingGallery')}</div>
                 ) : (
                     <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
                         {images.map((url, index) => (

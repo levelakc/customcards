@@ -1,9 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { useRouter } from '../contexts/RouterContext';
 import * as api from '../api/api';
+import { useTranslation } from 'react-i18next';
 
 export default function AllCategoriesPage() {
     const { navigate } = useRouter();
+    const { t, i18n } = useTranslation();
     const [categories, setCategories] = useState([]);
     const [loading, setLoading] = useState(true);
 
@@ -20,15 +22,15 @@ export default function AllCategoriesPage() {
             }
         };
         fetchCategories();
-    }, []);
+    }, [i18n.language]);
 
-    if (loading) return <div className="text-center p-10 text-white bg-gray-900 min-h-screen">טוען קטגוריות...</div>;
-    if (categories.length === 0) return <div className="text-center p-10 text-white bg-gray-900 min-h-screen">לא נמצאו קטגוריות.</div>;
+    if (loading) return <div className="text-center p-10 text-white bg-gray-900 min-h-screen">{t('loadingCategories')}...</div>;
+    if (categories.length === 0) return <div className="text-center p-10 text-white bg-gray-900 min-h-screen">{t('noCategoriesFound')}.</div>;
 
     return (
         <div className="bg-gray-900 min-h-screen">
             <div className="max-w-7xl mx-auto py-12 px-4 sm:px-6 lg:px-8">
-                <h1 className="text-4xl font-extrabold text-white mb-8 text-center font-dancing">כל הקטגוריות</h1>
+                <h1 className="text-4xl font-extrabold text-white mb-8 text-center font-dancing">{t('allCategoriesTitle')}</h1>
                 <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-8">
                     {categories.map(category => (
                         <div 

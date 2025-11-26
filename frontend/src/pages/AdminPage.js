@@ -41,7 +41,7 @@ function SiteSettingsPage() {
 
             await api.updateSiteSettings({ [key]: value }, token);
             updateLocalSettings({ [key]: value });
-            setMessage(`${fileType.charAt(0).toUpperCase() + fileType.slice(1)} updated successfully!`);
+            setMessage(`${fileType.charAt(0).toUpperCase() + fileType.slice(1)} ${t('updatedSuccessfully')}`);
             fetchSettings(); 
         } catch (err) {
             setMessage(`${t('fileUploadError')} ${err.message}`);
@@ -54,7 +54,7 @@ function SiteSettingsPage() {
         try {
             await api.updateSiteSettings({ [key]: value }, token);
             updateLocalSettings({ [key]: value });
-            setMessage(`${key} updated successfully!`);
+            setMessage(`${key} ${t('updatedSuccessfully')}`);
             fetchSettings();
         } catch (err) {
             setMessage(`${t('error')} ${err.message}`);
@@ -71,7 +71,7 @@ function SiteSettingsPage() {
                     <h3 className="text-lg font-semibold text-white border-b border-gray-700 pb-2">{t('siteLogo')}</h3>
                     <div className="flex items-center space-x-4 space-x-reverse">
                         <p>{t('preview')}:</p>
-                        {localSettings.logoUrl && <img src={localSettings.logoUrl} alt="Logo Preview" className="h-10 bg-gray-700 p-1 rounded"/>}
+                        {localSettings.logoUrl && <img src={localSettings.logoUrl} alt={t('logoPreviewAlt')} className="h-10 bg-gray-700 p-1 rounded"/>}
                     </div>
                     <div>
                         <label className="block mb-1">{t('uploadNewLogo')}</label>
@@ -97,7 +97,7 @@ function SiteSettingsPage() {
                     <div>
                         <label className="block mb-1">{t('uploadNewVideo')}</label>
                         <input type="file" accept="video/mp4,video/webm,video/ogg" onChange={(e) => handleFileUpload(e, 'video')} className="w-full text-sm text-gray-400 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-indigo-50 file:text-indigo-700 hover:file:bg-indigo-100"/>
-                        <p className="text-xs text-gray-400 mt-1">{t('currentVideo')}: {localSettings.backgroundVideoUrl}</p>
+                        <p className="text-xs text-gray-400 mt-1">{t('currentVideoLabel')}: {localSettings.backgroundVideoUrl}</p>
                     </div>
                     <div>
                         <label htmlFor="opacity" className="block mb-2 text-sm font-medium">{t('videoOpacity')}: {Math.round((localSettings.videoOpacity || 0) * 100)}%</label>
@@ -129,7 +129,7 @@ function GallerySettingsPage() {
         } finally {
             setIsLoading(false);
         }
-    }, [token]); // Added token to dependency array
+    }, []);
 
     useEffect(() => {
         fetchGallery();
@@ -197,14 +197,14 @@ function GallerySettingsPage() {
                         <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
                             {galleryImages.map((url, index) => (
                                 <div key={index} className="relative group">
-                                    <img src={url} alt={`Gallery image ${index + 1}`} className="rounded-lg object-cover w-full h-32" />
+                                    <img src={url} alt={t('galleryImageAlt', { index: index + 1 })} className="rounded-lg object-cover w-full h-32" />
                                     <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-50 transition-all flex items-center justify-center">
                                         <button 
                                             onClick={() => handleDeleteImage(url)}
                                             className="text-white bg-red-600 hover:bg-red-700 rounded-full w-10 h-10 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity"
                                             title={t('deleteImage')}
                                         >
-                                            X
+                                            {t('delete')}
                                         </button>
                                     </div>
                                 </div>
@@ -239,7 +239,7 @@ export default function AdminPage() {
     const [selectedFile, setSelectedFile] = useState(null);
     const [previewUrl, setPreviewUrl] = useState('');
     const [customization, setCustomization] = useState({
-        position: { x: 45, y: 10 }, // Set initial position to match default preview
+        position: { x: 45, y: 10 },
         scale: 1,
         rotation: 0,
     });
@@ -267,7 +267,7 @@ export default function AdminPage() {
         } finally {
             setLoading(false);
         }
-    }, [token]); // Added token to dependency array
+    }, []);
     useEffect(() => {
         if (isAdmin) {
             fetchData();
@@ -294,7 +294,6 @@ export default function AdminPage() {
     
     const resetProductForm = () => {
         setProductForm({ name: '', description: '', price: '', image: '', category: categories[0]?._id || '', availableColors: new Set(ALL_CARD_COLORS), isUpsellProduct: false });
-        // Reset customization to default values
         setCustomization({ position: { x: 45, y: 10 }, scale: 1, rotation: 0 });
         setIsEditing(false);
         setEditingId(null);
@@ -312,14 +311,18 @@ export default function AdminPage() {
             availableColors: new Set(product.availableColors),
             isUpsellProduct: product.isUpsellProduct || false,
         });
-        // Load existing customization, defaulting to standard values if missing
         setCustomization(product.customization || { position: { x: 45, y: 10 }, scale: 1, rotation: 0 });
     };
     
-    const handleSelectCategoryToEdit = (category) => {
+    const handleSelectCategoryToEdit = async (categoryId) => {
         setIsEditing(true);
-        setEditingId(category._id);
-        setCategoryName(category.name);
+        setEditingId(categoryId);
+        try {
+            const categoryToEdit = await api.getCategoryById(categoryId, token);
+            setCategoryName(categoryToEdit.name);
+        } catch (err) {
+            alert(`${t('error')} ${err.message}`);
+        }
     };
     const resetCategoryForm = () => {
         setCategoryName({ en: '', he: '' });
@@ -353,22 +356,20 @@ export default function AdminPage() {
             image: imageUrl, 
             price: Number(productForm.price), 
             availableColors: Array.from(productForm.availableColors),
-            customization: customization, // Include the customization object
+            customization: customization,
         };
         
         try {
             if (isEditing) {
-                // FIX for 404: Ensure we are using updateProduct with the correct ID
                 await api.updateProduct(editingId, productData, token); 
             }
             else {
-                // FIX for 404: Ensure we are using addProduct for new items
                 await api.addProduct(productData, token);
             }
             resetProductForm();
             fetchData();
         } catch (err) {
-            alert(`${t('error')} ${err.message}. ${err.response?.data?.message || ''}`); // Improved error message
+            alert(`${t('error')} ${err.message}. ${err.response?.data?.message || ''}`);
         }
     };
     const handleDeleteProduct = async (productId) => {
@@ -450,12 +451,11 @@ export default function AdminPage() {
                                             onClick={() => setPreviewColorKey(colorKey)}
                                             className={`px-2 py-1 text-xs rounded ${previewColorKey === colorKey ? 'bg-indigo-600 text-white' : 'bg-gray-700 text-gray-300'}`}
                                         >
-                                            {cardColorOptions[colorKey].name}
+                                            {t(cardColorOptions[colorKey].nameKey)}
                                         </button>
                                     ))}
                                 </div>
                             )}
-                            {/* THE FIX: Conditional rendering for the preview */}
                             {productForm.isUpsellProduct ? (
                                 <WalletPreview
                                     customSvgUrl={previewUrl}
@@ -482,7 +482,6 @@ export default function AdminPage() {
                                 <h3 className="text-lg font-semibold">{t('customizeDesign')}</h3>
                                 <p className="text-sm text-gray-400">{t('customizeDesignDescription')}</p>
                                 
-                                {/* SCALE SLIDER - ADDED */}
                                 <div>
                                     <label htmlFor="scale-slider" className="block text-sm font-medium mb-1">
                                         {t('size')} {customization.scale.toFixed(2)}x
@@ -498,7 +497,6 @@ export default function AdminPage() {
                                         className="w-full h-2 bg-gray-700 rounded-lg appearance-none cursor-pointer range-lg"
                                     />
                                 </div>
-                                {/* ROTATION SLIDER - ADDED */}
                                 <div>
                                     <label htmlFor="rotation-slider" className="block text-sm font-medium mb-1">
                                         {t('rotation')} {Math.round(customization.rotation)}°
@@ -534,7 +532,7 @@ export default function AdminPage() {
                             <div className="text-center text-gray-400">{t('or')}</div>
                             <div>
                                 <label className="block mb-1">{t('pasteLinkToFile')}</label>
-                                <input type="text" name="image" value={productForm.image} onChange={handleProductInputChange} placeholder="https://example.com/logo.svg" className="w-full bg-gray-700 rounded p-2 border border-gray-600"/>
+                                <input type="text" name="image" value={productForm.image} onChange={handleProductInputChange} placeholder={t('pasteLogoLink')} className="w-full bg-gray-700 rounded p-2 border border-gray-600"/>
                             </div>
                             
                             
@@ -551,7 +549,6 @@ export default function AdminPage() {
                                 />
                                 <label htmlFor="isUpsellProduct" className="mr-2 text-sm font-medium text-gray-300">{t('isUpsell')}</label>
                             </div>
-                            {/* Conditionally hide the color options if it's an upsell product */}
                             {!productForm.isUpsellProduct && (
                                 <div>
                                     <label className="block mb-1">{t('availableCardColors')}</label>
@@ -564,7 +561,7 @@ export default function AdminPage() {
                                                     onChange={() => handleColorToggle(color)} 
                                                     className="form-checkbox bg-gray-600 border-gray-500"
                                                 />
-                                                <span>{color}</span>
+                                                <span>{t(color)}</span>
                                             </label>
                                         ))}
                                     </div>
@@ -584,14 +581,13 @@ export default function AdminPage() {
                 <div>
                     <h2 className="text-2xl font-bold mb-4">{t('categoryList')}</h2>
                     <div className="bg-gray-800 rounded-lg">
-                        <ul className="divide-y divide-gray-700">{categories.map(c => <li key={c._id} className="p-4 flex justify-between items-center"><span>{c.name[i18n.language]}</span><div className="space-x-2 space-x-reverse"><button type="button" onClick={() => handleSelectCategoryToEdit(c)} className="font-medium text-blue-500 hover:underline">{t('edit')}</button><button type="button" onClick={() => handleDeleteCategory(c._id)} className="font-medium text-red-500 hover:underline">{t('delete')}</button></div></li>)}</ul>
-                    </div>
+                                                    <ul className="divide-y divide-gray-700">{categories.map(c => <li key={c._id} className="p-4 flex justify-between items-center"><span>{c.name[i18n.language]}</span><div className="space-x-2 space-x-reverse"><button type="button" onClick={() => handleSelectCategoryToEdit(c._id)} className="font-medium text-blue-500 hover:underline">{t('edit')}</button><button type="button" onClick={() => handleDeleteCategory(c._id)} className="font-medium text-red-500 hover:underline">{t('delete')}</button></div></li>)}</ul>                    </div>
                 </div>
                  <div>
                     <h2 className="text-2xl font-bold mb-4">{isEditing ? t('editCategory') : t('addNewCategory')}</h2>
                     <form onSubmit={handleCategoryFormSubmit} className="bg-gray-800 p-6 rounded-lg space-y-4">
-                        <div><label className="block mb-1">{t('categoryName')} (EN)</label><input type="text" value={categoryName.en} onChange={e => setCategoryName(prev => ({...prev, en: e.target.value}))} required className="w-full bg-gray-700 rounded p-2 border border-gray-600"/></div>
-                        <div><label className="block mb-1">{t('categoryName')} (HE)</label><input type="text" value={categoryName.he} onChange={e => setCategoryName(prev => ({...prev, he: e.target.value}))} required className="w-full bg-gray-700 rounded p-2 border border-gray-600"/></div>
+                        <div><label className="block mb-1">{`${t('categoryName')} (EN)`}</label><input type="text" value={categoryName.en} onChange={e => setCategoryName(prev => ({...prev, en: e.target.value}))} required className="w-full bg-gray-700 rounded p-2 border border-gray-600"/></div>
+                        <div><label className="block mb-1">{`${t('categoryName')} (HE)`}</label><input type="text" value={categoryName.he} onChange={e => setCategoryName(prev => ({...prev, he: e.target.value}))} required className="w-full bg-gray-700 rounded p-2 border border-gray-600"/></div>
                         <button type="submit" className="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2 px-4 rounded">{isEditing ? t('updateCategory') : t('addCategory')}</button>
                         {isEditing && <button type="button" onClick={resetCategoryForm} className="w-full mt-2 bg-gray-600 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded">{t('cancelEdit')}</button>}
                     </form>

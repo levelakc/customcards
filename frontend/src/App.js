@@ -5,6 +5,7 @@ import { CartProvider, useCart } from './contexts/CartContext';
 import { SiteSettingsProvider } from './contexts/SiteSettingsContext';
 import ReactGA from 'react-ga4';
 import ReactPixel from 'react-facebook-pixel';
+import { useTranslation } from 'react-i18next';
 
 import Navbar from './components/Navbar';
 import Footer from './components/Footer';
@@ -35,6 +36,7 @@ ReactPixel.init(FACEBOOK_PIXEL_ID);
 function AppContent() {
     const { route } = useRouter();
     const { showPopup, setShowPopup } = useCart();
+    const { i18n } = useTranslation(); // Add useTranslation hook
 
     useEffect(() => {
         ReactGA.send({ hitType: "pageview", page: window.location.pathname + window.location.search });
@@ -63,7 +65,7 @@ function AppContent() {
     };
 
     return (
-        <div dir="rtl" className="bg-gray-900 font-sans">
+        <div dir={i18n.dir()} className="bg-gray-900 font-sans">
             <Navbar />
             <main className="pt-20">{renderPage()}</main>
             <Footer />

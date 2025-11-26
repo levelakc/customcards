@@ -31,7 +31,7 @@ const ProductCard = ({ product, cardColorKey, engravingColorKey, disableClick = 
             className="group flex flex-col h-full cursor-pointer"
         >
             <div 
-                className="transition-transform duration-300 md:group-hover:-translate-y-2"
+                className="transition-transform duration-300 md:group-hover:-translate-y-2 relative z-0"
                 style={{ transform: 'translateZ(0)' }}
             >
                 <CreditCardPreview 
@@ -45,8 +45,9 @@ const ProductCard = ({ product, cardColorKey, engravingColorKey, disableClick = 
                 />
             </div>
             
-            <div className="p-6 pt-2 flex-grow flex flex-col text-center">
+            <div className="p-6 pt-2 flex-grow flex flex-col text-center relative z-10">
                 <h3 className="text-xl font-semibold text-white mb-2">{product.name.replace(/<br\s*\/?>/gi, ' ')}</h3>
+                <p className="text-gray-300 text-sm mb-4 line-clamp-2">{product.description}</p>
                 <div className="flex-grow"></div>
                 <p className="text-indigo-400 font-bold text-lg mb-4">₪{product.price}</p>
                 <button 
