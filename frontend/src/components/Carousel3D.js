@@ -1,18 +1,17 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import ProductCard from './ProductCard';
-import { nameToKeyMap, getDefaultEngraving } from '../utils/colorUtils';
 
-const DRAG_SENSITIVITY = 0.25;
+const DRAG_SENSITIVITY = 0.05;
 const INERTIA_DAMPING = 0.95;
 const AUTO_ROTATE_SPEED = -0.05;
 const MOBILE_BREAKPOINT = 768;
 
 export default function Carousel3D({ items }) {
-    const [rotation, setRotation] = useState(0);
-    const [colorIndexes, setColorIndexes] = useState({});
+    const rotationValue = useRef(0);
     const [isMobile, setIsMobile] = useState(window.innerWidth < MOBILE_BREAKPOINT);
 
     const elementRef = useRef(null);
+    const carouselInnerRef = useRef(null); // New ref for the inner carousel div
     const isDragging = useRef(false);
     const dragStart = useRef({ x: 0, rotation: 0, lastX: 0, lastTime: 0 });
     const velocity = useRef(0);
@@ -28,45 +27,36 @@ export default function Carousel3D({ items }) {
             return () => window.removeEventListener('resize', handleResize);
         }, []);
     
-        useEffect(() => {
-            if (!items || items.length === 0) return;
-            const initialIndexes = {};
-            items.forEach(item => { if(item) initialIndexes[item._id] = 0; });
-            setColorIndexes(initialIndexes);
-        }, [items]);
-        
-        // Calculate itemAngle outside of useCallback for animate
         const itemAngle = items && items.length > 0 ? 360 / items.length : 0;
     
         const animate = useCallback(() => {
-            setRotation(prev => {
-                let newRotation = prev;
+            let currentRotation = rotationValue.current;
     
-                if (isDragging.current) {
-                    isSnapping.current = false; // Stop snapping if dragging starts
-                    return prev;
+            if (isDragging.current) {
+                isSnapping.current = false;
+                currentRotation += velocity.current * DRAG_SENSITIVITY * 0.1;
+                velocity.current *= 0.8;
+            } else if (isSnapping.current) {
+                const closestAngle = Math.round(currentRotation / itemAngle) * itemAngle;
+                currentRotation += (closestAngle - currentRotation) * 0.1;
+                if (Math.abs(closestAngle - currentRotation) < 0.1) {
+                    currentRotation = closestAngle;
+                    isSnapping.current = false;
+                    autoRotate.current = true;
                 }
-    
-                if (isSnapping.current) {
-                    const closestAngle = Math.round(prev / itemAngle) * itemAngle;
-                    newRotation += (closestAngle - prev) * 0.1; // Smooth snap
-                    if (Math.abs(closestAngle - newRotation) < 0.1) {
-                        newRotation = closestAngle;
-                        isSnapping.current = false; // Snapping finished
-                        autoRotate.current = true; // Re-enable auto-rotate
-                    }
-                } else if (Math.abs(velocity.current) > 0.01) {
-                    // Apply inertia
-                    velocity.current *= INERTIA_DAMPING;
-                    newRotation += velocity.current;
-                } else {
-                    velocity.current = 0; // Stop velocity when it's very small
-                    if (autoRotate.current) {
-                        newRotation += AUTO_ROTATE_SPEED;
-                    }
+            } else if (Math.abs(velocity.current) > 0.01) {
+                velocity.current *= INERTIA_DAMPING;
+                currentRotation += velocity.current;
+            } else {
+                velocity.current = 0;
+                if (autoRotate.current) {
+                    currentRotation += AUTO_ROTATE_SPEED;
                 }
-                return newRotation;
-            });
+            }
+            rotationValue.current = currentRotation;
+            if (carouselInnerRef.current) {
+                carouselInnerRef.current.style.transform = `rotateY(${rotationValue.current}deg)`;
+            }
             animationFrameId.current = requestAnimationFrame(animate);
         }, [itemAngle]);
     
@@ -77,40 +67,22 @@ export default function Carousel3D({ items }) {
             };
         }, [animate]);
     
-        useEffect(() => {
-            const intervalTime = isMobile ? 3000 : 1500; // Longer interval on mobile
-            const colorInterval = setInterval(() => {
-                setColorIndexes(prevIndexes => {
-                    const newIndexes = { ...prevIndexes };
-                    items.forEach(item => {
-                        if(item) {
-                            const availableColors = item.availableColors || [];
-                            if (availableColors.length > 1) {
-                                newIndexes[item._id] = ((prevIndexes[item._id] || 0) + 1) % availableColors.length;
-                            }
-                        }
-                    });
-                    return newIndexes;
-                });
-            }, intervalTime); // Use dynamic intervalTime
-            
-            return () => clearInterval(colorInterval);
-        }, [items, isMobile]); // Dependency on isMobile
+
     
         const handleDragStart = useCallback((e) => {
             isDragging.current = true;
-            isSnapping.current = false; // Stop snapping if dragging starts
+            isSnapping.current = false;
             velocity.current = 0;
             autoRotate.current = false; 
     
             const clientX = e.touches ? e.touches[0].clientX : e.clientX;
-            dragStart.current = { x: clientX, rotation: rotation, lastX: clientX, lastTime: Date.now() };
+            dragStart.current = { x: clientX, rotation: rotationValue.current, lastX: clientX, lastTime: Date.now() };
             document.body.style.userSelect = 'none';
             document.body.style.cursor = 'grabbing';
             if (e.touches) {
                 e.preventDefault(); 
             }
-        }, [rotation]);
+        }, []);
     
         const handleDragMove = useCallback((e) => {
             if (!isDragging.current) return;
@@ -118,7 +90,6 @@ export default function Carousel3D({ items }) {
                 e.preventDefault(); 
             }
             const clientX = e.touches ? e.touches[0].clientX : e.clientX;
-            const deltaX = clientX - dragStart.current.x;
             
             const now = Date.now();
             const moveDelta = clientX - dragStart.current.lastX;
@@ -131,7 +102,8 @@ export default function Carousel3D({ items }) {
             dragStart.current.lastX = clientX;
             dragStart.current.lastTime = now;
             
-            setRotation(dragStart.current.rotation + (deltaX * DRAG_SENSITIVITY)); 
+            // Do not set rotation here directly. Let the animate loop handle it using velocity.
+            // setRotation(dragStart.current.rotation + (deltaX * DRAG_SENSITIVITY)); 
         }, []);
     
         const handleDragEnd = useCallback(() => {
@@ -193,21 +165,15 @@ export default function Carousel3D({ items }) {
         >
                         <div className="w-full h-full" style={{ perspective: '2500px', transformStyle: 'preserve-3d' }}>
                             <div
+                                ref={carouselInnerRef} // Attach the ref here
                                 className="relative w-full h-full"
                                 style={{
                                     transformStyle: 'preserve-3d',
-                                    transform: `rotateY(${rotation}deg)`,
                                     transformOrigin: '50% 50%', // Explicitly set transform origin
                                 }}
                             >
                                 {items.map((item, i) => {
                                     if (!item || !item._id) return null;
-                                    const availableColors = item.availableColors || [];
-                                    const colorIndex = colorIndexes[item._id] || 0;
-                                    const safeColorIndex = colorIndex < availableColors.length ? colorIndex : 0;
-                                    const colorName = availableColors[safeColorIndex] || 'שחור';
-                                    const cardColorKey = nameToKeyMap[colorName] || 'black';
-                                    const engravingColorKey = item.customization?.engraveColors?.[0] || getDefaultEngraving(cardColorKey);
                                     return (
                                         <div
                                             key={item._id}
@@ -224,9 +190,8 @@ export default function Carousel3D({ items }) {
                                         >
                                            <ProductCard
                                                 product={item}
-                                                cardColorKey={cardColorKey}
-                                                engravingColorKey={engravingColorKey}
                                                 disableClick={true}
+                                                isMobile={isMobile}
                                            />
                                         </div>
                                     );

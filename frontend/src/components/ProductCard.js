@@ -1,20 +1,36 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { useRouter } from '../contexts/RouterContext';
 import CreditCardPreview from './CreditCardPreview';
 import { useTranslation } from 'react-i18next';
+import { nameToKeyMap, getDefaultEngraving } from '../utils/colorUtils';
 
-const ProductCard = ({ product, cardColorKey, engravingColorKey, disableClick = false }) => {
+
+const ProductCard = ({ product, disableClick = false, isMobile }) => {
     const { navigate } = useRouter();
     const { t } = useTranslation();
+    const [colorIndex, setColorIndex] = useState(0);
 
+    useEffect(() => {
+        if (!product || !product.availableColors || product.availableColors.length <= 1) return;
+
+        const intervalTime = isMobile ? 3000 : 1500; // Longer interval on mobile
+        const colorInterval = setInterval(() => {
+            setColorIndex(prevIndex => (prevIndex + 1) % product.availableColors.length);
+        }, intervalTime);
+
+        return () => clearInterval(colorInterval);
+    }, [product, isMobile]);
+    
     // console.log(`ProductCard for ${product?._id}: received cardColorKey=${cardColorKey}, engravingColorKey=${engravingColorKey}`);
 
     if (!product) {
         return null;
     }
 
-    const finalCardColor = cardColorKey || 'black';
-    const finalEngravingColor = engravingColorKey || 'silver';
+    const availableColors = product.availableColors || [];
+    const colorName = availableColors[colorIndex] || 'שחור';
+    const finalCardColor = nameToKeyMap[colorName] || 'black';
+    const finalEngravingColor = product.customization?.engraveColors?.[0] || getDefaultEngraving(finalCardColor);
 
     const handleClick = (e) => {
         // Stop propagation to prevent carousel drag from triggering navigation
