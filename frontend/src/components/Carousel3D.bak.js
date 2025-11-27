@@ -5,6 +5,7 @@ import { nameToKeyMap, getDefaultEngraving } from '../utils/colorUtils';
 const DRAG_SENSITIVITY = 0.25;
 const INERTIA_DAMPING = 0.95;
 const AUTO_ROTATE_SPEED = -0.05;
+const IDLE_TIMEOUT = 5000;
 const MOBILE_BREAKPOINT = 768;
 
 export default function Carousel3D({ items }) {
@@ -17,6 +18,7 @@ export default function Carousel3D({ items }) {
     const dragStart = useRef({ x: 0, rotation: 0, lastX: 0, lastTime: 0 });
     const velocity = useRef(0);
     const animationFrameId = useRef(null);
+    const idleTimer = useRef(null);
         const autoRotate = useRef(true);
         const isSnapping = useRef(false); // New ref for snapping state
     
@@ -91,15 +93,25 @@ export default function Carousel3D({ items }) {
                     });
                     return newIndexes;
                 });
-            }, 1500);
+            }, 3000);
             
             return () => clearInterval(colorInterval);
         }, [items]);
+    
+        const resetIdleTimer = () => {
+            clearTimeout(idleTimer.current);
+            idleTimer.current = setTimeout(() => {
+                if (!isDragging.current && !isSnapping.current) {
+                    autoRotate.current = true;
+                }
+            }, IDLE_TIMEOUT);
+        };
     
         const handleDragStart = useCallback((e) => {
             isDragging.current = true;
             isSnapping.current = false; // Stop snapping if dragging starts
             velocity.current = 0;
+            clearTimeout(idleTimer.current); 
             autoRotate.current = false; 
     
             const clientX = e.touches ? e.touches[0].clientX : e.clientX;
@@ -134,14 +146,13 @@ export default function Carousel3D({ items }) {
         }, []);
     
         const handleDragEnd = useCallback(() => {
+.
             isDragging.current = false;
             if (Math.abs(velocity.current) < 0.5) { // If velocity is low, snap
                 isSnapping.current = true;
                 autoRotate.current = false; // Disable auto-rotate during snap
-            } else {
-                // If there's still momentum, let inertia continue, but ensure auto-rotate is eventually re-enabled
-                autoRotate.current = true; // Instantly re-enable auto-rotate after inertia starts
             }
+            resetIdleTimer();
             document.body.style.userSelect = '';
             document.body.style.cursor = '';
         }, []);
@@ -152,29 +163,23 @@ export default function Carousel3D({ items }) {
     
     // The minimum radius needed to prevent cards from overlapping is (cardWidth / 2) / tan(PI / itemCount).
     // We add a little extra padding.
-    const cardWidthForCalc = (isMobile ? 140 : 200);
-    let radius;
+    const cardWidthForCalc = isMobile ? 200 : 260;
+    let calculatedRadius = (cardWidthForCalc / 2) / Math.tan(Math.PI / items.length);
 
-    if (!items || items.length <= 1) { 
-        radius = 0; 
+    if (isMobile) {
+        calculatedRadius = Math.max(calculatedRadius + 20, 220);
     } else {
-        let calculatedRadius = (cardWidthForCalc / 2) / Math.tan(Math.PI / items.length);
-
-        if (isMobile) {
-            calculatedRadius = Math.max(calculatedRadius + 50, 200);
-        } else {
-            calculatedRadius = Math.max(calculatedRadius + 100, 350);
-        }
-        radius = calculatedRadius;
+        calculatedRadius = Math.max(calculatedRadius + 50, 350);
     }
+    const radius = calculatedRadius;
 
-    const cardWidth = (isMobile ? Math.min(160, window.innerWidth * 0.7) : 220);
+    const cardWidth = isMobile ? Math.min(200, window.innerWidth * 0.8) : 260;
 
 
     return (
         <div 
             ref={elementRef} 
-            className="w-full flex relative min-h-[400px] md:min-h-[500px] max-h-screen items-center justify-center cursor-grab active:cursor-grabbing overflow-x-hidden overflow-y-hidden"
+            className="w-full flex relative min-h-[400px] md:min-h-[500px] max-h-screen items-center justify-center cursor-grab active:cursor-grabbing overflow-x-hidden"
             onMouseDown={handleDragStart}
             onTouchStart={handleDragStart}
             onMouseMove={handleDragMove}
@@ -182,55 +187,57 @@ export default function Carousel3D({ items }) {
             onMouseUp={handleDragEnd}
             onTouchEnd={handleDragEnd}
             onMouseEnter={() => {
+                clearTimeout(idleTimer.current);
                 autoRotate.current = false;
             }}
             onMouseLeave={() => {
-                if (!isDragging.current && !isSnapping.current) {
-                    autoRotate.current = true; // Instantly resume auto-rotate
+                if (!isDragging.current) { // Only reset idle timer if not currently dragging
+                    resetIdleTimer();
                 }
             }}
         >
-                        <div className="w-full h-full" style={{ perspective: '2500px', transformStyle: 'preserve-3d' }}>
+            <div className="w-full h-full" style={{ perspective: '1500px', transformStyle: 'preserve-3d' }}>
+                <div 
+                    className="relative w-full h-full" 
+                    style={{ 
+                        transformStyle: 'preserve-3d', 
+                        transform: `rotateY(${rotation}deg)`,
+                    }}
+                >
+                    {items.map((item, i) => {
+                        if (!item || !item._id) return null;
+                        const availableColors = item.availableColors || [];
+                        const colorIndex = colorIndexes[item._id] || 0;
+                        const safeColorIndex = colorIndex < availableColors.length ? colorIndex : 0;
+                        const colorName = availableColors[safeColorIndex] || 'שחור';
+                        const cardColorKey = nameToKeyMap[colorName] || 'black';
+                        const engravingColorKey = getDefaultEngraving(cardColorKey);
+
+                        return (
                             <div
-                                className="relative w-full h-full"
+                                key={item._id} 
+                                className="absolute h-auto"
                                 style={{
-                                    transformStyle: 'preserve-3d',
-                                    transform: `rotateY(${rotation}deg)`,
-                                    transformOrigin: '50% 50%', // Explicitly set transform origin
+                                    width: `${cardWidth}px`,
+                                    transform: `translateX(-50%) rotateY(${i * itemAngle}deg) translateZ(${radius}px) translateY(-50%)`,
+                                    backfaceVisibility: 'hidden',
+                                    WebkitBackfaceVisibility: 'hidden',
+                                    top: '50%', 
+                                    insetInlineStart: '50%',
+                                    willChange: 'transform'
                                 }}
                             >
-                                {items.map((item, i) => {
-                                    if (!item || !item._id) return null;
-                                    const availableColors = item.availableColors || [];
-                                    const colorIndex = colorIndexes[item._id] || 0;
-                                    const safeColorIndex = colorIndex < availableColors.length ? colorIndex : 0;
-                                    const colorName = availableColors[safeColorIndex] || 'שחור';
-                                    const cardColorKey = nameToKeyMap[colorName] || 'black';
-                                    const engravingColorKey = item.customization?.engraveColors?.[0] || getDefaultEngraving(cardColorKey);
-                                    return (
-                                        <div
-                                            key={item._id}
-                                            className="absolute h-auto"
-                                            style={{
-                                                width: `${cardWidth}px`,
-                                                transform: `translateX(-50%) translateY(-50%) rotateY(${i * itemAngle}deg) translateZ(${radius}px)`,
-                                                backfaceVisibility: 'hidden',
-                                                WebkitBackfaceVisibility: 'hidden',
-                                                top: '50%',
-                                                left: '50%', // Changed from insetInlineStart
-                                                willChange: 'transform'
-                                            }}
-                                        >
-                                           <ProductCard
-                                                product={item}
-                                                cardColorKey={cardColorKey}
-                                                engravingColorKey={engravingColorKey}
-                                                disableClick={true}
-                                           />
-                                        </div>
-                                    );
-                                })}
+                               <ProductCard 
+                                    product={item} 
+                                    cardColorKey={cardColorKey}
+                                    engravingColorKey={engravingColorKey}
+                                    disableClick={true}
+                               />
                             </div>
-                        </div>        </div>
+                        );
+                    })}
+                </div>
+            </div>
+        </div>
     );
 }

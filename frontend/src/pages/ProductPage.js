@@ -3,21 +3,21 @@ import { useRouter } from '../contexts/RouterContext';
 import { useCart } from '../contexts/CartContext';
 import * as api from '../api/api';
 import CreditCardPreview from '../components/CreditCardPreview';
-import ProductCard from '../components/ProductCard'; // Added this import
+import ProductCard from '../components/ProductCard';
 import { useTranslation } from 'react-i18next';
 import {
-    cardColorOptions,
     nameToKeyMap,
     engravingColorNames,
-    engravingColorClasses, // Added this import
-    getSortedColors
+    engravingColorClasses,
+    getSortedColors,
 } from '../utils/colorUtils';
+import { cardColorBgClasses } from '../utils/tailwindColors';
 
 export default function ProductPage() {
-    const { route, navigate } = useRouter(); // Modified this line
+    const { route, navigate } = useRouter();
     const { addToCart } = useCart();
     const { id } = route.params;
-    const { t, i18n } = useTranslation(); // Destructure t and i18n
+    const { t, i18n } = useTranslation();
     const [product, setProduct] = useState(null);
     const [relatedProducts, setRelatedProducts] = useState([]);
     const [loading, setLoading] = useState(true);
@@ -34,14 +34,22 @@ export default function ProductPage() {
                 const currentProduct = await api.getProductById(id);
                 setProduct(currentProduct);
 
+
+
                 if (currentProduct?.availableColors?.length > 0) {
                     const sortedColors = getSortedColors(currentProduct.availableColors);
                     const initialColorName = sortedColors[0];
                     const initialColorKey = nameToKeyMap[initialColorName];
                     setSelectedCardColorKey(initialColorKey);
+
+                    // Initialize engraving color based on the first available card color
+                    setSelectedEngravingColor(currentProduct.customization?.engraveColors?.[0] || getDefaultEngraving(initialColorKey));
+                } else {
+                    // Fallback if no availableColors are defined
+                    setSelectedCardColorKey('black'); // Default card color
+                    setSelectedEngravingColor('silver'); // Default engraving color
                 }
 
-                // Fetch all products to find related ones
                 const allProducts = await api.getProducts();
                 const filteredRelated = allProducts.filter(
                     (p) => p.category?._id === currentProduct.category?._id && p._id !== currentProduct._id
@@ -57,16 +65,6 @@ export default function ProductPage() {
         fetchProductAndRelated();
     }, [id, i18n.language]);
 
-    useEffect(() => {
-        if (!selectedCardColorKey) return;
-        console.log('selectedCardColorKey changed:', selectedCardColorKey); // Log 1
-        const validEngravings = cardColorOptions[selectedCardColorKey]?.engraving || [];
-        console.log('Valid engravings for current card:', validEngravings); // Log 3
-        if (!validEngravings.includes(selectedEngravingColor)) {
-            setSelectedEngravingColor(validEngravings[0]);
-        }
-    }, [selectedCardColorKey, selectedEngravingColor]); // Added selectedEngravingColor to dependency array to log changes
-
     const handleCardColorChange = (colorName) => {
         const colorKey = nameToKeyMap[colorName];
         setSelectedCardColorKey(colorKey);
@@ -74,8 +72,9 @@ export default function ProductPage() {
 
     const handleAddToCart = () => {
         if (product) {
-            const cardColorName = cardColorOptions[selectedCardColorKey]?.name;
-            const fullDescription = `${cardColorName} עם חריטת ${engravingColorNames[selectedEngravingColor]}`;
+            const cardColorName = Object.keys(nameToKeyMap).find(key => nameToKeyMap[key] === selectedCardColorKey);
+            const engravingColorName = t(engravingColorNames[selectedEngravingColor]);
+            const fullDescription = `${t(cardColorName)} עם חריטת ${engravingColorName}`;
             addToCart(product, 1, fullDescription);
             setShowSuccessMessage(true);
             setTimeout(() => setShowSuccessMessage(false), 2000);
@@ -85,19 +84,13 @@ export default function ProductPage() {
     if (loading) return <div className="text-center p-10 text-white bg-gray-900 min-h-screen">טוען מוצר...</div>;
     if (!product) return <div className="text-center p-10 text-white bg-gray-900 min-h-screen">מוצר לא נמצא.</div>;
 
-    const currentEngravingOptions = cardColorOptions[selectedCardColorKey]?.engraving || [];
+    const currentEngravingOptions = product.customization?.engraveColors || [];
     const sortedColorNames = getSortedColors(product.availableColors);
-
-    console.log('Current selected card color:', selectedCardColorKey); // Log 1
-    console.log('Current selected engraving color:', selectedEngravingColor); // Log 2
-    console.log('Available engraving options:', currentEngravingOptions); // Log 3
 
     return (
         <div className="bg-gray-900 min-h-screen text-white">
             <div className="max-w-6xl mx-auto py-12 px-4 sm:px-6 lg:px-8">
-                {/* Main Product Details Section */}
                 <div className="lg:grid lg:grid-cols-2 lg:gap-x-8 lg:items-start">
-                    {/* Image gallery */}
                     <div className="flex flex-col-reverse">
                         <div className="mt-6 w-full max-w-2xl mx-auto sm:px-6 lg:max-w-none lg:px-0">
                             <CreditCardPreview 
@@ -108,9 +101,8 @@ export default function ProductPage() {
                         </div>
                     </div>
 
-                    {/* Product info */}
                     <div className="mt-10 px-4 sm:px-0 sm:mt-16 lg:mt-0">
-                        <h1 className="text-3xl font-extrabold tracking-tight text-white font-dancing">{product.name}</h1>
+                        <h1 className="text-3xl font-extrabold tracking-tight text-white font-dancing">{product.name[i18n.language]}</h1>
                         <div className="mt-3">
                             <h2 className="sr-only">Product information</h2>
                             <p className="text-3xl text-white">{product.price} ₪</p>
@@ -120,7 +112,7 @@ export default function ProductPage() {
                             <h3 className="sr-only">Description</h3>
                             <div
                                 className="text-base text-gray-300 space-y-6"
-                                dangerouslySetInnerHTML={{ __html: product.description }}
+                                dangerouslySetInnerHTML={{ __html: product.description[i18n.language] }}
                             />
                         </div>
 
@@ -129,12 +121,15 @@ export default function ProductPage() {
                             <div className="mt-2 flex items-center space-x-3">
                                 {sortedColorNames.map((colorName) => {
                                     const colorKey = nameToKeyMap[colorName];
-                                    const colorClass = cardColorOptions[colorKey]?.bgColor || 'bg-gray-700';
+                                    const colorClass = cardColorBgClasses[colorKey] || 'bg-gray-700';
                                     return (
                                         <button
                                             key={colorKey}
                                             className={`w-8 h-8 rounded-full border-2 ${selectedCardColorKey === colorKey ? 'border-blue-500' : 'border-transparent'} ${colorClass}`}
-                                            onClick={() => handleCardColorChange(colorName)}
+                                            onClick={() => {
+                                                console.log("Card color button clicked:", colorName);
+                                                handleCardColorChange(colorName);
+                                            }}
                                             aria-label={`בחר צבע ${colorName}`}
                                         ></button>
                                     );
@@ -146,14 +141,14 @@ export default function ProductPage() {
                             <h3 className="text-lg font-medium text-white">צבע חריטה</h3>
                             <div className="mt-2 flex items-center space-x-3">
                                 {currentEngravingOptions.map((engravingKey) => {
-                                    const engravingName = engravingColorNames[engravingKey];
+                                    const engravingName = t(engravingColorNames[engravingKey]);
                                     const engravingClass = engravingColorClasses[engravingKey] || 'text-gray-400';
                                     return (
                                         <button
                                             key={engravingKey}
                                             className={`px-3 py-1 rounded-md border-2 ${selectedEngravingColor === engravingKey ? 'border-blue-500' : 'border-transparent'} ${engravingClass}`}
                                             onClick={() => {
-                                                console.log('Engraving button clicked:', engravingKey); // Log 4
+                                                console.log("Engraving color button clicked:", engravingKey);
                                                 setSelectedEngravingColor(engravingKey);
                                             }}
                                         >
@@ -180,7 +175,6 @@ export default function ProductPage() {
                             </div>
                         )}
 
-                        {/* Delivery, Security, and Product Highlights */}
                         <div className="mt-10 border-t border-gray-700 pt-10">
                             <h3 className="text-lg font-medium text-white mb-4">מידע נוסף</h3>
                             <ul className="space-y-4 text-gray-300">
@@ -205,7 +199,6 @@ export default function ProductPage() {
                     </div>
                 </div>
 
-                {/* All Categories Button */}
                 <button 
                     onClick={() => navigate('all-categories')}
                     className="block mx-auto mt-10 mb-10 px-6 py-3 bg-blue-600 text-white font-bold rounded-full shadow-lg hover:bg-blue-700 transition duration-300 ease-in-out focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-75"
@@ -213,19 +206,23 @@ export default function ProductPage() {
                     כל הקטגוריות
                 </button>
 
-                {/* Related Products Section */}
                 {relatedProducts.length > 0 && (
                     <div className="mt-20">
                         <h2 className="text-3xl font-extrabold text-white text-center mb-10">מוצרים דומים שאולי תאהב</h2>
                         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-8">
-                            {relatedProducts.map(relatedProduct => (
-                                <ProductCard 
-                                    key={relatedProduct._id} 
-                                    product={relatedProduct}
-                                    cardColorKey={nameToKeyMap[getSortedColors(relatedProduct.availableColors)[0]] || 'black'}
-                                    engravingColorKey={cardColorOptions[nameToKeyMap[getSortedColors(relatedProduct.availableColors)[0]] || 'black']?.engraving[0] || 'silver'}
-                                />
-                            ))}
+                            {console.log("Related Products:", relatedProducts)}
+                            {relatedProducts.map(relatedProduct => {
+                                const cardColorKey = nameToKeyMap[getSortedColors(relatedProduct.availableColors)[0]] || 'black';
+                                const engravingColorKey = relatedProduct.customization?.engraveColors?.[0] || 'silver';
+                                return (
+                                    <ProductCard 
+                                        key={relatedProduct._id} 
+                                        product={relatedProduct}
+                                        cardColorKey={cardColorKey}
+                                        engravingColorKey={engravingColorKey}
+                                    />
+                                );
+                            })}
                         </div>
                     </div>
                 )}

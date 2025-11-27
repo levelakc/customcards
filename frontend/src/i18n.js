@@ -11,7 +11,7 @@ i18n
   // init i18next
   // for all options read: https://www.i18next.com/overview/configuration-options
   .init({
-    debug: true,
+    debug: false,
     fallbackLng: 'en',
     interpolation: {
       escapeValue: false, // not needed for react as it escapes by default
@@ -117,7 +117,7 @@ i18n
           shipped: 'Shipped',
           delivered: 'Delivered',
           cancelled: 'Cancelled',
-          viewDetails: 'View Details',
+          viewDetailsButton: 'View Details',
           confirmDeletion: 'Confirm Deletion',
           confirmBulkDeletion: 'Confirm Bulk Deletion',
           deleteSelected: 'Delete Selected',
@@ -160,7 +160,13 @@ i18n
           viewCollectionButton: 'View Collection',
           tryDesignYourselfButton: 'Try Designing Yourself',
           ourDesignsTitle: 'Our Designs',
+          ourCategoriesTitle: 'Choose by Category',
           loadingDesigns: 'Loading designs...',
+          allCategoriesTitle: 'Explore Our Collections',
+          viewCategory: 'View Category',
+          loadingCategoriesAndProducts: 'Loading categories and products...',
+          noCategoriesOrProductsFound: 'No categories or products found.',
+          failedToLoadCategories: 'Failed to load categories or products.',
           whatOurCustomersSay: "What Our Customers Say",
           leaveAReview: "Leave a Review",
           select: "Select...",
@@ -260,7 +266,12 @@ i18n
           usefulLinks: "Useful Links",
           accessibility: "Accessibility",
           followUs: "Follow Us",
-          copyright: "© 2025 VIPCard. All rights reserved."
+          copyright: "© 2025 VIPCard. All rights reserved.",
+          rating1: "Poor",
+          rating2: "Fair",
+          rating3: "Good",
+          rating4: "Very Good",
+          rating5: "Excellent"
         }
       },
       he: {
@@ -363,7 +374,7 @@ i18n
           shipped: 'נשלח',
           delivered: 'נמסר',
           cancelled: 'בוטל',
-          viewDetails: 'צפה בפרטים',
+          viewDetailsButton: 'הצג פרטים',
           confirmDeletion: 'אישור מחיקה',
           confirmBulkDeletion: 'אישור מחיקה מרובה',
           deleteSelected: 'מחק נבחרים',
@@ -406,7 +417,14 @@ i18n
           viewCollectionButton: 'צפה בקולקציה',
           tryDesignYourselfButton: 'נסה לעצב בעצמך',
           ourDesignsTitle: 'העיצובים שלנו',
+          ourCategoriesTitle: 'בחר לפי קטגוריה',
           loadingDesigns: 'טוען עיצובים...',
+          allCategoriesTitle: 'חקור את הקולקציות שלנו',
+          viewCategory: 'צפה בקטגוריה',
+          loadingCategoriesAndProducts: 'טוען קטגוריות ומוצרים...',
+          noCategoriesOrProductsFound: 'לא נמצאו קטגוריות או מוצרים.',
+          failedToLoadCategories: 'נכשל בטעינת קטגוריות או מוצרים.',
+          noCategories: 'אין קטגוריות',
           whatOurCustomersSay: "מה הלקוחות שלנו אומרים",
           leaveAReview: "השאר ביקורת",
           select: "בחר...",
@@ -506,7 +524,12 @@ i18n
           usefulLinks: "קישורים שימושיים",
           accessibility: "נגישות",
           followUs: "עקבו אחרינו",
-          copyright: "© 2025 VIPCard. כל הזכויות שמורות."
+          copyright: "© 2025 VIPCard. כל הזכויות שמורות.",
+          rating1: "גרוע",
+          rating2: "בסדר",
+          rating3: "טוב",
+          rating4: "טוב מאוד",
+          rating5: "מצוין"
         }
       }
     }

@@ -1,9 +1,13 @@
 import React from 'react';
 import { useRouter } from '../contexts/RouterContext';
 import CreditCardPreview from './CreditCardPreview';
+import { useTranslation } from 'react-i18next';
 
 const ProductCard = ({ product, cardColorKey, engravingColorKey, disableClick = false }) => {
     const { navigate } = useRouter();
+    const { t } = useTranslation();
+
+    // console.log(`ProductCard for ${product?._id}: received cardColorKey=${cardColorKey}, engravingColorKey=${engravingColorKey}`);
 
     if (!product) {
         return null;
@@ -54,7 +58,7 @@ const ProductCard = ({ product, cardColorKey, engravingColorKey, disableClick = 
                     onClick={handleButtonClick}
                     className="w-full bg-indigo-600 text-white py-2 rounded-md hover:bg-indigo-500 transition-colors"
                 >
-                    הצג פרטים
+                    {t('viewDetailsButton')}
                 </button>
             </div>
         </div>

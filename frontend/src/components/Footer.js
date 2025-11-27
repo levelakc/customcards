@@ -22,7 +22,7 @@ export default function Footer() {
                 </div>
                 <div>
                     <h3 className="font-bold text-lg mb-4">{t('followUs')}</h3>
-                    <div className="flex justify-center space-x-4 space-x-reverse">
+                    <div className="flex justify-center space-x-6 space-x-reverse">
                         <a href="https://tiktok.com" target="_blank" rel="noopener noreferrer" className="text-gray-400 hover:text-white">TikTok</a>
                         <a href="https://instagram.com" target="_blank" rel="noopener noreferrer" className="text-gray-400 hover:text-white">Instagram</a>
                         <a href="https://facebook.com" target="_blank" rel="noopener noreferrer" className="text-gray-400 hover:text-white">Facebook</a>

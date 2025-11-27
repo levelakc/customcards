@@ -79,7 +79,7 @@ export default function CategoryGallery({ items = [] }) {
                         return (
                             <div key={product._id} className="text-center">
                                 <h3 
-                                    className="mt-4 text-xl font-semibold text-white cursor-pointer hover:text-indigo-400 transition-colors"
+                                    className="mt-4 text-3xl font-extrabold tracking-tight text-white font-dancing cursor-pointer hover:text-indigo-400 transition-colors"
                                     onClick={() => navigate('category', { id: product.category._id })}
                                 >
                                     {product.category.name}

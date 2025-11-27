@@ -1,6 +1,6 @@
 import React, { useState, useRef, useEffect, useMemo, useCallback } from 'react';
 import * as api from '../api/api'; // Import the api file
-import { cardColorOptions, engravingColorHex } from '../utils/colorUtils';
+import { cardColorOptions, engravingColorHex, getDefaultEngraving } from '../utils/colorUtils';
 
 // Helper function to check if a string is a valid CSS color
 const isValidCssColor = (color) => {
@@ -70,7 +70,6 @@ const CreditCardPreview = React.memo(function CreditCardPreview({
             blackSpotlight: `black-card-spotlight-gradient-${randomString}`,
             silverSpotlight: `silver-card-spotlight-gradient-${randomString}`,
             simStripes: `sim-stripes-gradient-${randomString}`,
-            visaGradient: `visa-gradient-${randomString}`,
         };
     }, []);
 
@@ -284,22 +283,13 @@ const CreditCardPreview = React.memo(function CreditCardPreview({
     }, [isResizing, handleCornerDragMove]);
 
     const getContrastingEngravingColor = useCallback((cardKey, engravingKey) => {
-        let effectiveEngravingKey = engravingKey;
-
-        // Get the actual hex color for the card
-        const cardHex = cardColorOptions[cardKey]?.hex || '#000000'; // Default to black if not found
-
-        // Logic to ensure contrast
-        if (cardKey === 'black' && engravingKey === 'black') {
-            effectiveEngravingKey = 'silver';
-        } else if (cardKey === 'gold' && engravingKey === 'gold') {
-            effectiveEngravingKey = 'black';
-        } else if (cardKey === 'silver' && engravingKey === 'silver') {
-            effectiveEngravingKey = 'black';
+        const options = cardColorOptions[cardKey];
+        if (options && options.engraving.includes(engravingKey)) {
+            return engravingColorHex[engravingKey];
         }
-        // Add more contrast logic if needed based on cardHex
-
-        return engravingColorHex[effectiveEngravingKey] || engravingColorHex.silver; // Default to silver if not found
+        // If the selected engraving color is not available for the card, use the default.
+        const defaultEngraving = getDefaultEngraving(cardKey);
+        return engravingColorHex[defaultEngraving] || engravingColorHex.silver;
     }, []);
 
 
@@ -371,31 +361,34 @@ const CreditCardPreview = React.memo(function CreditCardPreview({
         const option = cardColorOptions[cardColorKey];
         if (!option) return 'black'; // Default fallback
 
-        if (option.bgColor.includes('gradient')) {
-            // Map to existing SVG gradients based on the key
-            switch (cardColorKey) {
+        const colorBg = option.bgColor;
+
+        if (colorBg.startsWith('gradient')) {
+            // Map to existing SVG gradients based on the key derived from the gradient string
+            const gradientKey = colorBg.replace('gradient-', ''); // e.g., 'black', 'roseGold', 'visa', 'colorful'
+            switch (gradientKey) {
                 case 'colorful':
                     return `url(#${uniqueIds.colorfulGradient})`;
                 case 'roseGold':
                     return `url(#${uniqueIds.roseGoldGradient})`;
                 case 'black':
                     return `url(#${uniqueIds.blackGradient})`;
-                case 'visa': // Assuming 'visa' might be a cardColorKey with a specific gradient
-                    return `url(#${uniqueIds.visaGradient})`;
                 default:
                     return 'black'; // Fallback for unknown gradients
             }
-        } else {
+        } else if (colorBg.startsWith('bg-')) {
             // Map Tailwind classes to hex codes
-            switch (option.bgColor) {
+            switch (colorBg) {
                 case 'bg-yellow-500': return '#D4AF37'; // Gold
                 case 'bg-gray-300': return '#D1D5DB'; // Silver
                 case 'bg-white': return '#FFFFFF'; // White
                 case 'bg-blue-500': return '#3B82F6'; // Blue
                 case 'bg-red-500': return '#EF4444'; // Red
+                // Add more Tailwind to hex mappings as needed
                 default: return 'black'; // Default fallback
             }
         }
+        return 'black'; // Final fallback
     }, [cardColorKey, uniqueIds]);
 
     return (
@@ -417,13 +410,9 @@ const CreditCardPreview = React.memo(function CreditCardPreview({
                     <linearGradient id={uniqueIds.goldGradient} x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stopColor="#d4af37" /><stop offset="100%" stopColor="#b8860b" /></linearGradient>
                     <linearGradient id={uniqueIds.blackGradient} x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stopColor="#222222" /><stop offset="100%" stopColor="#000000" /></linearGradient>
                     <linearGradient id={uniqueIds.roseGoldGradient} x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stopColor="#E5B4A3" /><stop offset="100%" stopColor="#C98E7A" /></linearGradient>
+                    <linearGradient id={uniqueIds.roseGoldGradient} x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stopColor="#E5B4A3" /><stop offset="100%" stopColor="#C98E7A" /></linearGradient>
                     <linearGradient id={uniqueIds.colorfulGradient} x1="0%" y1="100%" x2="100%" y2="0%">
                         <stop offset="0%" stopColor="#6b21a8" /><stop offset="20%" stopColor="#c026d3" /><stop offset="40%" stopColor="#db2777" /><stop offset="60%" stopColor="#ca8a04" /><stop offset="80%" stopColor="#16a34a" /><stop offset="100%" stopColor="#2563eb" />
-                    </linearGradient>
-                    <linearGradient id={uniqueIds.visaGradient} x1="0%" y1="0%" x2="100%" y2="100%">
-                        <stop offset="0%" stopColor="#1A237E" />
-                        <stop offset="50%" stopColor="#42A5F5" />
-                        <stop offset="100%" stopColor="#1565C0" />
                     </linearGradient>
                     
                     <filter id={uniqueIds.shimmerFilter} x="-20%" y="-20%" width="140%" height="140%">
@@ -477,8 +466,6 @@ const CreditCardPreview = React.memo(function CreditCardPreview({
                             height={SVG_HEIGHT}
                             rx="20"
                             fill={cardFill}
-                            stroke={cardColorKey === 'visa' ? '#CCCCCC' : 'none'}
-                            strokeWidth={cardColorKey === 'visa' ? '1' : '0'}
                         />
                     </g>
                     

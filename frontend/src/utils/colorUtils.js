@@ -13,6 +13,11 @@ export const nameToKeyMap = {
     black: 'black',
     roseGold: 'roseGold',
     colorful: 'colorful',
+    'שחור': 'black', // Added Hebrew for Black
+    'זהב': 'gold', // Added Hebrew for Gold
+    'כסף': 'silver', // Added Hebrew for Silver
+    'רוז גולד': 'roseGold', // Added Hebrew for Rose Gold
+    'צבעוני': 'colorful', // Added Hebrew for Colorful
 };
 
 export const engravingColorNames = {
@@ -42,7 +47,7 @@ export const cardColorOptions = {
     gold:     { nameKey: 'gold',       engraving: ['black'],    bgColor: 'bg-yellow-500' },
     silver:   { nameKey: 'silver',       engraving: ['black'],    bgColor: 'bg-gray-300' },
     roseGold: { nameKey: 'roseGold',  engraving: ['black'],    bgColor: 'gradient-roseGold' },
-    colorful: { nameKey: 'colorful',    engraving: ['silver'],   bgColor: 'bg-gradient-to-r from-purple-400 via-pink-500 to-red-500' },
+    colorful: { nameKey: 'colorful',    engraving: ['silver'],   bgColor: 'gradient-colorful' },
     black:    { nameKey: 'black',       engraving: ['silver', 'gold'], bgColor: 'gradient-black' },
 };
 

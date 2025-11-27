@@ -1,6 +1,6 @@
 // CustomCard/frontend/src/utils/currencyUtils.js
 
-const EXCHANGE_RATE_API_URL = 'https://api.exchangerate.host/latest';
+const EXCHANGE_RATE_API_URL = 'https://api.frankfurter.app/latest';
 const CACHE_DURATION = 3600000; // 1 hour in milliseconds
 
 let exchangeRateCache = {
@@ -15,16 +15,15 @@ export const getIlsToUsdtRate = async () => {
     }
 
     try {
-        const response = await fetch(`${EXCHANGE_RATE_API_URL}?base=ILS&symbols=USD`);
+        const response = await fetch(`${EXCHANGE_RATE_API_URL}?from=ILS&to=USD`);
         if (!response.ok) {
             throw new Error(`HTTP error! status: ${response.status}`);
         }
         const data = await response.json();
         
-        // ExchangeRate.host provides rates relative to the base currency.
-        // So, data.rates.USD will be 1 USD = X ILS.
-        // We need 1 ILS = Y USD. So, 1 / data.rates.USD.
-        const ilsToUsdRate = 1 / data.rates.USD;
+        // Frankfurter.app provides rates directly as 1 BASE_CURRENCY = X TARGET_CURRENCY.
+        // So, if base=ILS and to=USD, data.rates.USD will be 1 ILS = X USD.
+        const ilsToUsdRate = data.rates.USD;
 
         // Now, we need USD to USDT. For simplicity, we'll assume 1 USD = 1 USDT.
         // In a real-world scenario, you might fetch this separately or use a crypto-specific API.

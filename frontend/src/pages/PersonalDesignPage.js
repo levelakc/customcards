@@ -19,7 +19,6 @@ export default function PersonalDesignPage() {
     const [position, setPosition] = useState({ x: 45, y: 10 });
 
     const fileInputRef = useRef(null);
-
     const handleCardColorChange = (colorKey) => {
         setCardColor(colorKey);
         setEngravingColor(cardColorOptions[colorKey].engraving[0]);

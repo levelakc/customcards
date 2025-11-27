@@ -2,20 +2,18 @@ import React, { useState, useEffect, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 import * as api from '../api/api';
 import Carousel3D from '../components/Carousel3D';
-import CategoryGallery from '../components/CategoryGallery';
+import CategoryProductGallery from '../components/CategoryProductGallery'; // Import the new component
 import PersonalDesignPage from './PersonalDesignPage';
 import AboutUs from '../components/AboutUs';
 import Reviews from '../components/Reviews';
 import RealLifeGallery from '../components/RealLifeGallery'; 
 
 const MAX_CAROUSEL_ITEMS = 12;
-const MOBILE_BREAKPOINT = 768;
 
 export default function HomePage() {
     const { t, i18n } = useTranslation();
     const [featured, setFeatured] = useState([]);
-    const [galleryItems, setGalleryItems] = useState([]);
-    const [allCategories, setAllCategories] = useState([]);
+    // const [allCategories, setAllCategories] = useState([]); // Removed
     const [backgroundVideoUrl, setBackgroundVideoUrl] = useState('');
     const [videoOpacity, setVideoOpacity] = useState(0.3);
     const designsSectionRef = useRef(null);
@@ -47,37 +45,22 @@ export default function HomePage() {
                 setBackgroundVideoUrl(settings.backgroundVideoUrl);
                 setVideoOpacity(settings.videoOpacity);
 
-                const fetchedCategories = await api.getCategories(); // Fetch categories
-                setAllCategories(fetchedCategories); // Set categories state
+                // const fetchedCategories = await api.getCategories(); // No longer needed here
+                // setAllCategories(fetchedCategories); // No longer needed here
 
                 const allProducts = await api.getProducts();
                 
-                // Filter products to ensure they have all necessary display information
-                const validProducts = allProducts.filter(product => 
-                    product.name && 
-                    product.description && 
-                    product.price !== undefined && 
-                    product.image
-                );
-                
                 const usedProductIds = new Set();
                 
-                const galleryProducts = [];
-                fetchedCategories.forEach(category => {
-                    const productsInCategory = validProducts.filter(p => p.category?._id === category._id);
-                    if (productsInCategory.length > 0) {
-                        const randomIndex = Math.floor(Math.random() * productsInCategory.length);
-                        const product = productsInCategory[randomIndex];
-                        if (product && product._id && !usedProductIds.has(product._id)) {
-                           galleryProducts.push(product);
-                           usedProductIds.add(product._id);
-                        }
-                    }
-                });
-                setGalleryItems(galleryProducts);
+                // Use a dummy categories array or fetch if needed for carousel, but not for CategoryProductGallery
+                // For simplicity, let's assume we can get categories for carousel logic from fetchedCategories if needed.
+                // However, the original logic already fetches products and then filters based on category,
+                // so we don't strictly need to fetch categories here unless `fetchedCategories` is used later for other logic.
+                // Re-introducing a minimal category fetch for existing carousel logic if `fetchedCategories` is not removed above.
+                const fetchedCategoriesForCarousel = await api.getCategories(); 
 
                 const carouselProducts = [];
-                fetchedCategories.forEach(category => {
+                fetchedCategoriesForCarousel.forEach(category => {
                     const productsInCategory = allProducts.filter(p => p.category?._id === category._id);
                     if (productsInCategory.length > 0) {
                         let productToAdd = productsInCategory.find(p => !usedProductIds.has(p._id));
@@ -104,7 +87,6 @@ export default function HomePage() {
             } catch (err) {
                 console.error("Failed to fetch initial data:", err);
                 setFeatured([]);
-                setGalleryItems([]);
             }
         };
         fetchInitialData();
@@ -195,7 +177,7 @@ export default function HomePage() {
                 </div>
             </div>
 
-            {galleryItems.length > 0 && <CategoryGallery items={galleryItems} />}
+            <CategoryProductGallery /> {/* Use the new component */}
 
             <div ref={personalDesignSectionRef}>
                 <PersonalDesignPage />

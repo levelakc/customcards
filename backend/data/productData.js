@@ -6,6 +6,7 @@ const products = [
         en: 'A sleek and elegant silver metal card for a premium feel.',
         he: 'כרטיס מתכת כסף מלוטש ואלגנטי לתחושה יוקרתית.'
       },
+      availableColors: ['silver', 'black', 'gold'],
       brand: 'VIPCard',
       category: 'category_placeholder_classic',
       price: 199.99,
@@ -20,6 +21,7 @@ const products = [
         en: 'Experience unparalleled luxury with our 24k gold plated card.',
         he: 'חווה יוקרה ללא תחרות עם כרטיס מצופה זהב 24 קראט שלנו.'
       },
+      availableColors: ['gold', 'silver', 'roseGold'],
       brand: 'VIPCard',
       category: 'category_placeholder_luxury',
       price: 499.99,
@@ -34,6 +36,7 @@ const products = [
         en: 'Design your own unique black metal card with custom engraving.',
         he: 'עצב כרטיס מתכת שחור ייחודי משלך עם חריטה אישית.'
       },
+      availableColors: ['black', 'silver', 'gold'],
       brand: 'VIPCard',
       category: 'category_placeholder_custom',
       price: 299.99,
