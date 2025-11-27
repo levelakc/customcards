@@ -78,6 +78,7 @@ export default function Carousel3D({ items }) {
         }, [animate]);
     
         useEffect(() => {
+            const intervalTime = isMobile ? 3000 : 1500; // Longer interval on mobile
             const colorInterval = setInterval(() => {
                 setColorIndexes(prevIndexes => {
                     const newIndexes = { ...prevIndexes };
@@ -91,10 +92,10 @@ export default function Carousel3D({ items }) {
                     });
                     return newIndexes;
                 });
-            }, 1500);
+            }, intervalTime); // Use dynamic intervalTime
             
             return () => clearInterval(colorInterval);
-        }, [items]);
+        }, [items, isMobile]); // Dependency on isMobile
     
         const handleDragStart = useCallback((e) => {
             isDragging.current = true;
