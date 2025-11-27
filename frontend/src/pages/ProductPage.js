@@ -10,6 +10,7 @@ import {
     engravingColorNames,
     engravingColorClasses,
     getSortedColors,
+    getDefaultEngraving,
 } from '../utils/colorUtils';
 import { cardColorBgClasses } from '../utils/tailwindColors';
 
