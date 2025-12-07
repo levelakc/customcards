@@ -13,7 +13,7 @@ const ProductCard = ({ product, disableClick = false, isMobile }) => {
     useEffect(() => {
         if (!product || !product.availableColors || product.availableColors.length <= 1) return;
 
-        const intervalTime = isMobile ? 3000 : 1500; // Longer interval on mobile
+        const intervalTime = 5000; // Longer interval on mobile
         const colorInterval = setInterval(() => {
             setColorIndex(prevIndex => (prevIndex + 1) % product.availableColors.length);
         }, intervalTime);

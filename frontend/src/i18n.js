@@ -271,7 +271,12 @@ i18n
           rating2: "Fair",
           rating3: "Good",
           rating4: "Very Good",
-          rating5: "Excellent"
+          rating5: "Excellent",
+          "accessibilityStatementTitle": "Accessibility Statement",
+          "accessibilityStatementP1": "We are committed to making our website accessible to everyone, including people with disabilities. We are constantly working to improve the accessibility of our website and services, and we adhere to the latest standards and guidelines.",
+          "accessibilityStatementP2": "We have made every effort to ensure that our website is accessible to all users, regardless of the technology they use or their ability. We have followed the Web Content Accessibility Guidelines (WCAG) 2.1 at the AA level.",
+          "accessibilityStatementP3": "If you have any difficulty accessing our website, or if you have any suggestions for improving our accessibility, please contact us. We will be happy to assist you in any way we can.",
+          "accessibilityStatementP4": "You can contact us by email at [email protected] or by phone at [phone number]."
         }
       },
       he: {
@@ -529,7 +534,12 @@ i18n
           rating2: "בסדר",
           rating3: "טוב",
           rating4: "טוב מאוד",
-          rating5: "מצוין"
+          rating5: "מצוין",
+          "accessibilityStatementTitle": "הצהרת נגישות",
+          "accessibilityStatementP1": "אנו מחויבים להפוך את האתר שלנו לנגיש לכולם, כולל אנשים עם מוגבלויות. אנו פועלים כל העת לשיפור נגישות האתר והשירותים שלנו, ומקפידים על התקנים וההנחיות העדכניים ביותר.",
+          "accessibilityStatementP2": "עשינו כל מאמץ להבטיח שהאתר שלנו יהיה נגיש לכל המשתמשים, ללא קשר לטכנולוגיה בה הם משתמשים או ליכולתם. פעלנו בהתאם להנחיות הנגישות לתוכן באינטרנט (WCAG) 2.1 ברמה AA.",
+          "accessibilityStatementP3": "אם נתקלתם בקושי בגלישה באתר, או אם יש לכם הצעות לשיפור הנגישות שלנו, אנא צרו עמנו קשר. נשמח לסייע לכם בכל דרך שנוכל.",
+          "accessibilityStatementP4": "ניתן ליצור עמנו קשר בדוא\"ל בכתובת [כתובת דוא\"ל] או בטלפון במספר [מספר טלפון]."
         }
       }
     }

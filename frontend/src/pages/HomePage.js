@@ -4,6 +4,7 @@ import * as api from '../api/api';
 import Carousel3D from '../components/Carousel3D';
 import CategoryProductGallery from '../components/CategoryProductGallery'; // Import the new component
 import PersonalDesignPage from './PersonalDesignPage';
+import AnimatedSection from '../components/AnimatedSection';
 import AboutUs from '../components/AboutUs';
 import Reviews from '../components/Reviews';
 import RealLifeGallery from '../components/RealLifeGallery'; 
@@ -168,24 +169,36 @@ export default function HomePage() {
                 </div>
             </div>
             
-            <AboutUs />
+            <AnimatedSection animation="fade-in-up">
+                <AboutUs />
+            </AnimatedSection>
 
-            <div ref={designsSectionRef} className="py-20">
-                <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                    <h2 className="text-3xl font-extrabold text-white text-center mb-16">{t('ourDesignsTitle')}</h2>
-                    {featured.length > 0 ? <Carousel3D items={featured} /> : <div className="text-center text-gray-400 py-10">{t('loadingDesigns')}</div>}
+            <AnimatedSection animation="fade-in-left">
+                <div ref={designsSectionRef} className="py-20">
+                    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                        <h2 className="text-3xl font-extrabold text-white text-center mb-16">{t('ourDesignsTitle')}</h2>
+                        {featured.length > 0 ? <Carousel3D items={featured} /> : <div className="text-center text-gray-400 py-10">{t('loadingDesigns')}</div>}
+                    </div>
                 </div>
-            </div>
+            </AnimatedSection>
 
-            <CategoryProductGallery /> {/* Use the new component */}
+            <AnimatedSection animation="fade-in-right">
+                <CategoryProductGallery />
+            </AnimatedSection>
 
-            <div ref={personalDesignSectionRef}>
-                <PersonalDesignPage />
-            </div>
+            <AnimatedSection animation="fade-in-up">
+                <div ref={personalDesignSectionRef}>
+                    <PersonalDesignPage />
+                </div>
+            </AnimatedSection>
 
-            <RealLifeGallery />
+            <AnimatedSection animation="fade-in-left">
+                <RealLifeGallery />
+            </AnimatedSection>
 
-            <Reviews />
+            <AnimatedSection animation="fade-in-right">
+                <Reviews />
+            </AnimatedSection>
         </div>
     );
 }
