@@ -65,7 +65,7 @@ function AppContent() {
     };
 
     return (
-        <div dir={i18n.dir()} className="bg-gray-900 font-sans">
+        <div dir={i18n.dir()} className="w-full overflow-x-hidden bg-gray-900 font-sans">
             <Navbar />
             <main className="pt-20">{renderPage()}</main>
             <Footer />

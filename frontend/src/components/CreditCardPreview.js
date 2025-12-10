@@ -399,8 +399,7 @@ const CreditCardPreview = React.memo(function CreditCardPreview({
                 viewBox={`0 0 ${SVG_WIDTH} ${SVG_HEIGHT}`}
                 className={`w-full object-cover md:transform-style-3d md:rotate-x-5 md:-rotate-y-10 ${isDraggable ? (isDragging ? 'cursor-grabbing' : 'cursor-grab') : ''}`}
                 style={{
-                    filter: 'drop-shadow(0 10px 10px rgba(0,0,0,0.4))',
-                    touchAction: 'none'
+                    filter: 'drop-shadow(0 10px 10px rgba(0,0,0,0.4))'
                 }}
                 onMouseDown={handleDragStart}
                 onTouchStart={handleDragStart}
