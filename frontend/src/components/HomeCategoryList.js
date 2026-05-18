@@ -4,7 +4,7 @@ import { useTranslation } from 'react-i18next';
 
 export default function HomeCategoryList({ categories }) {
     const { navigate } = useRouter();
-    const { t } = useTranslation();
+    const { t, i18n } = useTranslation();
 
     return (
         <div className="bg-gray-800 py-20">
@@ -14,14 +14,19 @@ export default function HomeCategoryList({ categories }) {
                     <p className="text-center text-gray-400">No categories found. Please seed the database.</p>
                 ) : (
                     <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
-                        {categories.map(category => (
-                                                            <div 
-                                key={category._id} 
-                                onClick={() => navigate('category', { id: category._id })}
-                                className="bg-gray-800 rounded-lg shadow-lg p-6 flex flex-col items-center justify-center cursor-pointer hover:bg-gray-700 transition duration-300 ease-in-out"
-                            >
-                                <h2 className="text-2xl font-semibold text-white text-center mb-2">{category.name}</h2>
-                            </div>                        ))}
+                        {categories.map(category => {
+                            const currentLanguage = i18n.language || 'he';
+                            const categoryName = category.name?.[currentLanguage] || category.name?.he || category.name?.en || category.name || '';
+                            return (
+                                <div 
+                                    key={category._id} 
+                                    onClick={() => navigate('category', { id: category._id })}
+                                    className="bg-gray-800 rounded-lg shadow-lg p-6 flex flex-col items-center justify-center cursor-pointer hover:bg-gray-700 transition duration-300 ease-in-out"
+                                >
+                                    <h2 className="text-2xl font-semibold text-white text-center mb-2">{categoryName}</h2>
+                                </div>
+                            );
+                        })}
                     </div>
                 )}
             </div>

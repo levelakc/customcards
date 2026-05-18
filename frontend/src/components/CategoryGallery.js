@@ -2,9 +2,11 @@ import React, { useState, useEffect, useRef } from 'react';
 import { useRouter } from '../contexts/RouterContext';
 import ProductCard from './ProductCard';
 import { nameToKeyMap, getDefaultEngraving } from '../utils/colorUtils';
+import { useTranslation } from 'react-i18next';
 
 // The component now receives an `items` prop and no longer fetches its own data.
 export default function CategoryGallery({ items = [] }) {
+    const { i18n } = useTranslation();
     const [colorIndexes, setColorIndexes] = useState({});
     const { navigate } = useRouter();
 
@@ -75,6 +77,8 @@ export default function CategoryGallery({ items = [] }) {
                         const colorName = availableColors[safeColorIndex];
                         const cardColorKey = colorName ? nameToKeyMap[colorName] : 'black';
                         const engravingColorKey = getDefaultEngraving(cardColorKey);
+                        const currentLanguage = i18n.language || 'he';
+                        const categoryName = product.category?.name?.[currentLanguage] || product.category?.name?.he || product.category?.name?.en || product.category?.name || '';
 
                         return (
                             <div key={product._id} className="text-center">
@@ -82,7 +86,7 @@ export default function CategoryGallery({ items = [] }) {
                                     className="mt-4 text-3xl font-extrabold tracking-tight text-white font-dancing cursor-pointer hover:text-indigo-400 transition-colors"
                                     onClick={() => navigate('category', { id: product.category._id })}
                                 >
-                                    {product.category.name}
+                                    {categoryName}
                                 </h3>
                                 <ProductCard 
                                     product={product}

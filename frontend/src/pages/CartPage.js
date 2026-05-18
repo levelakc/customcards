@@ -21,7 +21,9 @@ export default function CartPage() {
         rotation: 0,
     });
     const [selectedFile, setSelectedFile] = useState(null);
-    const { t } = useTranslation(); // Initialize useTranslation
+    const { t, i18n } = useTranslation(); // Initialize useTranslation
+
+    const currentLanguage = i18n.language || 'he';
 
     useEffect(() => {
         if (selectedFile) {
@@ -129,7 +131,7 @@ export default function CartPage() {
                                     )}
                                 </div>
                                 <div className="flex-grow">
-                                    <h2 className="text-lg sm:text-xl font-bold">{item.name}</h2>
+                                    <h2 className="text-lg sm:text-xl font-bold">{item.name?.[currentLanguage] || item.name?.he || item.name?.en || item.name || ''}</h2>
                                     <p className="text-sm text-gray-400">{t('color')}: {item.selectedColor}</p>
                                     <p className="text-lg font-semibold text-indigo-400 mt-1">₪{item.price}</p>
                                 </div>
@@ -175,7 +177,7 @@ export default function CartPage() {
 
                         {/* Right Side: Controls */}
                         <div className="space-y-4">
-                            <h3 className="text-2xl font-bold">{t('addUpsellProduct', { productName: upsellProduct.name })}</h3>
+                            <h3 className="text-2xl font-bold">{t('addUpsellProduct', { productName: upsellProduct.name?.[currentLanguage] || upsellProduct.name?.he || upsellProduct.name?.en || upsellProduct.name || '' })}</h3>
                             <p className="text-lg font-semibold text-indigo-400">{t('upsellPrice', { price: upsellProduct.price })}</p>
                             
                             <div>

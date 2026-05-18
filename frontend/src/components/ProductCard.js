@@ -7,7 +7,7 @@ import { nameToKeyMap, getDefaultEngraving } from '../utils/colorUtils';
 
 const ProductCard = ({ product, disableClick = false, isMobile }) => {
     const { navigate } = useRouter();
-    const { t } = useTranslation();
+    const { t, i18n } = useTranslation();
     const [colorIndex, setColorIndex] = useState(0);
 
     useEffect(() => {
@@ -26,6 +26,10 @@ const ProductCard = ({ product, disableClick = false, isMobile }) => {
     if (!product) {
         return null;
     }
+
+    const currentLanguage = i18n.language || 'he';
+    const productName = (product.name?.[currentLanguage] || product.name || '').toString();
+    const productDescription = (product.description?.[currentLanguage] || product.description || '').toString();
 
     const availableColors = product.availableColors || [];
     const colorName = availableColors[colorIndex] || 'שחור';
@@ -66,8 +70,8 @@ const ProductCard = ({ product, disableClick = false, isMobile }) => {
             </div>
             
             <div className="p-6 pt-2 flex-grow flex flex-col text-center relative z-10">
-                <h3 className="text-xl font-semibold text-white mb-2">{product.name.replace(/<br\s*\/?>/gi, ' ')}</h3>
-                <p className="text-gray-300 text-sm mb-4 line-clamp-2">{product.description}</p>
+                <h3 className="text-xl font-semibold text-white mb-2">{productName.replace(/<br\s*\/?>/gi, ' ')}</h3>
+                <p className="text-gray-300 text-sm mb-4 line-clamp-2">{productDescription}</p>
                 <div className="flex-grow"></div>
                 <p className="text-indigo-400 font-bold text-lg mb-4">₪{product.price}</p>
                 <button 

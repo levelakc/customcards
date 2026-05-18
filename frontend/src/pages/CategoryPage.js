@@ -75,10 +75,13 @@ export default function CategoryPage() {
     if (loading) return <div className="text-center p-10 text-white bg-gray-900 min-h-screen">טוען קטגוריה...</div>;
     if (!category) return <div className="text-center p-10 text-white bg-gray-900 min-h-screen">קטגוריה לא נמצאה.</div>;
 
+    const currentLanguage = i18n.language || 'he';
+    const categoryName = category.name?.[currentLanguage] || category.name?.he || category.name?.en || category.name || '';
+
     return (
         <div className="bg-gray-900 min-h-screen">
             <div className="max-w-7xl mx-auto py-12 px-4 sm:px-6 lg:px-8">
-                <h1 className="text-4xl font-extrabold text-white mb-8 font-dancing">{category.name}</h1>
+                <h1 className="text-4xl font-extrabold text-white mb-8 font-dancing">{categoryName}</h1>
                 <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-8">
                     {products.map(product => {
                         const cardColorKey = 

@@ -13,7 +13,10 @@ const productSchema = mongoose.Schema({
         he: { type: String, required: true },
     },
     image: { type: String, required: true },
-    description: { type: String, required: true },
+    description: {
+        en: { type: String, required: true },
+        he: { type: String, required: true },
+    },
     category: { type: mongoose.Schema.Types.ObjectId, required: true, ref: 'Category' },
     price: { type: Number, required: true, default: 0 },
     availableColors: [{ type: String, required: true }],
