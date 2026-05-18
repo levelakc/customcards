@@ -8,6 +8,7 @@
     "data:import": "node seeder",
     "category:migrate": "node migration.js",
     "start": "node server.js",
+    "reset": "node reset-db.js",
     "server": "nodemon server.js"
   },
   "author": "",
