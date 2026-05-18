@@ -121,3 +121,51 @@ div.userway_buttons_wrapper {
   left: 25px !important;
   scale: 1.4 !important;
 }
+
+/* --- Luxury Navbar Styles --- */
+.navbar-luxury {
+    background: rgba(0, 0, 0, 0.85) !important;
+    backdrop-filter: blur(12px) !important;
+    -webkit-backdrop-filter: blur(12px) !important;
+    border-bottom: 1px solid rgba(212, 175, 55, 0.3) !important; /* Metallic gold border */
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5) !important;
+}
+
+.nav-link-luxury {
+    position: relative;
+    color: #d1d5db;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    letter-spacing: 0.05em;
+}
+
+.nav-link-luxury::after {
+    content: '';
+    position: absolute;
+    bottom: -4px;
+    right: 0;
+    width: 0;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, #d4af37, transparent);
+    transition: width 0.3s ease;
+}
+
+.nav-link-luxury:hover {
+    color: #d4af37 !important;
+    text-shadow: 0 0 10px rgba(212, 175, 55, 0.3);
+}
+
+.nav-link-luxury:hover::after {
+    width: 100%;
+}
+
+.gold-gradient-text {
+    background: linear-gradient(135deg, #bf953f, #fcf6ba, #b38728, #fbf5b7, #aa8238);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    display: inline-block;
+    font-weight: 700;
+}
+
+.gold-glow-hover:hover {
+    box-shadow: 0 0 15px rgba(212, 175, 55, 0.4);
+}

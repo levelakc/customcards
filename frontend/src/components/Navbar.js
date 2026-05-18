@@ -59,84 +59,95 @@ export default function Navbar() {
     }
 
     return (
-        <nav className="bg-black bg-opacity-50 backdrop-blur-lg fixed top-0 z-50 w-full text-white shadow-lg">
+        <nav className="navbar-luxury fixed top-0 z-50 w-full text-white">
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                <div className="flex items-center justify-between h-20">
+                <div className="flex items-center justify-between h-24">
                     
                     <div className="flex items-center">
                         <div className="flex-shrink-0">
                             {finalLogoUrl && (
-                            <button onClick={() => navigate('home')} className="cursor-pointer focus:outline-none" style={{ marginTop: '20px' }}>
-                                    <img src={finalLogoUrl} alt="VIPCard Logo" height="224px" width="224px" />
+                            <button onClick={() => navigate('home')} className="cursor-pointer focus:outline-none transition-transform hover:scale-105 duration-300">
+                                    <img src={finalLogoUrl} alt="VIPCard Logo" className="h-16 w-auto" />
                                 </button>
                             )}
                         </div>
-                        <div className="hidden md:block">
-                            <div className="mr-10 flex flex-wrap items-center space-x-4">
+                        <div className="hidden lg:block">
+                            <div className="mr-12 flex flex-wrap items-center space-x-6 space-x-reverse">
                                 {mainLinks.map(link => (
-                                    <button key={link.page === 'home' ? 'home' : link.params.id} onClick={() => navigate(link.page, link.params)} className="hover:bg-gray-700 hover:bg-opacity-50 px-3 py-2 rounded-md text-sm font-medium transition-colors whitespace-nowrap">{link.name}</button>
+                                    <button 
+                                        key={link.page === 'home' ? 'home' : link.params.id} 
+                                        onClick={() => navigate(link.page, link.params)} 
+                                        className="nav-link-luxury px-1 py-2 text-sm font-semibold transition-colors whitespace-nowrap"
+                                    >
+                                        {link.name}
+                                    </button>
                                 ))}
                                 {moreLinks.length > 0 && (
                                     <div className="relative group">
-                                        <button onClick={() => setIsMoreMenuOpen(!isMoreMenuOpen)} className="hover:bg-gray-700 hover:bg-opacity-50 px-3 py-2 rounded-md text-sm font-medium">
+                                        <button onClick={() => setIsMoreMenuOpen(!isMoreMenuOpen)} className="nav-link-luxury px-1 py-2 text-sm font-semibold flex items-center">
                                             {t('more')}
+                                            <svg className="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7"></path></svg>
                                         </button>
                                         {isMoreMenuOpen && (
-                                            <div className="absolute start-0 mt-2 w-48 bg-gray-800 rounded-md shadow-lg py-1 z-20">
+                                            <div className="absolute start-0 mt-2 w-48 bg-gray-900 border border-gray-700 rounded-md shadow-2xl py-2 z-20">
                                                 {moreLinks.map(link => (
-                                                    <button key={link.params.id} onClick={() => {navigate(link.page, link.params); setIsMoreMenuOpen(false);}} className="block w-full text-right px-4 py-2 text-sm text-gray-300 hover:bg-gray-700">{link.name}</button>
+                                                    <button key={link.params.id} onClick={() => {navigate(link.page, link.params); setIsMoreMenuOpen(false);}} className="block w-full text-right px-4 py-3 text-sm text-gray-300 hover:bg-gray-800 hover:text-gold transition-colors">{link.name}</button>
                                                 ))}
                                             </div>
                                         )}
                                     </div>
                                 )}
-                                {isAdmin && (
-                                    <button onClick={() => navigate('admin')} className="border border-indigo-500 hover:bg-indigo-500 hover:bg-opacity-25 px-3 py-2 rounded-md text-sm font-medium transition-colors">{t('adminPanel')}</button>
-                                )}
                             </div>
                         </div>
                     </div>
 
-                    <div className="flex items-center">
-                        <div className="hidden md:flex items-center">
+                    <div className="flex items-center space-x-4 space-x-reverse">
+                        <div className="hidden md:flex items-center space-x-4 space-x-reverse">
                             
                             <LanguageSwitcher />
 
-                            <button onClick={() => navigate('search')} className="relative p-2 rounded-full hover:bg-gray-700 hover:bg-opacity-50 focus:outline-none ms-4">
+                            <button onClick={() => navigate('search')} className="relative p-2 rounded-full hover:bg-gray-800 transition-colors focus:outline-none">
                                 <SearchIcon />
                             </button>
                             {isAuthenticated ? (
                                 <div className="relative group">
-                                    <button className="hover:bg-gray-700 hover:bg-opacity-50 px-3 py-2 rounded-md text-sm font-medium whitespace-nowrap">
+                                    <button className="nav-link-luxury px-3 py-2 text-sm font-bold flex items-center gold-gradient-text">
                                         {t('hello')}, {user.name}
                                     </button>
-                                    <div className="absolute start-0 mt-2 w-48 bg-gray-800 rounded-md shadow-lg py-1 z-20 opacity-0 group-hover:opacity-100 transition-opacity duration-200">
-                                        <button onClick={() => navigate('profile')} className="block w-full text-right px-4 py-2 text-sm text-gray-300 hover:bg-gray-700">{t('myProfile')}</button>
-                                        <button onClick={handleLogout} className="block w-full text-right px-4 py-2 text-sm text-gray-300 hover:bg-gray-700">{t('logout')}</button>
+                                    <div className="absolute start-0 mt-2 w-48 bg-gray-900 border border-gray-700 rounded-md shadow-2xl py-2 z-20 opacity-0 group-hover:opacity-100 transition-opacity duration-200">
+                                        <button onClick={() => navigate('profile')} className="block w-full text-right px-4 py-3 text-sm text-gray-300 hover:bg-gray-800">{t('myProfile')}</button>
+                                        <button onClick={handleLogout} className="block w-full text-right px-4 py-3 text-sm text-red-400 hover:bg-gray-800">{t('logout')}</button>
                                     </div>
                                 </div>
                             ) : (
-                                <button onClick={() => navigate('login')} className="hover:bg-gray-700 hover:bg-opacity-50 px-3 py-2 rounded-md text-sm font-medium">{t('loginRegister')}</button>
+                                <button onClick={() => navigate('login')} className="bg-transparent border border-gray-600 hover:border-gold-500 hover:text-gold-500 px-5 py-2 rounded-full text-sm font-bold transition-all duration-300">
+                                    {t('loginRegister')}
+                                </button>
                             )}
-                            <button onClick={() => navigate('cart')} className="relative p-2 rounded-full hover:bg-gray-700 hover:bg-opacity-50 focus:outline-none ml-4">
+                            
+                            {isAdmin && (
+                                <button onClick={() => navigate('admin')} className="bg-indigo-900 bg-opacity-30 border border-indigo-500 text-indigo-300 hover:bg-indigo-800 px-4 py-2 rounded-full text-xs font-bold transition-all uppercase tracking-wider">{t('adminPanel')}</button>
+                            )}
+
+                            <button onClick={() => navigate('cart')} className="relative p-3 bg-gray-800 rounded-full hover:bg-gray-700 transition-all focus:outline-none shadow-inner border border-gray-700">
                                 <ShoppingCartIcon />
                                 {cartItemCount > 0 && (
-                                    <span className="absolute -top-1 -right-1 flex h-5 w-5 items-center justify-center rounded-full bg-red-500 text-xs font-bold">{cartItemCount}</span>
+                                    <span className="absolute -top-1 -right-1 flex h-6 w-6 items-center justify-center rounded-full bg-red-600 text-xs font-black shadow-lg border border-gray-900">{cartItemCount}</span>
                                 )}
                             </button>
                         </div>
                         
-                        <div className="flex items-center md:hidden">
-                            <button onClick={() => navigate('search')} className="relative p-2 rounded-full text-gray-400 hover:text-white hover:bg-gray-700 focus:outline-none">
+                        <div className="flex items-center space-x-2 space-x-reverse md:hidden">
+                            <button onClick={() => navigate('search')} className="p-2 text-gray-400 hover:text-white">
                                 <SearchIcon />
                             </button>
-                            <button onClick={() => navigate('cart')} className="relative p-2 rounded-full text-gray-400 hover:text-white hover:bg-gray-700 focus:outline-none">
+                            <button onClick={() => navigate('cart')} className="relative p-2 text-gray-400 hover:text-white">
                                 <ShoppingCartIcon />
                                 {cartItemCount > 0 && (
                                     <span className="absolute top-1 right-1 flex h-3 w-3"><span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span><span className="relative inline-flex rounded-full h-3 w-3 bg-red-500"></span></span>
                                 )}
                             </button>
-                            <button onClick={() => setIsMenuOpen(!isMenuOpen)} type="button" className="relative inline-flex items-center justify-center p-2 rounded-md text-gray-400 hover:text-white hover:bg-gray-700 focus:outline-none">
+                            <button onClick={() => setIsMenuOpen(!isMenuOpen)} type="button" className="p-2 rounded-md text-gray-400 hover:text-white hover:bg-gray-800 focus:outline-none transition-colors">
                                 {isMenuOpen ? <XIcon /> : <MenuIcon />}
                             </button>
                         </div>
@@ -145,31 +156,33 @@ export default function Navbar() {
             </div>
             
             {isMenuOpen && (
-                <div className="md:hidden">
-                    <div className="px-2 pt-2 pb-3 space-y-1 sm:px-3">
+                <div className="md:hidden bg-gray-900 border-t border-gray-800 shadow-2xl">
+                    <div className="px-4 pt-4 pb-6 space-y-2">
                         {allNavLinks.map(link => (
-                            <button key={link.name} onClick={() => { navigate(link.page, link.params); setIsMenuOpen(false); }} className="text-gray-300 hover:bg-gray-700 hover:text-white block w-full text-right px-3 py-2 rounded-md text-base font-medium">{link.name}</button>
+                            <button key={link.name} onClick={() => { navigate(link.page, link.params); setIsMenuOpen(false); }} className="text-gray-300 hover:bg-gray-800 hover:text-gold-500 block w-full text-right px-4 py-3 rounded-lg text-base font-medium transition-all">{link.name}</button>
                         ))}
                         {isAdmin && (
-                            <button onClick={() => { navigate('admin'); setIsMenuOpen(false); }} className="text-gray-300 bg-indigo-600 hover:bg-indigo-700 block w-full text-right px-3 py-2 rounded-md text-base font-medium">{t('adminPanel')}</button>
+                            <button onClick={() => { navigate('admin'); setIsMenuOpen(false); }} className="text-indigo-300 bg-indigo-900 bg-opacity-20 border border-indigo-800 block w-full text-right px-4 py-3 rounded-lg text-base font-bold transition-all uppercase tracking-widest mt-4">{t('adminPanel')}</button>
                         )}
-                         <LanguageSwitcher />
+                        <div className="pt-4 flex justify-between items-center px-4">
+                            <LanguageSwitcher />
+                        </div>
                     </div>
-                    <div className="pt-4 pb-3 border-t border-gray-700">
+                    <div className="pt-4 pb-8 border-t border-gray-800">
                         {isAuthenticated ? (
-                            <div className="px-2 space-y-1">
-                                <div className="flex items-center px-3 mb-2">
+                            <div className="px-4 space-y-2">
+                                <div className="flex items-center px-4 py-3 bg-gray-800 rounded-xl mb-4">
                                     <div className="ms-3 flex-grow text-right">
-                                        <div className="text-base font-medium leading-none text-white">{user.name}</div>
-                                        <div className="text-sm font-medium leading-none text-gray-400">{user.email}</div>
+                                        <div className="text-lg font-bold text-white">{user.name}</div>
+                                        <div className="text-sm text-gray-400">{user.email}</div>
                                     </div>
-.                                </div>
-                                <button onClick={() => {navigate('profile'); setIsMenuOpen(false);}} className="block w-full text-right rounded-md px-3 py-2 text-base font-medium text-gray-400 hover:text-white hover:bg-gray-700">{t('myProfile')}</button>
-                                <button onClick={handleLogout} className="block w-full text-right rounded-md px-3 py-2 text-base font-medium text-gray-400 hover:text-white hover:bg-gray-700">{t('logout')}</button>
+                                </div>
+                                <button onClick={() => {navigate('profile'); setIsMenuOpen(false);}} className="block w-full text-right rounded-lg px-4 py-3 text-base font-medium text-gray-300 hover:bg-gray-800 transition-colors">{t('myProfile')}</button>
+                                <button onClick={handleLogout} className="block w-full text-right rounded-lg px-4 py-3 text-base font-medium text-red-400 hover:bg-gray-800 transition-colors">{t('logout')}</button>
                             </div>
                         ) : (
-                            <div className="px-2">
-                                <button onClick={() => { navigate('login'); setIsMenuOpen(false); }} className="w-full text-right text-gray-300 hover:bg-gray-700 hover:text-white block px-3 py-2 rounded-md text-base font-medium">{t('loginRegister')}</button>
+                            <div className="px-4">
+                                <button onClick={() => { navigate('login'); setIsMenuOpen(false); }} className="w-full text-center bg-gold-600 text-white block px-4 py-4 rounded-xl text-base font-bold shadow-lg shadow-gold-900/20">{t('loginRegister')}</button>
                             </div>
                         )}
                     </div>

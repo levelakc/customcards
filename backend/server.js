@@ -29,7 +29,8 @@ const io = new Server(server, {
     origin: [
       'https://customcards-app.onrender.com', // Production frontend
       'http://localhost:3000', // Local frontend for development
-      'https://vip-card.co.il'
+      'https://vip-card.co.il',
+      'https://www.vip-card.co.il'
     ],
     methods: ['GET', 'POST']
   }
@@ -60,7 +61,8 @@ const corsOptions = {
   origin: [
     'https://customcards-app.onrender.com', // Production frontend
     'http://localhost:3000', // Local frontend for development
-    'https://vip-card.co.il'
+    'https://vip-card.co.il',
+    'https://www.vip-card.co.il'
   ]
 };
 

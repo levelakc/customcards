@@ -31,7 +31,7 @@ ChartJS.register(
     Legend
 );
 
-const socket = io(process.env.REACT_APP_API_URL || 'http://localhost:8000');
+const socket = io(api.BASE_URL);
 
 export default function AdminDashboardPage() {
     const { t } = useTranslation();

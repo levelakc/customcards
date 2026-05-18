@@ -3,7 +3,7 @@
 // environment variable configuration on Render.
 import i18n from 'i18next';
 
-export const BASE_URL = process.env.REACT_APP_API_URL || 'http://localhost:8001';
+export const BASE_URL = process.env.REACT_APP_API_URL || (window.location.hostname === 'localhost' ? 'http://localhost:8001' : 'https://customcards-api.onrender.com');
 const getAuthHeaders = (token) => {
     return {
         'Content-Type': 'application/json',
