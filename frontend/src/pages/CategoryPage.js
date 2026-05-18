@@ -11,6 +11,7 @@ export default function CategoryPage() {
     const { t, i18n } = useTranslation();
     const [category, setCategory] = useState(null);
     const [products, setProducts] = useState([]);
+    const [searchTerm, setSearchTerm] = useState('');
     const [loading, setLoading] = useState(true);
     const [colorIndexes, setColorIndexes] = useState({}); // State to manage color indexes for each product
     const colorIntervalRef = useRef(null); // Ref to store the interval ID
@@ -78,33 +79,61 @@ export default function CategoryPage() {
     const currentLanguage = i18n.language || 'he';
     const categoryName = category.name?.[currentLanguage] || category.name?.he || category.name?.en || category.name || '';
 
+    const filteredProducts = products.filter(product => {
+        const name = product.name?.[currentLanguage] || product.name?.he || product.name?.en || product.name || '';
+        return name.toLowerCase().includes(searchTerm.toLowerCase());
+    });
+
     return (
         <div className="bg-gray-900 min-h-screen">
             <div className="max-w-7xl mx-auto py-12 px-4 sm:px-6 lg:px-8">
-                <h1 className="text-4xl font-extrabold text-white mb-8 font-dancing">{categoryName}</h1>
+                <div className="flex flex-col md:flex-row md:items-center justify-between mb-8 gap-4">
+                    <h1 className="text-4xl font-extrabold text-white font-dancing">{categoryName}</h1>
+                    
+                    <div className="relative w-full md:w-64">
+                        <input
+                            type="text"
+                            placeholder={t('filterDesigns')}
+                            value={searchTerm}
+                            onChange={(e) => setSearchTerm(e.target.value)}
+                            className="w-full bg-gray-800 text-white border border-gray-700 rounded-full py-2 px-4 pl-10 focus:outline-none focus:border-gold-500 transition-colors"
+                        />
+                        <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                            <svg className="h-5 w-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                            </svg>
+                        </div>
+                    </div>
+                </div>
+
                 <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-8">
-                    {products.map(product => {
-                        const cardColorKey = 
-                            product.availableColors && product.availableColors.length > 0
-                                ? nameToKeyMap[product.availableColors[colorIndexes[product._id] || 0]] || 'black'
-                                : 'black';
-                        const engravingColorKey = 
-                            product.availableColors && product.availableColors.length > 0
-                                ? (product.customization?.engraveColors && product.customization.engraveColors.length > 0
-                                    ? product.customization.engraveColors[0]
-                                    : getDefaultEngraving(nameToKeyMap[product.availableColors[colorIndexes[product._id] || 0]] || 'black'))
-                                : getDefaultEngraving('black');
-                        
-                        return (
-                            // Pass the dynamic color props to the component
-                            <ProductCard 
-                                key={product._id} 
-                                product={product}
-                                cardColorKey={cardColorKey}
-                                engravingColorKey={engravingColorKey}
-                            />
-                        );
-                    })}
+                    {filteredProducts.length > 0 ? (
+                        filteredProducts.map(product => {
+                            const cardColorKey = 
+                                product.availableColors && product.availableColors.length > 0
+                                    ? nameToKeyMap[product.availableColors[colorIndexes[product._id] || 0]] || 'black'
+                                    : 'black';
+                            const engravingColorKey = 
+                                product.availableColors && product.availableColors.length > 0
+                                    ? (product.customization?.engraveColors && product.customization.engraveColors.length > 0
+                                        ? product.customization.engraveColors[0]
+                                        : getDefaultEngraving(nameToKeyMap[product.availableColors[colorIndexes[product._id] || 0]] || 'black'))
+                                    : getDefaultEngraving('black');
+                            
+                            return (
+                                <ProductCard 
+                                    key={product._id} 
+                                    product={product}
+                                    cardColorKey={cardColorKey}
+                                    engravingColorKey={engravingColorKey}
+                                />
+                            );
+                        })
+                    ) : (
+                        <div className="col-span-full text-center py-10 text-gray-400">
+                            {t('noCategoriesOrProductsFound')}
+                        </div>
+                    )}
                 </div>
             </div>
         </div>
