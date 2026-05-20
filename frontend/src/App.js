@@ -30,8 +30,13 @@ import AllCategoriesPage from './pages/AllCategoriesPage'; // NEW: Import AllCat
 const GOOGLE_ANALYTICS_ID = 'YOUR_GOOGLE_ANALYTICS_ID'; // Replace with your Google Analytics ID
 const FACEBOOK_PIXEL_ID = 'YOUR_FACEBOOK_PIXEL_ID'; // Replace with your Facebook Pixel ID
 
-ReactGA.initialize(GOOGLE_ANALYTICS_ID);
-ReactPixel.init(FACEBOOK_PIXEL_ID);
+if (GOOGLE_ANALYTICS_ID && GOOGLE_ANALYTICS_ID !== 'YOUR_GOOGLE_ANALYTICS_ID') {
+    ReactGA.initialize(GOOGLE_ANALYTICS_ID);
+}
+
+if (FACEBOOK_PIXEL_ID && FACEBOOK_PIXEL_ID !== 'YOUR_FACEBOOK_PIXEL_ID') {
+    ReactPixel.init(FACEBOOK_PIXEL_ID);
+}
 
 function AppContent() {
     const { route } = useRouter();
@@ -39,8 +44,12 @@ function AppContent() {
     const { i18n } = useTranslation(); // Add useTranslation hook
 
     useEffect(() => {
-        ReactGA.send({ hitType: "pageview", page: window.location.pathname + window.location.search });
-        ReactPixel.pageView();
+        if (GOOGLE_ANALYTICS_ID && GOOGLE_ANALYTICS_ID !== 'YOUR_GOOGLE_ANALYTICS_ID') {
+            ReactGA.send({ hitType: "pageview", page: window.location.pathname + window.location.search });
+        }
+        if (FACEBOOK_PIXEL_ID && FACEBOOK_PIXEL_ID !== 'YOUR_FACEBOOK_PIXEL_ID') {
+            ReactPixel.pageView();
+        }
     }, [route]);
 
 

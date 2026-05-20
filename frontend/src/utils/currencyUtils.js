@@ -1,6 +1,6 @@
 // CustomCard/frontend/src/utils/currencyUtils.js
 
-const EXCHANGE_RATE_API_URL = 'https://api.frankfurter.app/latest';
+const EXCHANGE_RATE_API_URL = 'https://api.frankfurter.dev/v1/latest';
 const CACHE_DURATION = 3600000; // 1 hour in milliseconds
 
 let exchangeRateCache = {
