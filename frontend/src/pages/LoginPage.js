@@ -75,6 +75,9 @@ export default function LoginPage() {
                             </button>
                         </div>
                     </form>
+                    <div className="mt-4 text-center">
+                        <p className="text-[10px] text-gray-600">v1.0.4-fix</p>
+                    </div>
                 </div>
             </div>
         </div>
