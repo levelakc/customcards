@@ -5,21 +5,33 @@ import generateToken from '../utils/generateToken.js';
 // @desc    Auth user & get token
 // @route   POST /api/users/login
 const authUser = asyncHandler(async (req, res) => {
-    const { email, password } = req.body;
+    const email = req.body.email ? req.body.email.trim().toLowerCase() : '';
+    const password = req.body.password ? req.body.password.trim() : '';
+    
+    console.log(`Login attempt for: ${email}`);
     const user = await User.findOne({ email });
 
-    if (user && (await user.matchPassword(password))) {
-        res.json({
-            _id: user._id,
-            name: user.name,
-            email: user.email,
-            isAdmin: user.isAdmin,
-            token: generateToken(user._id),
-        });
+    if (user) {
+        console.log('User found in database');
+        const isMatch = await user.matchPassword(password);
+        console.log(`Password match: ${isMatch}`);
+        
+        if (isMatch) {
+            res.json({
+                _id: user._id,
+                name: user.name,
+                email: user.email,
+                isAdmin: user.isAdmin,
+                token: generateToken(user._id),
+            });
+            return;
+        }
     } else {
-        res.status(401);
-        throw new Error('Invalid email or password');
+        console.log('User not found in database');
     }
+
+    res.status(401);
+    throw new Error('Invalid email or password');
 });
 
 // @desc    Register a new user

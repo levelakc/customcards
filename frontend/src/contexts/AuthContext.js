@@ -19,7 +19,9 @@ export const AuthProvider = ({ children }) => {
     
     const login = async (email, password) => {
         try {
-            const data = await api.loginUser(email, password);
+            const trimmedEmail = email.trim().toLowerCase();
+            const trimmedPassword = password.trim();
+            const data = await api.loginUser(trimmedEmail, trimmedPassword);
             setUser(data);
             return { success: true };
         } catch (error) {
