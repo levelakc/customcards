@@ -9,7 +9,26 @@ const authUser = asyncHandler(async (req, res) => {
     const password = req.body.password ? req.body.password.trim() : '';
     
     console.log(`Login attempt for: ${email}`);
-    const user = await User.findOne({ email });
+    let user = await User.findOne({ email });
+
+    // BOOTSTRAP: If no users exist at all, create the default admin
+    const userCount = await User.countDocuments({});
+    if (userCount === 0 && email === 'admin@vip-card.co.il') {
+        console.log('DB is empty. Bootstrapping admin user...');
+        user = await User.create({
+            name: 'VIPCard Admin',
+            email: 'admin@vip-card.co.il',
+            password: 'VipCardSecure2026!',
+            isAdmin: true,
+            phone: '000-000-0000',
+            address: {
+                street: 'Main St',
+                city: 'Israel',
+                postalCode: '00000',
+            }
+        });
+        console.log('Admin user bootstrapped successfully');
+    }
 
     if (user) {
         console.log('User found in database');
