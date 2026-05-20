@@ -1,9 +1,11 @@
 import React, { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useRouter } from '../contexts/RouterContext';
 import { useAuth } from '../contexts/AuthContext';
 import { EyeIcon, EyeOffIcon } from '../components/Icons';
 
 export default function LoginPage() {
+    const { t } = useTranslation();
     const { navigate } = useRouter();
     const { login } = useAuth();
     const [email, setEmail] = useState('');
@@ -61,7 +63,7 @@ export default function LoginPage() {
                                 </button>
                             </div>
                         </div>
-                        {error && <p className="text-red-400 text-sm text-center">{error}</p>}
+                        {error && <p className="text-red-400 text-sm text-center">{t(error)}</p>}
                         <div className="text-sm text-center">
                            <button type="button" onClick={() => navigate('register')} className="font-medium text-indigo-400 hover:text-indigo-300">
                                 אין לך חשבון? הירשם כאן
