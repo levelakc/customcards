@@ -49,11 +49,38 @@ const ProductCard = ({ product, disableClick = false, isMobile }) => {
         navigate('product', { id: product._id });
     }
 
+    const handleShare = (e) => {
+        e.stopPropagation();
+        const shareData = {
+            title: productName,
+            text: productDescription,
+            url: `${window.location.origin}/product?id=${product._id}`
+        };
+
+        if (navigator.share) {
+            navigator.share(shareData).catch(console.error);
+        } else {
+            // Fallback to WhatsApp
+            const whatsappUrl = `https://wa.me/?text=${encodeURIComponent(`${productName} - ${window.location.origin}/product?id=${product._id}`)}`;
+            window.open(whatsappUrl, '_blank');
+        }
+    };
+
     return (
         <div 
             onClick={handleClick}
-            className="group flex flex-col h-full cursor-pointer"
+            className="group flex flex-col h-full cursor-pointer relative"
         >
+            {/* Share Button Overlay */}
+            <button 
+                onClick={handleShare}
+                className="absolute top-4 right-4 z-20 p-3 bg-black/40 backdrop-blur-md border border-white/10 rounded-2xl text-white opacity-0 group-hover:opacity-100 transition-all duration-300 hover:bg-gold-500 hover:text-black hover:border-gold-500 shadow-xl"
+                title={t('share')}
+            >
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z" />
+                </svg>
+            </button>
             <div 
                 className="transition-transform duration-300 md:group-hover:-translate-y-2 relative z-0"
                 style={{ transform: 'translateZ(0)' }}

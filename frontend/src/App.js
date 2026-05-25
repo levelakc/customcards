@@ -8,6 +8,7 @@ import ReactPixel from 'react-facebook-pixel';
 import { useTranslation } from 'react-i18next';
 
 import Navbar from './components/Navbar';
+import Breadcrumbs from './components/Breadcrumbs';
 import Footer from './components/Footer';
 import CartPopup from './components/CartPopup';
 import FloatingWhatsApp from './components/FloatingWhatsApp';
@@ -78,7 +79,10 @@ function AppContent() {
     return (
         <div dir={i18n.dir()} className="w-full overflow-x-hidden bg-gray-900 font-sans">
             <Navbar />
-            <main className="pt-20">{renderPage()}</main>
+            <main className="pt-20">
+                <Breadcrumbs />
+                {renderPage()}
+            </main>
             <Footer />
             <CartPopup isVisible={showPopup} onClose={() => setShowPopup(false)} />
             <FloatingWhatsApp />

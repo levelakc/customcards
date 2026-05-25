@@ -3,16 +3,20 @@ import * as api from '../api/api';
 import ProductCard from '../components/ProductCard';
 import { useTranslation } from 'react-i18next';
 import { ALL_CARD_COLORS } from '../utils/colorUtils';
+import { useRouter } from '../contexts/RouterContext';
 
 export default function BrowsePage() {
     const { t } = useTranslation();
+    const { route, navigate } = useRouter();
     const [products, setProducts] = useState([]);
     const [categories, setCategories] = useState([]);
     const [loading, setLoading] = useState(true);
-    const [selectedCategory, setSelectedCategory] = useState(null);
-    const [selectedColors, setSelectedColors] = useState([]);
-    const [searchTerm, setSearchTerm] = useState('');
     const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+
+    // Derived state from URL params
+    const selectedCategory = route.params.category || null;
+    const selectedColors = route.params.colors ? route.params.colors.split(',') : [];
+    const searchTerm = route.params.q || '';
 
     useEffect(() => {
         const fetchData = async () => {
@@ -33,10 +37,30 @@ export default function BrowsePage() {
         fetchData();
     }, []);
 
+    const updateFilters = (newParams) => {
+        const updatedParams = { ...route.params, ...newParams };
+        // Remove empty values
+        Object.keys(updatedParams).forEach(key => {
+            if (!updatedParams[key] || updatedParams[key] === '') {
+                delete updatedParams[key];
+            }
+        });
+        navigate('browse', updatedParams);
+    };
+
     const toggleColor = (color) => {
-        setSelectedColors(prev => 
-            prev.includes(color) ? prev.filter(c => c !== color) : [...prev, color]
-        );
+        const newColors = selectedColors.includes(color) 
+            ? selectedColors.filter(c => c !== color) 
+            : [...selectedColors, color];
+        updateFilters({ colors: newColors.join(',') });
+    };
+
+    const handleCategoryClick = (catId) => {
+        updateFilters({ category: catId === selectedCategory ? null : catId });
+    };
+
+    const handleSearchChange = (e) => {
+        updateFilters({ q: e.target.value });
     };
 
     const filteredProducts = products.filter(product => {
@@ -93,7 +117,7 @@ export default function BrowsePage() {
                                     <input 
                                         type="text"
                                         value={searchTerm}
-                                        onChange={(e) => setSearchTerm(e.target.value)}
+                                        onChange={handleSearchChange}
                                         placeholder={t('filterDesigns')}
                                         className="w-full bg-black/40 border border-white/10 rounded-2xl py-4 pr-12 pl-4 focus:outline-none focus:border-gold-500/50 transition-all shadow-inner text-sm text-white placeholder:text-gray-600"
                                     />
@@ -111,7 +135,7 @@ export default function BrowsePage() {
                                 </div>
                                 <div className="flex flex-col gap-3">
                                     <button 
-                                        onClick={() => setSelectedCategory(null)}
+                                        onClick={() => handleCategoryClick(null)}
                                         className={`category-pill w-full text-right px-6 py-3 rounded-2xl text-xs font-black uppercase tracking-widest transition-all duration-500 border ${!selectedCategory ? 'bg-gold-500 text-black border-gold-500 shadow-[0_10px_30px_rgba(212,175,55,0.3)]' : 'bg-white/5 border-white/5 text-gray-500 hover:border-white/20 hover:text-white'}`}
                                     >
                                         {t('allProducts')}
@@ -119,7 +143,7 @@ export default function BrowsePage() {
                                     {categories.map(cat => (
                                         <button 
                                             key={cat._id}
-                                            onClick={() => setSelectedCategory(cat._id)}
+                                            onClick={() => handleCategoryClick(cat._id)}
                                             className={`category-pill w-full text-right px-6 py-3 rounded-2xl text-xs font-black uppercase tracking-widest transition-all duration-500 border ${selectedCategory === cat._id ? 'bg-gold-500 text-black border-gold-500 shadow-[0_10px_30px_rgba(212,175,55,0.3)]' : 'bg-white/5 border-white/5 text-gray-500 hover:border-white/20 hover:text-white'}`}
                                         >
                                             {cat.name}
@@ -168,7 +192,7 @@ export default function BrowsePage() {
                                     </p>
                                 </div>
                                 <button 
-                                    onClick={() => {setSelectedCategory(null); setSelectedColors([]); setSearchTerm('');}}
+                                    onClick={() => updateFilters({ category: null, colors: null, q: null })}
                                     className="text-[10px] uppercase tracking-widest text-gray-500 hover:text-white transition-colors font-bold"
                                 >
                                     {t('reset')}
@@ -197,7 +221,7 @@ export default function BrowsePage() {
                                 <h3 className="text-2xl font-bold text-gray-300 mb-2">{t('noProductsFound')}</h3>
                                 <p className="text-gray-500 mb-8 max-w-md mx-auto">{t('noSalesByCategory')}</p>
                                 <button 
-                                    onClick={() => {setSelectedCategory(null); setSelectedColors([]); setSearchTerm('');}}
+                                    onClick={() => updateFilters({ category: null, colors: null, q: null })}
                                     className="px-8 py-3 bg-gray-800 hover:bg-gray-700 text-gold-500 border border-gold-500/30 rounded-full font-bold transition-all"
                                 >
                                     {t('clearAllFilters')}
