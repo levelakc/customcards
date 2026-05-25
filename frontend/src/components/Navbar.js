@@ -34,8 +34,9 @@ export default function Navbar() {
 
     const allNavLinks = [
         { name: t('homePage'), page: 'home' },
+        { name: t('browseProducts'), page: 'browse' },
         ...categories.map(c => ({ 
-            name: c.name?.[i18n.language] || c.name?.he || c.name?.en || c.name || '', 
+            name: c.name, 
             page: 'category', 
             params: { id: c._id } 
         }))
