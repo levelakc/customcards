@@ -1,12 +1,16 @@
 import React, { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useRouter } from '../contexts/RouterContext';
 import { useAuth } from '../contexts/AuthContext';
+import { EyeIcon, EyeOffIcon } from '../components/Icons';
 
 export default function LoginPage() {
+    const { t } = useTranslation();
     const { navigate } = useRouter();
     const { login } = useAuth();
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
+    const [showPassword, setShowPassword] = useState(false);
     const [error, setError] = useState('');
     const [loading, setLoading] = useState(false);
 
@@ -39,11 +43,27 @@ export default function LoginPage() {
                         </div>
                         <div>
                             <label htmlFor="password" className="block text-sm font-medium text-gray-300">סיסמה</label>
-                            <div className="mt-1">
-                                <input id="password" name="password" type="password" autoComplete="current-password" required value={password} onChange={e => setPassword(e.target.value)} className="appearance-none block w-full px-3 py-2 border border-gray-600 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm bg-gray-700 text-white" />
+                            <div className="mt-1 relative">
+                                <input 
+                                    id="password" 
+                                    name="password" 
+                                    type={showPassword ? "text" : "password"} 
+                                    autoComplete="current-password" 
+                                    required 
+                                    value={password} 
+                                    onChange={e => setPassword(e.target.value)} 
+                                    className="appearance-none block w-full px-3 py-2 border border-gray-600 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm bg-gray-700 text-white pl-10 text-right" 
+                                />
+                                <button
+                                    type="button"
+                                    className="absolute inset-y-0 left-0 pl-3 flex items-center text-gray-400 hover:text-white focus:outline-none"
+                                    onClick={() => setShowPassword(!showPassword)}
+                                >
+                                    {showPassword ? <EyeOffIcon /> : <EyeIcon />}
+                                </button>
                             </div>
                         </div>
-                        {error && <p className="text-red-400 text-sm text-center">{error}</p>}
+                        {error && <p className="text-red-400 text-sm text-center">{t(error)}</p>}
                         <div className="text-sm text-center">
                            <button type="button" onClick={() => navigate('register')} className="font-medium text-indigo-400 hover:text-indigo-300">
                                 אין לך חשבון? הירשם כאן
@@ -55,6 +75,9 @@ export default function LoginPage() {
                             </button>
                         </div>
                     </form>
+                    <div className="mt-4 text-center">
+                        <p className="text-[10px] text-gray-600">v1.0.4-fix</p>
+                    </div>
                 </div>
             </div>
         </div>

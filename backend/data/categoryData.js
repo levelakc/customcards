@@ -1,7 +1,3 @@
-const categories = [
-  { name: 'כרטיסים קלאסיים' },
-  { name: 'כרטיסי יוקרה' },
-  { name: 'עיצובים מותאמים אישית' },
-];
+const categories = [];
 
 export default categories;

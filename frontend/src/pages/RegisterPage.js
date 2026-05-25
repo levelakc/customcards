@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useRouter } from '../contexts/RouterContext';
 import { useAuth } from '../contexts/AuthContext';
+import { EyeIcon, EyeOffIcon } from '../components/Icons';
 
 export default function RegisterPage() {
     const { navigate } = useRouter();
@@ -8,6 +9,7 @@ export default function RegisterPage() {
     const [name, setName] = useState('');
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
+    const [showPassword, setShowPassword] = useState(false);
     const [phone, setPhone] = useState('');
     const [street, setStreet] = useState('');
     const [city, setCity] = useState('');
@@ -55,7 +57,22 @@ export default function RegisterPage() {
                         </div>
                         <div>
                             <label className="block text-sm font-medium text-gray-300">סיסמה</label>
-                            <input type="password" value={password} onChange={e => setPassword(e.target.value)} required className="appearance-none block w-full px-3 py-2 border border-gray-600 rounded-md bg-gray-700 text-white"/>
+                            <div className="mt-1 relative">
+                                <input 
+                                    type={showPassword ? "text" : "password"} 
+                                    value={password} 
+                                    onChange={e => setPassword(e.target.value)} 
+                                    required 
+                                    className="appearance-none block w-full px-3 py-2 border border-gray-600 rounded-md bg-gray-700 text-white pl-10 text-right"
+                                />
+                                <button
+                                    type="button"
+                                    className="absolute inset-y-0 left-0 pl-3 flex items-center text-gray-400 hover:text-white focus:outline-none"
+                                    onClick={() => setShowPassword(!showPassword)}
+                                >
+                                    {showPassword ? <EyeOffIcon /> : <EyeIcon />}
+                                </button>
+                            </div>
                         </div>
                         <div>
                             <label className="block text-sm font-medium text-gray-300">מספר טלפון</label>

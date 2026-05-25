@@ -1,8 +1,11 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { RouterProvider, useRouter } from './contexts/RouterContext';
 import { AuthProvider } from './contexts/AuthContext';
 import { CartProvider, useCart } from './contexts/CartContext';
 import { SiteSettingsProvider } from './contexts/SiteSettingsContext';
+import ReactGA from 'react-ga4';
+import ReactPixel from 'react-facebook-pixel';
+import { useTranslation } from 'react-i18next';
 
 import Navbar from './components/Navbar';
 import Footer from './components/Footer';
@@ -21,10 +24,34 @@ import ProfilePage from './pages/ProfilePage';
 import AccessibilityPage from './pages/AccessibilityPage';
 import PolicyPage from './pages/PolicyPage';
 import CheckoutPage from './pages/CheckoutPage';
+import SearchPage from './pages/SearchPage';
+import AllCategoriesPage from './pages/AllCategoriesPage'; // NEW: Import AllCategoriesPage
+
+const GOOGLE_ANALYTICS_ID = 'YOUR_GOOGLE_ANALYTICS_ID'; // Replace with your Google Analytics ID
+const FACEBOOK_PIXEL_ID = 'YOUR_FACEBOOK_PIXEL_ID'; // Replace with your Facebook Pixel ID
+
+if (GOOGLE_ANALYTICS_ID && GOOGLE_ANALYTICS_ID !== 'YOUR_GOOGLE_ANALYTICS_ID') {
+    ReactGA.initialize(GOOGLE_ANALYTICS_ID);
+}
+
+if (FACEBOOK_PIXEL_ID && FACEBOOK_PIXEL_ID !== 'YOUR_FACEBOOK_PIXEL_ID') {
+    ReactPixel.init(FACEBOOK_PIXEL_ID);
+}
 
 function AppContent() {
     const { route } = useRouter();
     const { showPopup, setShowPopup } = useCart();
+    const { i18n } = useTranslation(); // Add useTranslation hook
+
+    useEffect(() => {
+        if (GOOGLE_ANALYTICS_ID && GOOGLE_ANALYTICS_ID !== 'YOUR_GOOGLE_ANALYTICS_ID') {
+            ReactGA.send({ hitType: "pageview", page: window.location.pathname + window.location.search });
+        }
+        if (FACEBOOK_PIXEL_ID && FACEBOOK_PIXEL_ID !== 'YOUR_FACEBOOK_PIXEL_ID') {
+            ReactPixel.pageView();
+        }
+    }, [route]);
+
 
     const renderPage = () => {
         switch (route.page) {
@@ -40,14 +67,16 @@ function AppContent() {
             case 'accessibility': return <AccessibilityPage />;
             case 'policy': return <PolicyPage />;
             case 'checkout': return <CheckoutPage />;
+            case 'search': return <SearchPage />;
+            case 'all-categories': return <AllCategoriesPage />; // NEW: Add AllCategoriesPage route
             default: return <HomePage />;
         }
     };
 
     return (
-        <div dir="rtl" className="bg-gray-900 font-sans">
+        <div dir={i18n.dir()} className="w-full overflow-x-hidden bg-gray-900 font-sans">
             <Navbar />
-            <main>{renderPage()}</main>
+            <main className="pt-20">{renderPage()}</main>
             <Footer />
             <CartPopup isVisible={showPopup} onClose={() => setShowPopup(false)} />
             <FloatingWhatsApp />
