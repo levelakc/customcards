@@ -1,20 +1,19 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { useTranslation } from 'react-i18next';
 import * as api from '../api/api';
 import Carousel3D from '../components/Carousel3D';
-import CategoryProductGallery from '../components/CategoryProductGallery'; // Import the new component
+import CategoryGallery from '../components/CategoryGallery';
 import PersonalDesignPage from './PersonalDesignPage';
-import AnimatedSection from '../components/AnimatedSection';
 import AboutUs from '../components/AboutUs';
 import Reviews from '../components/Reviews';
 import RealLifeGallery from '../components/RealLifeGallery'; 
 
 const MAX_CAROUSEL_ITEMS = 12;
+const MOBILE_BREAKPOINT = 768;
 
 export default function HomePage() {
-    const { t, i18n } = useTranslation();
     const [featured, setFeatured] = useState([]);
-    // const [allCategories, setAllCategories] = useState([]); // Removed
+    const [galleryItems, setGalleryItems] = useState([]);
+    const [scrollPosition, setScrollPosition] = useState(0);
     const [backgroundVideoUrl, setBackgroundVideoUrl] = useState('');
     const [videoOpacity, setVideoOpacity] = useState(0.3);
     const designsSectionRef = useRef(null);
@@ -46,22 +45,27 @@ export default function HomePage() {
                 setBackgroundVideoUrl(settings.backgroundVideoUrl);
                 setVideoOpacity(settings.videoOpacity);
 
-                // const fetchedCategories = await api.getCategories(); // No longer needed here
-                // setAllCategories(fetchedCategories); // No longer needed here
-
                 const allProducts = await api.getProducts();
+                const allCategories = await api.getCategories();
                 
                 const usedProductIds = new Set();
                 
-                // Use a dummy categories array or fetch if needed for carousel, but not for CategoryProductGallery
-                // For simplicity, let's assume we can get categories for carousel logic from fetchedCategories if needed.
-                // However, the original logic already fetches products and then filters based on category,
-                // so we don't strictly need to fetch categories here unless `fetchedCategories` is used later for other logic.
-                // Re-introducing a minimal category fetch for existing carousel logic if `fetchedCategories` is not removed above.
-                const fetchedCategoriesForCarousel = await api.getCategories(); 
+                const galleryProducts = [];
+                allCategories.forEach(category => {
+                    const productsInCategory = allProducts.filter(p => p.category?._id === category._id);
+                    if (productsInCategory.length > 0) {
+                        const randomIndex = Math.floor(Math.random() * productsInCategory.length);
+                        const product = productsInCategory[randomIndex];
+                        if (product && product._id && !usedProductIds.has(product._id)) {
+                           galleryProducts.push(product);
+                           usedProductIds.add(product._id);
+                        }
+                    }
+                });
+                setGalleryItems(galleryProducts);
 
                 const carouselProducts = [];
-                fetchedCategoriesForCarousel.forEach(category => {
+                allCategories.forEach(category => {
                     const productsInCategory = allProducts.filter(p => p.category?._id === category._id);
                     if (productsInCategory.length > 0) {
                         let productToAdd = productsInCategory.find(p => !usedProductIds.has(p._id));
@@ -88,10 +92,15 @@ export default function HomePage() {
             } catch (err) {
                 console.error("Failed to fetch initial data:", err);
                 setFeatured([]);
+                setGalleryItems([]);
             }
         };
         fetchInitialData();
-    }, [i18n.language, t]);
+
+        const handleScroll = () => setScrollPosition(window.pageYOffset);
+        window.addEventListener('scroll', handleScroll, { passive: true });
+        return () => window.removeEventListener('scroll', handleScroll);
+    }, []);
 
     const handleScrollToDesigns = () => {
         designsSectionRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -142,63 +151,51 @@ export default function HomePage() {
 
                 <div className="z-10 p-5">
                     <h1 
-                        className="text-5xl md:text-7xl font-extrabold mb-4 drop-shadow-lg font-dancing"
+                        className="text-5xl md:text-7xl font-extrabold mb-4 drop-shadow-lg"
                         style={{
                             transition: 'transform 0.2s ease-out'
                         }}
                     >
                         <span className="shimmer-text">
-                            {t('heroTitle')}
+                            כרטיסי אשראי ממתכת. העיצוב שלך.
                         </span>
                     </h1>
-                    <p className="text-xl md:text-2xl mb-8 drop-shadow-md">{t('heroDescription')}</p>
+                    <p className="text-xl md:text-2xl mb-8 drop-shadow-md">הפוך את כרטיס הפלסטיק המשעמם שלך ליצירת אומנות ממתכת יוקרתית.</p>
                     <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
                         <button 
                             onClick={handleScrollToDesigns} 
                             className="bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 px-8 rounded-full text-lg transition duration-300 transform hover:scale-105"
                         >
-                            {t('viewCollectionButton')}
+                            צפה בקולקציה
                         </button>
                         <button 
                             onClick={handleScrollToPersonalDesign} 
                             className="bg-green-600 hover:bg-green-700 text-white font-bold py-3 px-8 rounded-full text-lg transition duration-300 transform hover:scale-105"
                         >
-                            {t('tryDesignYourselfButton')}
+                            נסה לעצב בעצמך
                         </button>
                     </div>
                 </div>
             </div>
             
-            <AnimatedSection animation="fade-in-up">
-                <AboutUs />
-            </AnimatedSection>
+            <AboutUs />
 
-            <AnimatedSection animation="fade-in-left">
-                <div ref={designsSectionRef} className="py-20">
-                    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                        <h2 className="text-3xl font-extrabold text-white text-center mb-16">{t('ourDesignsTitle')}</h2>
-                        {featured.length > 0 ? <Carousel3D items={featured} /> : <div className="text-center text-gray-400 py-10">{t('loadingDesigns')}</div>}
-                    </div>
+            <div ref={designsSectionRef} className="py-20">
+                <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                    <h2 className="text-3xl font-extrabold text-white text-center mb-16">העיצובים שלנו</h2>
+                    {featured.length > 0 ? <Carousel3D items={featured} /> : <div className="text-center text-gray-400 py-10">טוען עיצובים...</div>}
                 </div>
-            </AnimatedSection>
+            </div>
 
-            <AnimatedSection animation="fade-in-right">
-                <CategoryProductGallery />
-            </AnimatedSection>
+            {galleryItems.length > 0 && <CategoryGallery items={galleryItems} />}
 
-            <AnimatedSection animation="fade-in-up">
-                <div ref={personalDesignSectionRef}>
-                    <PersonalDesignPage />
-                </div>
-            </AnimatedSection>
+            <div ref={personalDesignSectionRef}>
+                <PersonalDesignPage />
+            </div>
 
-            <AnimatedSection animation="fade-in-left">
-                <RealLifeGallery />
-            </AnimatedSection>
+            <RealLifeGallery />
 
-            <AnimatedSection animation="fade-in-right">
-                <Reviews />
-            </AnimatedSection>
+            <Reviews />
         </div>
     );
 }

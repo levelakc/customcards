@@ -6,14 +6,15 @@ import * as api from '../api/api';
 import CreditCardPreview from '../components/CreditCardPreview';
 import WalletPreview from '../components/WalletPreview';
 import Modal from '../components/Modal';
-import { parseFullDescription } from '../utils/colorUtils'; // Import the new utility function
-import { useTranslation } from 'react-i18next'; // Import useTranslation
 
 export default function CartPage() {
-    const { cartItems, removeFromCart, updateQuantity, addToCart } = useCart();
     const { navigate } = useRouter();
+    const { cartItems, removeFromCart, updateQuantity, addToCart } = useCart();
+// ... existing code ...
+    const { user } = useAuth();
     const [isUpsellModalOpen, setIsUpsellModalOpen] = useState(false);
     const [upsellProduct, setUpsellProduct] = useState(null);
+    const [loadingUpsell, setLoadingUpsell] = useState(true);
     const [customSvgUrl, setCustomSvgUrl] = useState(null);
     const [customization, setCustomization] = useState({
         position: { x: 50, y: 50 },
@@ -21,9 +22,6 @@ export default function CartPage() {
         rotation: 0,
     });
     const [selectedFile, setSelectedFile] = useState(null);
-    const { t, i18n } = useTranslation(); // Initialize useTranslation
-
-    const currentLanguage = i18n.language || 'he';
 
     useEffect(() => {
         if (selectedFile) {
@@ -39,11 +37,14 @@ export default function CartPage() {
     useEffect(() => {
         const fetchUpsellProduct = async () => {
             try {
+                setLoadingUpsell(true);
                 const product = await api.getUpsellProduct();
                 setUpsellProduct(product);
             } catch (error) {
                 console.error("Could not fetch upsell product:", error);
                 setUpsellProduct(null); // Ensure it's null if there's an error
+            } finally {
+                setLoadingUpsell(false);
             }
         };
 
@@ -53,6 +54,10 @@ export default function CartPage() {
     const subtotal = cartItems.reduce((sum, item) => sum + item.price * item.quantity, 0);
 
     const handleProceedToCheckout = () => {
+        if (!user) {
+            navigate('login');
+            return;
+        }
         // Only show the modal if there is an upsell product and it's not already in the cart
         if (upsellProduct && !cartItems.some(item => item._id === upsellProduct._id)) {
             setIsUpsellModalOpen(true);
@@ -87,13 +92,13 @@ export default function CartPage() {
     if (cartItems.length === 0) {
         return (
             <div className="bg-gray-900 min-h-screen text-white flex flex-col items-center justify-center">
-                <h1 className="text-4xl font-extrabold mb-4 font-dancing">{t('emptyCartTitle')}</h1>
-                <p className="text-xl text-gray-400 mb-8">{t('emptyCartMessage')}</p>
+                <h1 className="text-4xl font-extrabold mb-4">הסל שלך ריק</h1>
+                <p className="text-xl text-gray-400 mb-8">נראה שעדיין לא הוספת מוצרים.</p>
                 <button 
                     onClick={() => navigate('home')} 
                     className="bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 px-8 rounded-lg text-lg"
                 >
-                    {t('backToShopButton')}
+                    חזרה לחנות
                 </button>
             </div>
         );
@@ -102,7 +107,7 @@ export default function CartPage() {
     return (
         <div className="bg-gray-900 min-h-screen text-white">
             <div className="max-w-4xl mx-auto py-12 px-4 sm:px-6 lg:px-8">
-                <h1 className="text-4xl font-extrabold mb-8 font-dancing">{t('yourCartTitle')}</h1>
+                <h1 className="text-4xl font-extrabold mb-8">סל הקניות שלך</h1>
                 <div className="bg-gray-800 rounded-lg shadow-xl">
                     <ul className="divide-y divide-gray-700">
                         {cartItems.map(item => (
@@ -117,22 +122,17 @@ export default function CartPage() {
                                             svgRotation={item.customization?.rotation}
                                         />
                                     ) : (
-                                        (() => {
-                                            const { cardColorKey, engravingColorKey } = parseFullDescription(item.selectedColor, t);
-                                            return (
-                                                <CreditCardPreview
-                                                    cardColor={cardColorKey}
-                                                    engravingColor={engravingColorKey}
-                                                    logoUrl={item.image}
-                                                    isDraggable={false}
-                                                />
-                                            );
-                                        })()
+                                        <CreditCardPreview
+                                            cardColor={item.selectedColor?.split(' ')[0].toLowerCase() || 'black'}
+                                            engravingColor={item.selectedColor?.split(' ')[2] || 'silver'}
+                                            logoUrl={item.image}
+                                            isDraggable={false}
+                                        />
                                     )}
                                 </div>
                                 <div className="flex-grow">
-                                    <h2 className="text-lg sm:text-xl font-bold">{item.name?.[currentLanguage] || item.name?.he || item.name?.en || item.name || ''}</h2>
-                                    <p className="text-sm text-gray-400">{t('color')}: {item.selectedColor}</p>
+                                    <h2 className="text-lg sm:text-xl font-bold">{item.name}</h2>
+                                    <p className="text-sm text-gray-400">צבע: {item.selectedColor}</p>
                                     <p className="text-lg font-semibold text-indigo-400 mt-1">₪{item.price}</p>
                                 </div>
                                 <div className="flex flex-col items-end space-y-2">
@@ -141,32 +141,32 @@ export default function CartPage() {
                                         <span className="px-3 py-1 text-lg">{item.quantity}</span>
                                         <button onClick={() => updateQuantity(item.cartItemId, item.quantity + 1)} className="px-3 py-1 text-lg">+</button>
                                     </div>
-                                    <button onClick={() => removeFromCart(item.cartItemId)} className="text-xs text-red-500 hover:underline">{t('remove')}</button>
+                                    <button onClick={() => removeFromCart(item.cartItemId)} className="text-xs text-red-500 hover:underline">הסר</button>
                                 </div>
                             </li>
                         ))}
                     </ul>
                     <div className="p-6 border-t border-gray-700">
                         <div className="flex justify-between items-center text-xl font-bold mb-4">
-                            <span>{t('subtotal')}:</span>
+                            <span>סך הכל:</span>
                             <span>₪{subtotal.toFixed(2)}</span>
                         </div>
                         <button 
                             onClick={handleProceedToCheckout} 
                             className="w-full bg-green-600 hover:bg-green-700 text-white font-bold py-3 rounded-lg text-lg"
                         >
-                            {t('proceedToCheckoutButton')}
+                            המשך לתשלום
                         </button>
                     </div>
                 </div>
             </div>
 
             {upsellProduct && (
-                <Modal isOpen={isUpsellModalOpen} onClose={handleFinalCheckout} title={t('customizeWalletTitle')}>
+                <Modal isOpen={isUpsellModalOpen} onClose={handleFinalCheckout} title="התאם אישית את הארנק שלך!">
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6 text-white">
                         {/* Left Side: Preview */}
                         <div className="flex flex-col items-center justify-center p-4 bg-gray-800 rounded-lg">
-                            <h4 className="text-lg font-semibold mb-4">{t('preview')}</h4>
+                            <h4 className="text-lg font-semibold mb-4">תצוגה מקדימה</h4>
                             <WalletPreview
                                 customSvgUrl={customSvgUrl}
                                 svgPosition={customization.position}
@@ -177,11 +177,11 @@ export default function CartPage() {
 
                         {/* Right Side: Controls */}
                         <div className="space-y-4">
-                            <h3 className="text-2xl font-bold">{t('addUpsellProduct', { productName: upsellProduct.name?.[currentLanguage] || upsellProduct.name?.he || upsellProduct.name?.en || upsellProduct.name || '' })}</h3>
-                            <p className="text-lg font-semibold text-indigo-400">{t('upsellPrice', { price: upsellProduct.price })}</p>
+                            <h3 className="text-2xl font-bold">הוסף {upsellProduct.name}</h3>
+                            <p className="text-lg font-semibold text-indigo-400">רק ב-₪{upsellProduct.price}!</p>
                             
                             <div>
-                                <label className="block mb-2 text-sm font-medium">{t('uploadPersonalDesignLabel')}</label>
+                                <label className="block mb-2 text-sm font-medium">העלה עיצוב אישי (SVG):</label>
                                 <input 
                                     type="file" 
                                     accept="image/svg+xml"
@@ -192,29 +192,29 @@ export default function CartPage() {
 
                             {customSvgUrl && (
                                 <div className="space-y-4 pt-4 border-t border-gray-700">
-                                    <h4 className="text-md font-semibold">{t('adjustDesignTitle')}:</h4>
+                                    <h4 className="text-md font-semibold">התאם את העיצוב:</h4>
                                     <div>
-                                        <label className="block text-sm">{t('positionX')}: {customization.position.x}</label>
+                                        <label className="block text-sm">מיקום X: {customization.position.x}</label>
                                         <input type="range" min="0" max="100" value={customization.position.x} onChange={(e) => setCustomization(c => ({ ...c, position: { ...c.position, x: parseInt(e.target.value) } }))} className="w-full"/>
                                     </div>
                                     <div>
-                                        <label className="block text-sm">{t('positionY')}: {customization.position.y}</label>
+                                        <label className="block text-sm">מיקום Y: {customization.position.y}</label>
                                         <input type="range" min="0" max="100" value={customization.position.y} onChange={(e) => setCustomization(c => ({ ...c, position: { ...c.position, y: parseInt(e.target.value) } }))} className="w-full"/>
                                     </div>
                                     <div>
-                                        <label className="block text-sm">{t('sizeZoom')}: {customization.scale}</label>
+                                        <label className="block text-sm">גודל (זום): {customization.scale}</label>
                                         <input type="range" min="0.5" max="2.5" step="0.05" value={customization.scale} onChange={(e) => setCustomization(c => ({ ...c, scale: parseFloat(e.target.value) }))} className="w-full"/>
                                     </div>
                                     <div>
-                                        <label className="block text-sm">{t('rotation')}: {customization.rotation}°</label>
+                                        <label className="block text-sm">סיבוב: {customization.rotation}°</label>
                                         <input type="range" min="0" max="360" value={customization.rotation} onChange={(e) => setCustomization(c => ({ ...c, rotation: parseInt(e.target.value) }))} className="w-full"/>
                                     </div>
                                 </div>
                             )}
 
                             <div className="flex justify-center gap-4 pt-4">
-                                <button onClick={handleAddUpsellItem} className="bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-6 rounded-lg">{t('addToCartButton')}</button>
-                                <button onClick={handleFinalCheckout} className="bg-gray-600 hover:bg-gray-700 text-white font-bold py-2 px-6 rounded-lg">{t('noThanksButton')}</button>
+                                <button onClick={handleAddUpsellItem} className="bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-6 rounded-lg">הוסף לעגלה</button>
+                                <button onClick={handleFinalCheckout} className="bg-gray-600 hover:bg-gray-700 text-white font-bold py-2 px-6 rounded-lg">לא, תודה</button>
                             </div>
                         </div>
                     </div>

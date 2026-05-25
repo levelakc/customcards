@@ -1,10 +1,8 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { useAuth } from '../contexts/AuthContext';
 import * as api from '../api/api';
-import { useTranslation } from 'react-i18next';
 
 function EditReviewModal({ review, onClose, onSave, token }) {
-    const { t } = useTranslation();
     const [comment, setComment] = useState(review.comment);
     const [rating, setRating] = useState(review.rating);
 
@@ -15,27 +13,27 @@ function EditReviewModal({ review, onClose, onSave, token }) {
     return (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center">
             <div className="bg-gray-800 p-6 rounded-lg w-full max-w-md">
-                <h3 className="text-xl font-bold mb-4">{t('editReview')}</h3>
+                <h3 className="text-xl font-bold mb-4">Edit Review</h3>
                 <div className="space-y-4">
                     <div>
-                        <label className="block mb-1 text-sm font-medium">{t('rating')}</label>
+                        <label className="block mb-1 text-sm font-medium">Rating</label>
                         <select value={rating} onChange={e => setRating(e.target.value)} required className="w-full bg-gray-700 rounded p-2 border border-gray-600">
-                            <option value="">{t('select')}...</option>
-                            <option value="1">1 - {t('poor')}</option>
-                            <option value="2">2 - {t('fair')}</option>
-                            <option value="3">3 - {t('good')}</option>
-                            <option value="4">4 - {t('veryGood')}</option>
-                            <option value="5">5 - {t('excellent')}</option>
+                            <option value="">Select...</option>
+                            <option value="1">1 - Poor</option>
+                            <option value="2">2 - Fair</option>
+                            <option value="3">3 - Good</option>
+                            <option value="4">4 - Very Good</option>
+                            <option value="5">5 - Excellent</option>
                         </select>
                     </div>
                     <div>
-                        <label className="block mb-1 text-sm font-medium">{t('comment')}</label>
+                        <label className="block mb-1 text-sm font-medium">Comment</label>
                         <textarea value={comment} onChange={e => setComment(e.target.value)} required rows="4" className="w-full bg-gray-700 rounded p-2 border border-gray-600"></textarea>
                     </div>
                 </div>
                 <div className="mt-6 flex justify-end space-x-4">
-                    <button onClick={onClose} className="bg-gray-600 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded">{t('cancel')}</button>
-                    <button onClick={handleSave} className="bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2 px-4 rounded">{t('save')}</button>
+                    <button onClick={onClose} className="bg-gray-600 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded">Cancel</button>
+                    <button onClick={handleSave} className="bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2 px-4 rounded">Save</button>
                 </div>
             </div>
         </div>
@@ -43,7 +41,6 @@ function EditReviewModal({ review, onClose, onSave, token }) {
 }
 
 export default function AdminReviewsPage() {
-    const { t } = useTranslation();
     const { token } = useAuth();
     const [reviews, setReviews] = useState([]);
     const [loading, setLoading] = useState(true);
@@ -67,7 +64,7 @@ export default function AdminReviewsPage() {
     }, [fetchReviews]);
 
     const handleDelete = async (id) => {
-        if (window.confirm(t('deleteReviewConfirmation'))) {
+        if (window.confirm('Are you sure you want to delete this review?')) {
             try {
                 await api.deleteReview(id, token);
                 fetchReviews();
@@ -87,20 +84,20 @@ export default function AdminReviewsPage() {
         }
     };
 
-    if (loading) return <p>{t('loadingReviews')}...</p>;
+    if (loading) return <p>Loading reviews...</p>;
     if (error) return <p className="text-red-500">{error}</p>;
 
     return (
         <div>
-            <h2 className="text-2xl font-bold mb-4">{t('reviewManagement')}</h2>
+            <h2 className="text-2xl font-bold mb-4">Manage Reviews</h2>
             <div className="bg-gray-800 rounded-lg overflow-x-auto">
                 <table className="w-full text-sm text-right text-gray-300">
                     <thead className="text-xs text-gray-400 uppercase bg-gray-700">
                         <tr>
-                            <th scope="col" className="px-6 py-3">{t('user')}</th>
-                            <th scope="col" className="px-6 py-3">{t('rating')}</th>
-                            <th scope="col" className="px-6 py-3">{t('comment')}</th>
-                            <th scope="col" className="px-6 py-3">{t('actions')}</th>
+                            <th scope="col" className="px-6 py-3">User</th>
+                            <th scope="col" className="px-6 py-3">Rating</th>
+                            <th scope="col" className="px-6 py-3">Comment</th>
+                            <th scope="col" className="px-6 py-3">Actions</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -110,8 +107,8 @@ export default function AdminReviewsPage() {
                                 <td className="px-6 py-4">{review.rating}</td>
                                 <td className="px-6 py-4">{review.comment}</td>
                                 <td className="px-6 py-4 space-x-2 space-x-reverse">
-                                    <button onClick={() => setEditingReview(review)} className="font-medium text-blue-500 hover:underline">{t('edit')}</button>
-                                    <button onClick={() => handleDelete(review._id)} className="font-medium text-red-500 hover:underline">{t('delete')}</button>
+                                    <button onClick={() => setEditingReview(review)} className="font-medium text-blue-500 hover:underline">Edit</button>
+                                    <button onClick={() => handleDelete(review._id)} className="font-medium text-red-500 hover:underline">Delete</button>
                                 </td>
                             </tr>
                         ))}

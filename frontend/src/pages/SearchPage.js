@@ -1,9 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import * as api from '../api/api';
-import { useTranslation } from 'react-i18next';
 
 export default function SearchPage() {
-    const { i18n } = useTranslation();
     const [keyword, setKeyword] = useState('');
     const [minPrice, setMinPrice] = useState('');
     const [maxPrice, setMaxPrice] = useState('');
@@ -13,7 +11,7 @@ export default function SearchPage() {
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState(null);
 
-    const availableColors = ['שחור', 'כסף', 'זהב', 'רוז גולד', 'צבעוני']; // Corrected available colors
+    const availableColors = ['שחור', 'כסף', 'זהב', 'רוז גולד', 'כחול', 'אדום']; // Example colors
     const availableEngraveColors = ['לבן', 'שחור', 'כסף', 'זהב']; // Example engrave colors
 
     const handleSearch = async (e) => {
@@ -37,12 +35,10 @@ export default function SearchPage() {
         }
     };
 
-    const currentLanguage = i18n.language || 'he';
-
     return (
         <div className="min-h-screen bg-gray-900 text-white py-12 px-4 sm:px-6 lg:px-8">
             <div className="max-w-3xl mx-auto">
-                <h1 className="text-4xl font-extrabold text-white mb-8 text-center font-dancing">חיפוש מוצרים</h1>
+                <h1 className="text-4xl font-extrabold text-white mb-8 text-center">חיפוש מוצרים</h1>
 
                 <form onSubmit={handleSearch} className="bg-gray-800 p-6 rounded-lg shadow-lg mb-8">
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
@@ -118,26 +114,22 @@ export default function SearchPage() {
 
                 {!loading && !error && results.length > 0 && (
                     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-                        {results.map((product) => {
-                            const productName = (product.name?.[currentLanguage] || product.name || '').toString();
-                            const productDescription = (product.description?.[currentLanguage] || product.description || '').toString();
-                            return (
-                                <div key={product._id} className="bg-gray-800 rounded-lg shadow-lg overflow-hidden">
-                                    <img src={product.image} alt={productName} className="w-full h-48 object-cover" />
-                                    <div className="p-4">
-                                        <h3 className="text-xl font-semibold text-white mb-2">{productName}</h3>
-                                        <p className="text-gray-300 text-sm mb-2">{productDescription.substring(0, 100)}...</p>
-                                        <p className="text-lg font-bold text-indigo-400 mb-4">₪{product.price}</p>
-                                        <button
-                                            onClick={() => { /* navigate to product page */ }}
-                                            className="w-full py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
-                                        >
-                                            צפה במוצר
-                                        </button>
-                                    </div>
+                        {results.map((product) => (
+                            <div key={product._id} className="bg-gray-800 rounded-lg shadow-lg overflow-hidden">
+                                <img src={product.image} alt={product.name} className="w-full h-48 object-cover" />
+                                <div className="p-4">
+                                    <h3 className="text-xl font-semibold text-white mb-2">{product.name}</h3>
+                                    <p className="text-gray-300 text-sm mb-2">{product.description.substring(0, 100)}...</p>
+                                    <p className="text-lg font-bold text-indigo-400 mb-4">₪{product.price}</p>
+                                    <button
+                                        onClick={() => { /* navigate to product page */ }}
+                                        className="w-full py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+                                    >
+                                        צפה במוצר
+                                    </button>
                                 </div>
-                            );
-                        })}
+                            </div>
+                        ))}
                     </div>
                 )}
 

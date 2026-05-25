@@ -1,8 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { useTranslation } from 'react-i18next';
 import io from 'socket.io-client';
 import { useAuth } from '../contexts/AuthContext';
-import { useCurrency } from '../contexts/CurrencyContext';
 import * as api from '../api/api';
 import {
     Chart as ChartJS,
@@ -31,11 +29,9 @@ ChartJS.register(
     Legend
 );
 
-const socket = io(api.BASE_URL);
+const socket = io(process.env.REACT_APP_API_URL || 'http://localhost:8000');
 
 export default function AdminDashboardPage() {
-    const { t } = useTranslation();
-    const { getSymbol, convert } = useCurrency();
     const { token } = useAuth();
     const [onlineUsers, setOnlineUsers] = useState(0);
     const [recentOrders, setRecentOrders] = useState([]);
@@ -118,8 +114,8 @@ export default function AdminDashboardPage() {
         labels: salesTrendData ? salesTrendData.map(data => data.date) : [],
         datasets: [
             {
-                label: t('revenue'),
-                data: salesTrendData ? salesTrendData.map(data => convert(data.totalRevenue)) : [],
+                label: 'Revenue',
+                data: salesTrendData ? salesTrendData.map(data => data.totalRevenue) : [],
                 borderColor: 'rgb(75, 192, 192)',
                 backgroundColor: 'rgba(75, 192, 192, 0.5)',
                 tension: 0.1,
@@ -138,7 +134,7 @@ export default function AdminDashboardPage() {
             },
             title: {
                 display: true,
-                text: t('revenueTrend'),
+                text: 'Revenue Trend (Last 30 Days)',
                 color: '#fff',
             },
             tooltip: {
@@ -149,7 +145,7 @@ export default function AdminDashboardPage() {
                             label += ': ';
                         }
                         if (context.parsed.y !== null) {
-                            label += getSymbol() + context.parsed.y.toFixed(2);
+                            label += new Intl.NumberFormat('en-US', { style: 'currency', currency: 'ILS' }).format(context.parsed.y);
                         }
                         return label;
                     }
@@ -169,7 +165,7 @@ export default function AdminDashboardPage() {
                 ticks: {
                     color: '#ccc',
                     callback: function(value) {
-                        return getSymbol() + value.toFixed(2);
+                        return new Intl.NumberFormat('en-US', { style: 'currency', currency: 'ILS' }).format(value);
                     }
                 },
                 grid: {
@@ -183,8 +179,8 @@ export default function AdminDashboardPage() {
         labels: topProducts ? topProducts.map(p => p.name) : [],
         datasets: [
             {
-                label: t('revenue'),
-                data: topProducts ? topProducts.map(p => convert(p.totalRevenue)) : [],
+                label: 'Revenue',
+                data: topProducts ? topProducts.map(p => p.totalRevenue) : [],
                 backgroundColor: 'rgba(153, 102, 255, 0.6)',
                 borderColor: 'rgba(153, 102, 255, 1)',
                 borderWidth: 1,
@@ -203,7 +199,7 @@ export default function AdminDashboardPage() {
             },
             title: {
                 display: true,
-                text: t('top5Products'),
+                text: 'Top 5 Selling Products by Revenue',
                 color: '#fff',
             },
             tooltip: {
@@ -214,7 +210,7 @@ export default function AdminDashboardPage() {
                             label += ': ';
                         }
                         if (context.parsed.y !== null) {
-                            label += getSymbol() + context.parsed.y.toFixed(2);
+                            label += new Intl.NumberFormat('en-US', { style: 'currency', currency: 'ILS' }).format(context.parsed.y);
                         }
                         return label;
                     }
@@ -234,7 +230,7 @@ export default function AdminDashboardPage() {
                 ticks: {
                     color: '#ccc',
                     callback: function(value) {
-                        return getSymbol() + value.toFixed(2);
+                        return new Intl.NumberFormat('en-US', { style: 'currency', currency: 'ILS' }).format(value);
                     }
                 },
                 grid: {
@@ -248,7 +244,7 @@ export default function AdminDashboardPage() {
         labels: salesByCategory ? salesByCategory.map(c => c.category) : [],
         datasets: [
             {
-                data: salesByCategory ? salesByCategory.map(c => convert(c.totalRevenue)) : [],
+                data: salesByCategory ? salesByCategory.map(c => c.totalRevenue) : [],
                 backgroundColor: [
                     'rgba(255, 99, 132, 0.6)',
                     'rgba(54, 162, 235, 0.6)',
@@ -281,7 +277,7 @@ export default function AdminDashboardPage() {
             },
             title: {
                 display: true,
-                text: t('salesByCategory'),
+                text: 'Sales by Category',
                 color: '#fff',
             },
             tooltip: {
@@ -292,7 +288,7 @@ export default function AdminDashboardPage() {
                             label += ': ';
                         }
                         if (context.parsed !== null) {
-                            label += getSymbol() + context.parsed.toFixed(2);
+                            label += new Intl.NumberFormat('en-US', { style: 'currency', currency: 'ILS' }).format(context.parsed);
                         }
                         return label;
                     }
@@ -301,76 +297,76 @@ export default function AdminDashboardPage() {
         },
     };
 
-    if (loading) return <div className="text-center p-10 text-white bg-gray-900 min-h-screen">{t('loadingDashboard')}...</div>;
-    if (error) return <div className="text-center p-10 text-red-400 bg-gray-900 min-h-screen">{t('error')}: {error}</div>;
+    if (loading) return <div className="text-center p-10 text-white bg-gray-900 min-h-screen">טוען לוח מחוונים...</div>;
+    if (error) return <div className="text-center p-10 text-red-400 bg-gray-900 min-h-screen">Error: {error}</div>;
 
     return (
         <div className="p-4 md:p-8 bg-gray-900 text-white min-h-screen">
-            <h2 className="text-3xl font-extrabold mb-6">{t('dashboardOverview')}</h2>
+            <h2 className="text-3xl font-extrabold mb-6">סקירת לוח מחוונים</h2>
 
             {/* Summary Cards */}
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-                <DashboardCard title={t('onlineUsers')} value={onlineUsers} />
-                <DashboardCard title={t('todaysRevenue')} value={`${getSymbol()}${convert(summaryStats.totalRevenueToday).toFixed(2)}`} />
-                <DashboardCard title={t('todaysOrders')} value={summaryStats.totalOrdersToday} />
-                <DashboardCard title={t('avgOrderValue')} value={`${getSymbol()}${convert(summaryStats.averageOrderValue).toFixed(2)}`} />
-                <DashboardCard title={t('last7DaysRevenue')} value={`${getSymbol()}${convert(summaryStats.totalRevenueLast7Days).toFixed(2)}`} />
-                <DashboardCard title={t('last7DaysOrders')} value={summaryStats.totalOrdersLast7Days} />
-                <DashboardCard title={t('last30DaysRevenue')} value={`${getSymbol()}${convert(summaryStats.totalRevenueLast30Days).toFixed(2)}`} />
-                <DashboardCard title={t('last30DaysOrders')} value={summaryStats.totalOrdersLast30Days} />
-                <DashboardCard title={t('totalCustomers')} value={summaryStats.totalCustomers} />
-                <DashboardCard title={t('newCustomersToday')} value={summaryStats.newCustomersToday} />
-                <DashboardCard title={t('allTimeRevenue')} value={`${getSymbol()}${convert(summaryStats.totalRevenueAllTime).toFixed(2)}`} />
-                <DashboardCard title={t('allTimeOrders')} value={summaryStats.totalOrdersAllTime} />
+                <DashboardCard title="Online Users" value={onlineUsers} />
+                <DashboardCard title="Today's Revenue" value={`₪${summaryStats.totalRevenueToday.toFixed(2)}`} />
+                <DashboardCard title="Today's Orders" value={summaryStats.totalOrdersToday} />
+                <DashboardCard title="Avg. Order Value" value={`₪${summaryStats.averageOrderValue.toFixed(2)}`} />
+                <DashboardCard title="Last 7 Days Revenue" value={`₪${summaryStats.totalRevenueLast7Days.toFixed(2)}`} />
+                <DashboardCard title="Last 7 Days Orders" value={summaryStats.totalOrdersLast7Days} />
+                <DashboardCard title="Last 30 Days Revenue" value={`₪${summaryStats.totalRevenueLast30Days.toFixed(2)}`} />
+                <DashboardCard title="Last 30 Days Orders" value={summaryStats.totalOrdersLast30Days} />
+                <DashboardCard title="Total Customers" value={summaryStats.totalCustomers} />
+                <DashboardCard title="New Customers Today" value={summaryStats.newCustomersToday} />
+                <DashboardCard title="All Time Revenue" value={`₪${summaryStats.totalRevenueAllTime.toFixed(2)}`} />
+                <DashboardCard title="All Time Orders" value={summaryStats.totalOrdersAllTime} />
             </div>
 
             {/* Sales Trend Chart */}
             <div className="bg-gray-800 p-6 rounded-lg shadow-lg mb-8">
-                <h3 className="text-xl font-semibold mb-4">{t('revenueTrend')}</h3>
+                <h3 className="text-xl font-semibold mb-4">Revenue Trend (Last 30 Days)</h3>
                 {salesTrendData && salesTrendData.length > 0 ? (
                     <Line data={lineChartData} options={lineChartOptions} />
                 ) : (
-                    <p className="text-gray-400">{t('noSalesData')}</p>
+                    <p className="text-gray-400">No sales data available for the last 30 days.</p>
                 )}
             </div>
 
             {/* Product Performance & Sales by Category */}
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
                 <div className="bg-gray-800 p-6 rounded-lg shadow-lg">
-                    <h3 className="text-xl font-semibold mb-4">{t('top5Products')}</h3>
+                    <h3 className="text-xl font-semibold mb-4">Top 5 Selling Products</h3>
                     {topProducts && topProducts.length > 0 ? (
                         <Bar data={topProductsChartData} options={topProductsChartOptions} />
                     ) : (
-                        <p className="text-gray-400">{t('noTopProducts')}</p>
+                        <p className="text-gray-400">No top selling products data available.</p>
                     )}
                 </div>
                 <div className="bg-gray-800 p-6 rounded-lg shadow-lg">
-                    <h3 className="text-xl font-semibold mb-4">{t('salesByCategory')}</h3>
+                    <h3 className="text-xl font-semibold mb-4">Sales by Category</h3>
                     {salesByCategory && salesByCategory.length > 0 ? (
                         <Pie data={salesByCategoryChartData} options={salesByCategoryChartOptions} />
                     ) : (
-                        <p className="text-gray-400">{t('noSalesByCategory')}</p>
+                        <p className="text-gray-400">No sales by category data available.</p>
                     )}
                 </div>
             </div>
 
             {/* Recent Orders */}
             <div className="bg-gray-800 p-6 rounded-lg shadow-lg">
-                <h3 className="text-xl font-semibold mb-4">{t('recentOrders')}</h3>
+                <h3 className="text-xl font-semibold mb-4">Recent Orders (Live)</h3>
                 {recentOrders.length > 0 ? (
                     <ul className="divide-y divide-gray-700">
                         {recentOrders.map(order => (
                             <li key={order._id} className="py-3 flex justify-between items-center">
                                 <div>
-                                    <p className="font-medium">{t('orderId')} {order._id}</p>
-                                    <p className="text-sm text-gray-400">{t('user')} {order.user?.name || t('guestUser')}</p>
+                                    <p className="font-medium">Order ID: {order._id}</p>
+                                    <p className="text-sm text-gray-400">User: {order.user?.name || 'Guest'}</p>
                                 </div>
-                                <p className="font-bold">{getSymbol()}{convert(order.totalPrice).toFixed(2)}</p>
+                                <p className="font-bold">₪{order.totalPrice.toFixed(2)}</p>
                             </li>
                         ))}
                     </ul>
                 ) : (
-                    <p className="text-gray-400">{t('noRecentOrders')}</p>
+                    <p className="text-gray-400">No recent orders.</p>
                 )}
             </div>
         </div>
