@@ -4,16 +4,8 @@ import Category from '../models/categoryModel.js';
 // @desc    Fetch all categories
 // @route   GET /api/categories
 const getCategories = asyncHandler(async (req, res) => {
-    const lang = req.headers['accept-language'] && req.headers['accept-language'].startsWith('he') ? 'he' : 'en';
     const categories = await Category.find({});
-    const categoriesWithLocalizedNames = categories.map(category => {
-        const categoryName = category.name[lang] || category.name['en'] || category.name['he'] || '';
-        return {
-            ...category.toObject(),
-            name: categoryName,
-        };
-    });
-    res.json(categoriesWithLocalizedNames);
+    res.json(categories);
 });
 
 // @desc    Create a category

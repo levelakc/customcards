@@ -4,41 +4,16 @@ import Product from '../models/productModel.js';
 // @desc    Fetch all products
 // @route   GET /api/products
 const getProducts = asyncHandler(async (req, res) => {
-    const lang = req.headers['accept-language'] && req.headers['accept-language'].startsWith('he') ? 'he' : 'en';
     const products = await Product.find({}).populate('category');
-
-    const productsWithLocalizedNames = products.map(product => {
-        const productName = product.name[lang] || product.name['en'] || product.name['he'] || '';
-        const categoryName = product.category ? (product.category.name[lang] || product.category.name['en'] || product.category.name['he'] || '') : '';
-        
-        return {
-            ...product.toObject(),
-            name: productName,
-            category: product.category ? {
-                ...product.category.toObject(),
-                name: categoryName
-            } : undefined
-        };
-    });
-    res.json(productsWithLocalizedNames);
+    res.json(products);
 });
 
 // @desc    Fetch single product
 // @route   GET /api/products/:id
 const getProductById = asyncHandler(async (req, res) => {
-    const lang = req.headers['accept-language'] && req.headers['accept-language'].startsWith('he') ? 'he' : 'en';
     const product = await Product.findById(req.params.id).populate('category');
     if (product) {
-        const productName = product.name[lang] || product.name['en'] || product.name['he'] || '';
-        const categoryName = product.category ? (product.category.name[lang] || product.category.name['en'] || product.category.name['he'] || '') : '';
-        res.json({
-            ...product.toObject(),
-            name: productName,
-            category: product.category ? {
-                ...product.category.toObject(),
-                name: categoryName
-            } : undefined
-        });
+        res.json(product);
     } else {
         res.status(404).json({ message: 'Product not found' });
     }
@@ -47,64 +22,48 @@ const getProductById = asyncHandler(async (req, res) => {
 // @desc    Create a product
 // @route   POST /api/products
 const createProduct = asyncHandler(async (req, res) => {
-    // Destructure the new customization field from the request body
     const { name, price, description, image, category, availableColors, customization, isUpsellProduct } = req.body;
 
-    // If this product is marked as an upsell, ensure no others are
     if (isUpsellProduct) {
         await Product.updateMany({}, { $set: { isUpsellProduct: false } });
     }
 
     const product = new Product({
-        name: {
-            en: name.en || name.he, // Use en if available, otherwise he
-            he: name.he
-        },
+        name,
         price,
         description,
         image,
         category,
         availableColors,
-        customization, // Add customization data to the new product
+        customization,
         isUpsellProduct,
     });
     const createdProduct = await product.save();
-    res.status(201).json({
-        ...createdProduct.toObject(),
-        name: (createdProduct.name.en || createdProduct.name.he || ''),
-    });
+    res.status(201).json(createdProduct);
 });
 
 // @desc    Update a product
 // @route   PUT /api/products/:id
 const updateProduct = asyncHandler(async (req, res) => {
-    // Destructure the new customization field from the request body
     const { name, price, description, image, category, availableColors, customization, isUpsellProduct } = req.body;
     const product = await Product.findById(req.params.id);
 
     if (product) {
-        // If this product is being marked as the upsell, ensure no others are
         if (isUpsellProduct && !product.isUpsellProduct) {
             await Product.updateMany({ _id: { $ne: product._id } }, { $set: { isUpsellProduct: false } });
         }
 
-        product.name = {
-            en: name.en || name.he, // Use en if available, otherwise he
-            he: name.he
-        };
+        product.name = name;
         product.price = price;
         product.description = description;
         product.image = image;
         product.category = category;
         product.availableColors = availableColors;
-        product.customization = customization; // Update customization data
+        product.customization = customization;
         product.isUpsellProduct = isUpsellProduct;
         
         const updatedProduct = await product.save();
-        res.json({
-            ...updatedProduct.toObject(),
-            name: (updatedProduct.name.en || updatedProduct.name.he || ''),
-        });
+        res.json(updatedProduct);
     } else {
         res.status(404).json({ message: 'Product not found' });
     }
@@ -113,19 +72,9 @@ const updateProduct = asyncHandler(async (req, res) => {
 // @desc    Get the single upsell product
 // @route   GET /api/products/upsell
 const getUpsellProduct = asyncHandler(async (req, res) => {
-    const lang = req.headers['accept-language'] && req.headers['accept-language'].startsWith('he') ? 'he' : 'en';
     const upsellProduct = await Product.findOne({ isUpsellProduct: true }).populate('category');
     if (upsellProduct) {
-        const productName = upsellProduct.name[lang] || upsellProduct.name['en'] || upsellProduct.name['he'] || '';
-        const categoryName = upsellProduct.category ? (upsellProduct.category.name[lang] || upsellProduct.category.name['en'] || upsellProduct.category.name['he'] || '') : '';
-        res.json({
-            ...upsellProduct.toObject(),
-            name: productName,
-            category: upsellProduct.category ? {
-                ...upsellProduct.category.toObject(),
-                name: categoryName
-            } : undefined
-        });
+        res.json(upsellProduct);
     } else {
         res.status(404).json({ message: 'No upsell product found' });
     }
@@ -134,19 +83,14 @@ const getUpsellProduct = asyncHandler(async (req, res) => {
 // @desc    Search products
 // @route   GET /api/products/search
 const searchProducts = asyncHandler(async (req, res) => {
-    const lang = req.headers['accept-language'] && req.headers['accept-language'].startsWith('he') ? 'he' : 'en';
     const { keyword, minPrice, maxPrice, color, engraveColor } = req.query;
     let query = {};
 
     if (keyword) {
-        // Search in the requested language first, then fallback to English
         query.$or = [
-            { [`name.${lang}`]: { $regex: keyword, $options: 'i' } },
+            { name: { $regex: keyword, $options: 'i' } },
             { description: { $regex: keyword, $options: 'i' } }
         ];
-        if (lang !== 'en') { // If not English, also search in English name
-            query.$or.push({ 'name.en': { $regex: keyword, $options: 'i' } });
-        }
     }
 
     if (minPrice || maxPrice) {
@@ -160,25 +104,11 @@ const searchProducts = asyncHandler(async (req, res) => {
     }
 
     if (engraveColor) {
-        // Assuming engraveColor is part of customization.engraveColors array
         query['customization.engraveColors'] = { $in: [engraveColor] };
     }
 
     const products = await Product.find(query).populate('category');
-
-    const productsWithLocalizedNames = products.map(product => {
-        const productName = product.name[lang] || product.name['en'] || product.name['he'] || '';
-        const categoryName = product.category ? (product.category.name[lang] || product.category.name['en'] || product.category.name['he'] || '') : '';
-        return {
-            ...product.toObject(),
-            name: productName,
-            category: product.category ? {
-                ...product.category.toObject(),
-                name: categoryName
-            } : undefined
-        };
-    });
-    res.json(productsWithLocalizedNames);
+    res.json(products);
 });
 
 const deleteProduct = asyncHandler(async (req, res) => {
