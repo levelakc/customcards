@@ -5,7 +5,7 @@ import { useTranslation } from 'react-i18next';
 import { nameToKeyMap, getDefaultEngraving } from '../utils/colorUtils';
 
 
-const ProductCard = ({ product, disableClick = false, isMobile }) => {
+const ProductCard = ({ product, disableClick = false, isMobile, hideDetails = false }) => {
     const { navigate } = useRouter();
     const { t, i18n } = useTranslation();
     const [colorIndex, setColorIndex] = useState(0);
@@ -96,18 +96,20 @@ const ProductCard = ({ product, disableClick = false, isMobile }) => {
                 />
             </div>
             
-            <div className="p-6 pt-2 flex-grow flex flex-col text-center relative z-10">
-                <h3 className="text-xl font-semibold text-white mb-2">{productName.replace(/<br\s*\/?>/gi, ' ')}</h3>
-                <p className="text-gray-300 text-sm mb-4 line-clamp-2">{productDescription}</p>
-                <div className="flex-grow"></div>
-                <p className="text-indigo-400 font-bold text-lg mb-4">₪{product.price}</p>
-                <button 
-                    onClick={handleButtonClick}
-                    className="w-full bg-indigo-600 text-white py-2 rounded-md hover:bg-indigo-500 transition-colors"
-                >
-                    {t('viewDetailsButton')}
-                </button>
-            </div>
+            {!hideDetails && (
+                <div className="p-6 pt-2 flex-grow flex flex-col text-center relative z-10">
+                    <h3 className="text-xl font-semibold text-white mb-2">{productName.replace(/<br\s*\/?>/gi, ' ')}</h3>
+                    <p className="text-gray-300 text-sm mb-4 line-clamp-2">{productDescription}</p>
+                    <div className="flex-grow"></div>
+                    <p className="text-indigo-400 font-bold text-lg mb-4">₪{product.price}</p>
+                    <button 
+                        onClick={handleButtonClick}
+                        className="w-full bg-indigo-600 text-white py-2 rounded-md hover:bg-indigo-500 transition-colors"
+                    >
+                        {t('viewDetailsButton')}
+                    </button>
+                </div>
+            )}
         </div>
     );
 };
