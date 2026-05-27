@@ -111,13 +111,14 @@ export default function Navbar() {
                                 <SearchIcon />
                             </button>
                             {isAuthenticated ? (
-                                <div className="relative group">
-                                    <button className="nav-link-luxury px-3 py-2 text-sm font-bold flex items-center gold-gradient-text">
+                                <div className="flex flex-col items-center justify-center -mt-2">
+                                    <span className="px-3 py-1 text-sm font-bold gold-gradient-text">
                                         {t('hello')}, {user.name}
-                                    </button>
-                                    <div className="absolute start-0 mt-2 w-48 bg-gray-900 border border-gray-700 rounded-md shadow-2xl py-2 z-20 opacity-0 group-hover:opacity-100 transition-opacity duration-200">
-                                        <button onClick={() => navigate('profile')} className="block w-full text-right px-4 py-3 text-sm text-gray-300 hover:bg-gray-800">{t('myProfile')}</button>
-                                        <button onClick={handleLogout} className="block w-full text-right px-4 py-3 text-sm text-red-400 hover:bg-gray-800">{t('logout')}</button>
+                                    </span>
+                                    <div className="flex items-center gap-3">
+                                        <button onClick={() => navigate('profile')} className="text-xs text-gray-300 hover:text-gold-500 transition-colors">{t('myProfile')}</button>
+                                        <span className="text-gray-600 text-xs">|</span>
+                                        <button onClick={handleLogout} className="text-xs text-red-400 hover:text-red-300 transition-colors">{t('logout')}</button>
                                     </div>
                                 </div>
                             ) : (
