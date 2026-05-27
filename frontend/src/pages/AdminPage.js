@@ -8,6 +8,7 @@ import AdminOrdersPage from './AdminOrdersPage';
 import AdminUsersPage from './AdminUsersPage';
 import AdminReviewsPage from './AdminReviewsPage';
 import AdminDashboardPage from './AdminDashboardPage';
+import AdminMailingPage from './AdminMailingPage';
 import CreditCardPreview from '../components/CreditCardPreview';
 import WalletPreview from '../components/WalletPreview'; // 1. Import WalletPreview
 import { ALL_CARD_COLORS, cardColorOptions } from '../utils/colorUtils';
@@ -61,13 +62,58 @@ function SiteSettingsPage() {
         }
     };
 
+    const handleWheelPrizeUpdate = (index, field, value) => {
+        const newPrizes = [...(localSettings.wheelPrizes || [])];
+        newPrizes[index] = { ...newPrizes[index], [field]: value };
+        setLocalSettings(s => ({ ...s, wheelPrizes: newPrizes }));
+    };
+
+    const saveWheelPrizes = () => {
+        handleUrlUpdate('wheelPrizes', localSettings.wheelPrizes);
+    };
+
     return (
         <div>
             <h2 className="text-2xl font-bold mb-4">{t('siteSettings')}</h2>
-            <div className="bg-gray-800 p-6 rounded-lg space-y-6 max-w-lg">
+            <div className="bg-gray-800 p-6 rounded-lg space-y-6 max-w-2xl">
                 {message && <p className={message.includes('Error') ? 'text-red-400' : 'text-green-400'}>{message}</p>}
                 
+                {/* --- WHEEL PRIZES --- */}
                 <div className="space-y-4">
+                    <h3 className="text-lg font-semibold text-white border-b border-gray-700 pb-2">{t('prizeWheelSettings') || 'Prize Wheel Settings'}</h3>
+                    {localSettings.wheelPrizes?.map((prize, index) => (
+                        <div key={index} className="flex flex-col md:flex-row gap-2 items-center bg-gray-900 p-2 rounded">
+                            <input 
+                                type="text" 
+                                value={prize.label} 
+                                onChange={(e) => handleWheelPrizeUpdate(index, 'label', e.target.value)} 
+                                className="w-full bg-gray-700 rounded p-1 text-sm border border-gray-600"
+                                placeholder="Label"
+                            />
+                            <div className="flex gap-2 w-full md:w-auto">
+                                <input 
+                                    type="number" 
+                                    value={prize.discount} 
+                                    onChange={(e) => handleWheelPrizeUpdate(index, 'discount', Number(e.target.value))} 
+                                    className="w-16 bg-gray-700 rounded p-1 text-sm border border-gray-600"
+                                    placeholder="%"
+                                    title="Discount %"
+                                />
+                                <input 
+                                    type="number" 
+                                    value={prize.probability} 
+                                    onChange={(e) => handleWheelPrizeUpdate(index, 'probability', Number(e.target.value))} 
+                                    className="w-16 bg-gray-700 rounded p-1 text-sm border border-gray-600"
+                                    placeholder="Prob"
+                                    title="Probability"
+                                />
+                            </div>
+                        </div>
+                    ))}
+                    <button type="button" onClick={saveWheelPrizes} className="bg-indigo-600 hover:bg-indigo-700 px-4 py-2 rounded font-bold w-full">{t('savePrizes') || 'Save Prizes'}</button>
+                </div>
+
+                <div className="space-y-4 pt-4 border-t border-gray-700">
                     <h3 className="text-lg font-semibold text-white border-b border-gray-700 pb-2">{t('siteLogo')}</h3>
                     <div className="flex items-center space-x-4 space-x-reverse">
                         <p>{t('preview')}:</p>
@@ -421,8 +467,10 @@ export default function AdminPage() {
             <button type="button" onClick={() => setActiveTab('users')} className={`py-2 px-4 ${activeTab === 'users' ? 'border-b-2 border-indigo-500' : 'text-gray-400'}`}>{t('userManagement')}</button>
             <button type="button" onClick={() => setActiveTab('reviews')} className={`py-2 px-4 ${activeTab === 'reviews' ? 'border-b-2 border-indigo-500' : 'text-gray-400'}`}>{t('reviewManagement')}</button>
             <button type="button" onClick={() => setActiveTab('settings')} className={`py-2 px-4 ${activeTab === 'settings' ? 'border-b-2 border-indigo-500' : 'text-gray-400'}`}>{t('siteSettings')}</button>
+            <button type="button" onClick={() => setActiveTab('mailing')} className={`py-2 px-4 ${activeTab === 'mailing' ? 'border-b-2 border-indigo-500' : 'text-gray-400'}`}>{t('emailBroadcast') || 'Email Broadcast'}</button>
         </div>
         {activeTab === 'dashboard' && <AdminDashboardPage />}
+        {activeTab === 'mailing' && <AdminMailingPage />}
         {activeTab === 'products' && (
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
                 <div className="lg:col-span-2">

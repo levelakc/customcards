@@ -3,6 +3,50 @@ import Order from '../models/orderModel.js';
 import User from '../models/userModel.js';
 import Product from '../models/productModel.js';
 import mongoose from 'mongoose';
+import nodemailer from 'nodemailer';
+
+// Configure nodemailer (use your own SMTP settings in production or .env)
+const transporter = nodemailer.createTransport({
+    service: 'gmail', // Placeholder, ideally use env vars
+    auth: {
+        user: process.env.EMAIL_USER || 'test@example.com',
+        pass: process.env.EMAIL_PASS || 'password'
+    }
+});
+
+// @desc    Send broadcast email to all users
+// @route   POST /api/admin/broadcast
+// @access  Private/Admin
+const sendBroadcastEmail = asyncHandler(async (req, res) => {
+    const { subject, htmlBody } = req.body;
+
+    if (!subject || !htmlBody) {
+        res.status(400);
+        throw new Error('Please provide both subject and HTML body');
+    }
+
+    const users = await User.find({}).select('email');
+    const emails = users.map(u => u.email);
+
+    if (emails.length === 0) {
+        res.status(400);
+        throw new Error('No users found to send emails to');
+    }
+
+    try {
+        await transporter.sendMail({
+            from: process.env.EMAIL_FROM || '"VIPCard" <noreply@vipcard.com>',
+            bcc: emails, // Use BCC to hide recipients from each other
+            subject: subject,
+            html: htmlBody,
+        });
+        res.json({ message: `Broadcast sent successfully to ${emails.length} users` });
+    } catch (error) {
+        console.error('Email send error:', error);
+        res.status(500);
+        throw new Error('Failed to send broadcast email');
+    }
+});
 
 // @desc    Get dashboard statistics for admin
 // @route   GET /api/admin/dashboard/stats
@@ -193,4 +237,4 @@ const getSalesByCategory = asyncHandler(async (req, res) => {
     res.json(salesByCategory);
 });
 
-export { getDashboardStats, getDashboardSummary, getSalesTrend, getTopSellingProducts, getSalesByCategory };
+export { getDashboardStats, getDashboardSummary, getSalesTrend, getTopSellingProducts, getSalesByCategory, sendBroadcastEmail };

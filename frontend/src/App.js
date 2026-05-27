@@ -11,7 +11,7 @@ import Navbar from './components/Navbar';
 import Breadcrumbs from './components/Breadcrumbs';
 import Footer from './components/Footer';
 import CartPopup from './components/CartPopup';
-import FloatingWhatsApp from './components/FloatingWhatsApp';
+import FloatingWidgets from './components/FloatingWidgets';
 
 import HomePage from './pages/HomePage';
 import CategoryPage from './pages/CategoryPage';
@@ -85,7 +85,7 @@ function AppContent() {
             </main>
             <Footer />
             <CartPopup isVisible={showPopup} onClose={() => setShowPopup(false)} />
-            <FloatingWhatsApp />
+            <FloatingWidgets />
         </div>
     );
 }
