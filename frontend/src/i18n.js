@@ -12,7 +12,8 @@ i18n
   // for all options read: https://www.i18next.com/overview/configuration-options
   .init({
     debug: false,
-    fallbackLng: 'en',
+    fallbackLng: 'he',
+    lng: 'he', // Force default to Hebrew unless overridden explicitly
     interpolation: {
       escapeValue: false, // not needed for react as it escapes by default
     },
