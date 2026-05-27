@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from 'react';
-import * as api from '../api/api';
+import React, { useState } from 'react';
+import { useData } from '../contexts/DataContext';
 import ProductCard from '../components/ProductCard';
 import { useTranslation } from 'react-i18next';
 import { ALL_CARD_COLORS } from '../utils/colorUtils';
@@ -8,34 +8,13 @@ import { useRouter } from '../contexts/RouterContext';
 export default function BrowsePage() {
     const { t } = useTranslation();
     const { route, navigate } = useRouter();
-    const [products, setProducts] = useState([]);
-    const [categories, setCategories] = useState([]);
-    const [loading, setLoading] = useState(true);
+    const { products, categories, isGlobalLoading } = useData();
     const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
     // Derived state from URL params
     const selectedCategory = route.params.category || null;
     const selectedColors = route.params.colors ? route.params.colors.split(',') : [];
     const searchTerm = route.params.q || '';
-
-    useEffect(() => {
-        const fetchData = async () => {
-            try {
-                setLoading(true);
-                const [allProducts, allCategories] = await Promise.all([
-                    api.getProducts(),
-                    api.getCategories()
-                ]);
-                setProducts(allProducts);
-                setCategories(allCategories);
-            } catch (error) {
-                console.error("Failed to fetch browse data:", error);
-            } finally {
-                setLoading(false);
-            }
-        };
-        fetchData();
-    }, []);
 
     const updateFilters = (newParams) => {
         const updatedParams = { ...route.params, ...newParams };
@@ -73,7 +52,7 @@ export default function BrowsePage() {
         return matchesCategory && matchesColor && matchesSearch;
     });
 
-    if (loading) return <div className="text-center p-10 text-white bg-gray-900 min-h-screen">{t('loadingData')}...</div>;
+    if (isGlobalLoading) return <div className="text-center p-10 text-white bg-gray-900 min-h-screen">{t('loadingData')}...</div>;
 
     return (
         <div className="bg-gray-900 min-h-screen text-white">

@@ -1,31 +1,15 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { useRouter } from '../contexts/RouterContext';
-import * as api from '../api/api';
+import { useData } from '../contexts/DataContext';
 import { useTranslation } from 'react-i18next';
 
 export default function AllCategoriesPage() {
     const { navigate } = useRouter();
     const { t, i18n } = useTranslation();
-    const [categories, setCategories] = useState([]);
+    const { categories, isGlobalLoading } = useData();
     const [searchTerm, setSearchTerm] = useState('');
-    const [loading, setLoading] = useState(true);
 
-    useEffect(() => {
-        const fetchCategories = async () => {
-            try {
-                setLoading(true);
-                const allCategories = await api.getCategories();
-                setCategories(allCategories);
-            } catch (error) {
-                console.error("Failed to fetch categories:", error);
-            } finally {
-                setLoading(false);
-            }
-        };
-        fetchCategories();
-    }, [i18n.language]);
-
-    if (loading) return <div className="text-center p-10 text-white bg-gray-900 min-h-screen">{t('loadingCategories')}...</div>;
+    if (isGlobalLoading) return <div className="text-center p-10 text-white bg-gray-900 min-h-screen">{t('loadingCategories')}...</div>;
 
     const currentLanguage = i18n.language || 'he';
 

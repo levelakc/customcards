@@ -381,6 +381,6 @@ export default function AdminDashboardPage() {
 const DashboardCard = ({ title, value }) => (
     <div className="bg-gray-800 p-5 rounded-lg shadow-md flex flex-col items-center justify-center text-center">
         <h3 className="text-lg font-semibold text-gray-300 mb-2">{title}</h3>
-        <p className="text-4xl font-bold text-indigo-400">{value}</p>
+        <p className="text-4xl font-bold text-white">{value}</p>
     </div>
 );

@@ -127,7 +127,7 @@ export default function SearchPage() {
                                     <div className="p-4">
                                         <h3 className="text-xl font-semibold text-white mb-2">{productName}</h3>
                                         <p className="text-gray-300 text-sm mb-2">{productDescription.substring(0, 100)}...</p>
-                                        <p className="text-lg font-bold text-indigo-400 mb-4">₪{product.price}</p>
+                                        <p className="text-lg font-bold text-white mb-4">₪{product.price}</p>
                                         <button
                                             onClick={() => { /* navigate to product page */ }}
                                             className="w-full py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"

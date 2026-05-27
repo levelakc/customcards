@@ -1,8 +1,9 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { RouterProvider, useRouter } from './contexts/RouterContext';
 import { AuthProvider } from './contexts/AuthContext';
 import { CartProvider, useCart } from './contexts/CartContext';
 import { SiteSettingsProvider } from './contexts/SiteSettingsContext';
+import { DataProvider, useData } from './contexts/DataContext';
 import ReactGA from 'react-ga4';
 import ReactPixel from 'react-facebook-pixel';
 import { useTranslation } from 'react-i18next';
@@ -12,6 +13,7 @@ import Breadcrumbs from './components/Breadcrumbs';
 import Footer from './components/Footer';
 import CartPopup from './components/CartPopup';
 import FloatingWidgets from './components/FloatingWidgets';
+import LoadingScreen from './components/LoadingScreen';
 
 import HomePage from './pages/HomePage';
 import CategoryPage from './pages/CategoryPage';
@@ -43,7 +45,16 @@ if (FACEBOOK_PIXEL_ID && FACEBOOK_PIXEL_ID !== 'YOUR_FACEBOOK_PIXEL_ID') {
 function AppContent() {
     const { route } = useRouter();
     const { showPopup, setShowPopup } = useCart();
-    const { i18n } = useTranslation(); // Add useTranslation hook
+    const { i18n } = useTranslation();
+    const { isGlobalLoading } = useData();
+    const [minLoadingComplete, setMinLoadingComplete] = useState(false);
+
+    useEffect(() => {
+        const timer = setTimeout(() => {
+            setMinLoadingComplete(true);
+        }, 2500); // 2.5 seconds minimum loading screen
+        return () => clearTimeout(timer);
+    }, []);
 
     useEffect(() => {
         if (GOOGLE_ANALYTICS_ID && GOOGLE_ANALYTICS_ID !== 'YOUR_GOOGLE_ANALYTICS_ID') {
@@ -54,6 +65,9 @@ function AppContent() {
         }
     }, [route]);
 
+    if (isGlobalLoading || !minLoadingComplete) {
+        return <LoadingScreen />;
+    }
 
     const renderPage = () => {
         switch (route.page) {
@@ -95,11 +109,14 @@ export default function App() {
         <AuthProvider>
             <CartProvider>
                 <SiteSettingsProvider>
-                    <RouterProvider>
-                        <AppContent />
-                    </RouterProvider>
+                    <DataProvider>
+                        <RouterProvider>
+                            <AppContent />
+                        </RouterProvider>
+                    </DataProvider>
                 </SiteSettingsProvider>
             </CartProvider>
         </AuthProvider>
     );
 }
+

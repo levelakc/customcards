@@ -1,6 +1,7 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useSiteSettings } from '../contexts/SiteSettingsContext';
+import { useData } from '../contexts/DataContext';
 import * as api from '../api/api';
 import Carousel3D from '../components/Carousel3D';
 import CategoryProductGallery from '../components/CategoryProductGallery'; // Import the new component
@@ -15,10 +16,7 @@ const MAX_CAROUSEL_ITEMS = 8;
 export default function HomePage() {
     const { t, i18n } = useTranslation();
     const { settings } = useSiteSettings();
-    const [featured, setFeatured] = useState([]);
-    // const [allCategories, setAllCategories] = useState([]); // Removed
-    const [backgroundVideoUrl, setBackgroundVideoUrl] = useState('');
-    const [videoOpacity, setVideoOpacity] = useState(0.3);
+    const { products, categories } = useData();
     const designsSectionRef = useRef(null);
     const personalDesignSectionRef = useRef(null);
 
@@ -40,60 +38,37 @@ export default function HomePage() {
             window.removeEventListener('orientationchange', setAppHeight);
         };
     }, []);
-    
-    useEffect(() => {
-        const fetchInitialData = async () => {
-            try {
-                const settings = await api.getSiteSettings();
-                setBackgroundVideoUrl(settings.backgroundVideoUrl);
-                setVideoOpacity(settings.videoOpacity);
 
-                // const fetchedCategories = await api.getCategories(); // No longer needed here
-                // setAllCategories(fetchedCategories); // No longer needed here
+    const featured = useMemo(() => {
+        if (!products.length || !categories.length) return [];
 
-                const allProducts = await api.getProducts();
-                
-                const usedProductIds = new Set();
-                
-                // Use a dummy categories array or fetch if needed for carousel, but not for CategoryProductGallery
-                // For simplicity, let's assume we can get categories for carousel logic from fetchedCategories if needed.
-                // However, the original logic already fetches products and then filters based on category,
-                // so we don't strictly need to fetch categories here unless `fetchedCategories` is used later for other logic.
-                // Re-introducing a minimal category fetch for existing carousel logic if `fetchedCategories` is not removed above.
-                const fetchedCategoriesForCarousel = await api.getCategories(); 
-
-                const carouselProducts = [];
-                fetchedCategoriesForCarousel.forEach(category => {
-                    const productsInCategory = allProducts.filter(p => p.category?._id === category._id);
-                    if (productsInCategory.length > 0) {
-                        let productToAdd = productsInCategory.find(p => !usedProductIds.has(p._id));
-                        if (!productToAdd) {
-                            productToAdd = productsInCategory[0];
-                        }
-                        
-                        if (productToAdd && !carouselProducts.some(p => p._id === productToAdd._id)) {
-                             carouselProducts.push(productToAdd);
-                        }
-                    }
-                });
-                
-                const remainingProducts = allProducts.filter(p => !carouselProducts.some(cp => cp._id === p._id));
-                remainingProducts.sort(() => 0.5 - Math.random());
-                
-                while (carouselProducts.length < MAX_CAROUSEL_ITEMS && remainingProducts.length > 0) {
-                    carouselProducts.push(remainingProducts.shift());
+        const usedProductIds = new Set();
+        const carouselProducts = [];
+        
+        categories.forEach(category => {
+            const productsInCategory = products.filter(p => p.category?._id === category._id);
+            if (productsInCategory.length > 0) {
+                let productToAdd = productsInCategory.find(p => !usedProductIds.has(p._id));
+                if (!productToAdd) {
+                    productToAdd = productsInCategory[0];
                 }
-
-                carouselProducts.sort(() => 0.5 - Math.random());
-                setFeatured(carouselProducts);
-
-            } catch (err) {
-                console.error("Failed to fetch initial data:", err);
-                setFeatured([]);
+                
+                if (productToAdd && !carouselProducts.some(p => p._id === productToAdd._id)) {
+                        carouselProducts.push(productToAdd);
+                        usedProductIds.add(productToAdd._id);
+                }
             }
-        };
-        fetchInitialData();
-    }, [i18n.language, t]);
+        });
+        
+        const remainingProducts = products.filter(p => !carouselProducts.some(cp => cp._id === p._id));
+        const shuffledRemaining = [...remainingProducts].sort(() => 0.5 - Math.random());
+        
+        while (carouselProducts.length < MAX_CAROUSEL_ITEMS && shuffledRemaining.length > 0) {
+            carouselProducts.push(shuffledRemaining.shift());
+        }
+
+        return [...carouselProducts].sort(() => 0.5 - Math.random());
+    }, [products, categories]);
 
     const handleScrollToDesigns = () => {
         designsSectionRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -102,6 +77,9 @@ export default function HomePage() {
     const handleScrollToPersonalDesign = () => {
         personalDesignSectionRef.current?.scrollIntoView({ behavior: 'smooth' });
     };
+
+    const backgroundVideoUrl = settings.backgroundVideoUrl;
+    const videoOpacity = settings.videoOpacity;
 
     return (
         <div>

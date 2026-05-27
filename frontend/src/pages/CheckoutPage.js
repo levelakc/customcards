@@ -176,11 +176,11 @@ export default function CheckoutPage() {
                     {/* Order Summary with Delivery Fee */}
                     <div className="mb-6">
                         <h2 className="text-2xl font-bold text-white mb-4">{t('orderSummary')}</h2>
-                        <div className="flex justify-between text-lg font-medium text-gray-300">
+                        <div className="flex justify-between text-lg font-medium text-white">
                             <span>{t('itemsTotal')}:</span>
                             <span>{getSymbol()}{convert(itemsTotal).toFixed(2)}</span>
                         </div>
-                        <div className="flex justify-between text-lg font-medium text-gray-300">
+                        <div className="flex justify-between text-lg font-medium text-white">
                             <div className="relative flex items-center">
                                 <span className="mr-2">{t('deliveryFee')}:</span>
                                 <div className="group relative">

@@ -1,6 +1,7 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { useRouter } from '../contexts/RouterContext';
 import { useCart } from '../contexts/CartContext';
+import { useData } from '../contexts/DataContext';
 import * as api from '../api/api';
 import CreditCardPreview from '../components/CreditCardPreview';
 import ProductCard from '../components/ProductCard';
@@ -17,54 +18,39 @@ import { cardColorBgClasses } from '../utils/tailwindColors';
 export default function ProductPage() {
     const { route, navigate } = useRouter();
     const { addToCart } = useCart();
+    const { products, isGlobalLoading } = useData();
     const { id } = route.params;
     const { t, i18n } = useTranslation();
-    const [product, setProduct] = useState(null);
-    const [relatedProducts, setRelatedProducts] = useState([]);
-    const [loading, setLoading] = useState(true);
 
-    const [selectedCardColorKey, setSelectedCardColorKey] = useState('');
-    const [selectedEngravingColor, setSelectedEngravingColor] = useState('');
+    const product = useMemo(() => products.find(p => String(p._id) === String(id)), [products, id]);
+    const relatedProducts = useMemo(() => {
+        if (!product) return [];
+        return products.filter(
+            (p) => p.category?._id === product.category?._id && String(p._id) !== String(id)
+        );
+    }, [products, product, id]);
 
+    const [selectedCardColorKey, setSelectedCardColorKey] = useState('black');
+    const [selectedEngravingColor, setSelectedEngravingColor] = useState('silver');
     const [showSuccessMessage, setShowSuccessMessage] = useState(false);
 
     useEffect(() => {
-        const fetchProductAndRelated = async () => {
-            try {
-                setLoading(true);
-                const currentProduct = await api.getProductById(id);
-                setProduct(currentProduct);
+        if (product) {
+            if (product.availableColors?.length > 0) {
+                const sortedColors = getSortedColors(product.availableColors);
+                const initialColorName = sortedColors[0];
+                const initialColorKey = nameToKeyMap[initialColorName];
+                setSelectedCardColorKey(initialColorKey);
 
-
-
-                if (currentProduct?.availableColors?.length > 0) {
-                    const sortedColors = getSortedColors(currentProduct.availableColors);
-                    const initialColorName = sortedColors[0];
-                    const initialColorKey = nameToKeyMap[initialColorName];
-                    setSelectedCardColorKey(initialColorKey);
-
-                    // Initialize engraving color based on the first available card color
-                    setSelectedEngravingColor(currentProduct.customization?.engraveColors?.[0] || getDefaultEngraving(initialColorKey));
-                } else {
-                    // Fallback if no availableColors are defined
-                    setSelectedCardColorKey('black'); // Default card color
-                    setSelectedEngravingColor('silver'); // Default engraving color
-                }
-
-                const allProducts = await api.getProducts();
-                const filteredRelated = allProducts.filter(
-                    (p) => p.category?._id === currentProduct.category?._id && p._id !== currentProduct._id
-                );
-                setRelatedProducts(filteredRelated);
-
-            } catch (error) {
-                console.error("Failed to fetch product or related products:", error);
-            } finally {
-                setLoading(false);
+                // Initialize engraving color based on the first available card color
+                setSelectedEngravingColor(product.customization?.engraveColors?.[0] || getDefaultEngraving(initialColorKey));
+            } else {
+                // Fallback if no availableColors are defined
+                setSelectedCardColorKey('black'); // Default card color
+                setSelectedEngravingColor('silver'); // Default engraving color
             }
-        };
-        fetchProductAndRelated();
-    }, [id, i18n.language]);
+        }
+    }, [product]);
 
     const handleCardColorChange = (colorName) => {
         const colorKey = nameToKeyMap[colorName];
@@ -82,7 +68,7 @@ export default function ProductPage() {
         }
     };
 
-    if (loading) return <div className="text-center p-10 text-white bg-gray-900 min-h-screen">טוען מוצר...</div>;
+    if (isGlobalLoading) return <div className="text-center p-10 text-white bg-gray-900 min-h-screen">טוען מוצר...</div>;
     if (!product) return <div className="text-center p-10 text-white bg-gray-900 min-h-screen">מוצר לא נמצא.</div>;
 
     const currentEngravingOptions = product.customization?.engraveColors || [];

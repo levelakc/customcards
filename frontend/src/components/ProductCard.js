@@ -101,7 +101,7 @@ const ProductCard = ({ product, disableClick = false, isMobile }) => {
                     <p className="text-gray-400 text-xs line-clamp-2 leading-relaxed">{productDescription}</p>
                 </div>
                 <div className="flex-grow"></div>
-                <p className="text-gold-400 font-black text-lg mb-3">₪{product.price}</p>
+                <p className="text-white font-black text-lg mb-3">₪{product.price}</p>
                 <button 
                     onClick={handleButtonClick}
                     className="w-full bg-indigo-600 text-white font-semibold py-2.5 rounded-lg hover:bg-indigo-500 hover:shadow-[0_0_15px_rgba(79,70,229,0.5)] transition-all"

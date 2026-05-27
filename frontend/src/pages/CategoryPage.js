@@ -1,6 +1,6 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useMemo } from 'react';
 import { useRouter } from '../contexts/RouterContext';
-import * as api from '../api/api';
+import { useData } from '../contexts/DataContext';
 import ProductCard from '../components/ProductCard';
 import { useTranslation } from 'react-i18next';
 import { nameToKeyMap, getDefaultEngraving } from '../utils/colorUtils'; // Import color utility functions
@@ -9,51 +9,32 @@ export default function CategoryPage() {
     const { route } = useRouter();
     const { id } = route.params;
     const { t, i18n } = useTranslation();
-    const [category, setCategory] = useState(null);
-    const [products, setProducts] = useState([]);
+    const { products, categories, isGlobalLoading } = useData();
     const [searchTerm, setSearchTerm] = useState('');
-    const [loading, setLoading] = useState(true);
     const [colorIndexes, setColorIndexes] = useState({}); // State to manage color indexes for each product
     const colorIntervalRef = useRef(null); // Ref to store the interval ID
 
+    const category = useMemo(() => categories.find(c => String(c._id) === String(id)), [categories, id]);
+    const productsInCategory = useMemo(() => products.filter(p => String(p.category?._id) === String(id)), [products, id]);
+
     useEffect(() => {
-        const fetchData = async () => {
-            try {
-                setLoading(true);
-                const allProducts = await api.getProducts();
-                const allCategories = await api.getCategories();
-                
-                const currentCategory = allCategories.find(c => String(c._id) === String(id));
-                const productsInCategory = allProducts.filter(p => String(p.category?._id) === String(id));
-
-                setCategory(currentCategory);
-                setProducts(productsInCategory);
-
-                // Initialize color indexes for newly fetched products
-                const initialColorIndexes = {};
-                productsInCategory.forEach(product => {
-                    if (product && product._id) {
-                        initialColorIndexes[product._id] = 0;
-                    }
-                });
-                setColorIndexes(initialColorIndexes);
-
-            } catch (error) {
-                console.error("Failed to fetch category data:", error);
-            } finally {
-                setLoading(false);
+        // Initialize color indexes for products in this category
+        const initialColorIndexes = {};
+        productsInCategory.forEach(product => {
+            if (product && product._id) {
+                initialColorIndexes[product._id] = 0;
             }
-        };
-        fetchData();
-    }, [id, i18n.language]);
+        });
+        setColorIndexes(initialColorIndexes);
+    }, [productsInCategory]);
 
     // Effect for dynamic color changing
     useEffect(() => {
-        if (products.length > 0) {
+        if (productsInCategory.length > 0) {
             colorIntervalRef.current = setInterval(() => {
                 setColorIndexes(prevIndexes => {
                     const newIndexes = { ...prevIndexes };
-                    products.forEach(product => {
+                    productsInCategory.forEach(product => {
                         if (product && product._id && product.availableColors) {
                             const availableColors = product.availableColors || [];
                             if (availableColors.length > 1) {
@@ -71,15 +52,15 @@ export default function CategoryPage() {
                 clearInterval(colorIntervalRef.current);
             }
         };
-    }, [products]);
+    }, [productsInCategory]);
 
-    if (loading) return <div className="text-center p-10 text-white bg-gray-900 min-h-screen">טוען קטגוריה...</div>;
+    if (isGlobalLoading) return <div className="text-center p-10 text-white bg-gray-900 min-h-screen">טוען קטגוריה...</div>;
     if (!category) return <div className="text-center p-10 text-white bg-gray-900 min-h-screen">קטגוריה לא נמצאה.</div>;
 
     const currentLanguage = i18n.language || 'he';
     const categoryName = category.name?.[currentLanguage] || category.name?.he || category.name?.en || category.name || '';
 
-    const filteredProducts = products.filter(product => {
+    const filteredProducts = productsInCategory.filter(product => {
         const name = product.name?.[currentLanguage] || product.name?.he || product.name?.en || product.name || '';
         return name.toLowerCase().includes(searchTerm.toLowerCase());
     });

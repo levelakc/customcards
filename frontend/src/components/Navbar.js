@@ -1,9 +1,10 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useRouter } from '../contexts/RouterContext';
 import { useAuth } from '../contexts/AuthContext';
 import { useCart } from '../contexts/CartContext';
 import { useSiteSettings } from '../contexts/SiteSettingsContext';
+import { useData } from '../contexts/DataContext';
 import * as api from '../api/api';
 import { ShoppingCartIcon, MenuIcon, XIcon, SearchIcon } from './Icons';
 import LanguageSwitcher from './LanguageSwitcher';
@@ -11,26 +12,14 @@ import LanguageSwitcher from './LanguageSwitcher';
 
 
 export default function Navbar() {
-    const { t, i18n } = useTranslation();
+    const { t } = useTranslation();
     const { navigate } = useRouter();
     const { isAuthenticated, isAdmin, logout, user } = useAuth();
     const { cartItems } = useCart();
     const { settings } = useSiteSettings();
+    const { categories } = useData();
     const [isMenuOpen, setIsMenuOpen] = useState(false);
     const [isMoreMenuOpen, setIsMoreMenuOpen] = useState(false);
-    const [categories, setCategories] = useState([]);
-
-    useEffect(() => {
-        const fetchData = async () => {
-            try {
-                const cats = await api.getCategories();
-                setCategories(cats);
-            } catch (error) {
-                console.error("Failed to fetch categories:", error);
-            }
-        };
-        fetchData();
-    }, [i18n.language]);
 
     const allNavLinks = [
         { name: t('homePage'), page: 'home' },

@@ -190,7 +190,7 @@ export default function AdminOrdersPage() {
                                 <td className="px-6 py-4 font-mono text-xs">{order._id}</td>
                                 <td className="px-6 py-4 font-medium text-white">{order.user ? order.user.name : t('notApplicable')}</td>
                                 <td className="px-6 py-4">{new Date(order.createdAt).toLocaleDateString('he-IL')}</td>
-                                <td className="px-6 py-4">{getSymbol()}{convert(order.totalPrice).toFixed(2)}</td>
+                                <td className="px-6 py-4 text-white font-bold">{getSymbol()}{convert(order.totalPrice).toFixed(2)}</td>
                                 <td className="px-6 py-4">
                                     <select 
                                         value={order.status} 
@@ -248,7 +248,7 @@ export default function AdminOrdersPage() {
                         <div className="p-4 bg-gray-900 rounded-lg">
                             <h3 className="font-bold text-lg text-white mb-2">{t('orderSummary')}</h3>
                             <p><strong className="text-gray-400">{t('date')}:</strong> {new Date(selectedOrder.createdAt).toLocaleString('he-IL')}</p>
-                            <p><strong className="text-gray-400">{t('total')}:</strong> {getSymbol()}{convert(editableOrder.orderItems.reduce((acc, item) => acc + item.qty * item.price, 0)).toFixed(2)}</p>
+                            <p><strong className="text-gray-400">{t('total')}:</strong> <span className="text-white font-bold">{getSymbol()}{convert(editableOrder.orderItems.reduce((acc, item) => acc + item.qty * item.price, 0)).toFixed(2)}</span></p>
                             <p><strong className="text-gray-400">{t('status')}:</strong> {selectedOrder.status}</p>
                         </div>
                         
@@ -278,7 +278,7 @@ export default function AdminOrdersPage() {
                                                     <p className="font-bold text-white">{item.name}</p>
                                                     <p>{t('color')}: {item.color}</p>
                                                     <p>{t('quantity')}: {item.qty}</p>
-                                                    <p>{t('price')}: {getSymbol()}{convert(item.price).toFixed(2)}</p>
+                                                    <p className="text-white font-bold">{t('price')}: {getSymbol()}{convert(item.price).toFixed(2)}</p>
                                                 </>
                                             )}
                                         </div>

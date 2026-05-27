@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useCart } from '../contexts/CartContext';
 import { useRouter } from '../contexts/RouterContext';
 import { useAuth } from '../contexts/AuthContext';
+import { useData } from '../contexts/DataContext';
 import * as api from '../api/api';
 import CreditCardPreview from '../components/CreditCardPreview';
 import WalletPreview from '../components/WalletPreview';
@@ -12,8 +13,8 @@ import { useTranslation } from 'react-i18next'; // Import useTranslation
 export default function CartPage() {
     const { cartItems, removeFromCart, updateQuantity, addToCart } = useCart();
     const { navigate } = useRouter();
+    const { upsellProduct } = useData();
     const [isUpsellModalOpen, setIsUpsellModalOpen] = useState(false);
-    const [upsellProduct, setUpsellProduct] = useState(null);
     const [customSvgUrl, setCustomSvgUrl] = useState(null);
     const [customization, setCustomization] = useState({
         position: { x: 50, y: 50 },
@@ -34,21 +35,6 @@ export default function CartPage() {
             reader.readAsDataURL(selectedFile);
         }
     }, [selectedFile]);
-
-
-    useEffect(() => {
-        const fetchUpsellProduct = async () => {
-            try {
-                const product = await api.getUpsellProduct();
-                setUpsellProduct(product);
-            } catch (error) {
-                console.error("Could not fetch upsell product:", error);
-                setUpsellProduct(null); // Ensure it's null if there's an error
-            }
-        };
-
-        fetchUpsellProduct();
-    }, []);
 
     const subtotal = cartItems.reduce((sum, item) => sum + item.price * item.quantity, 0);
 
@@ -133,7 +119,7 @@ export default function CartPage() {
                                 <div className="flex-grow">
                                     <h2 className="text-lg sm:text-xl font-bold">{item.name?.[currentLanguage] || item.name?.he || item.name?.en || item.name || ''}</h2>
                                     <p className="text-sm text-gray-400">{t('color')}: {item.selectedColor}</p>
-                                    <p className="text-lg font-semibold text-indigo-400 mt-1">₪{item.price}</p>
+                                    <p className="text-lg font-semibold text-white mt-1">₪{item.price}</p>
                                 </div>
                                 <div className="flex flex-col items-end space-y-2">
                                      <div className="flex items-center border border-gray-600 rounded-md">
@@ -178,7 +164,7 @@ export default function CartPage() {
                         {/* Right Side: Controls */}
                         <div className="space-y-4">
                             <h3 className="text-2xl font-bold">{t('addUpsellProduct', { productName: upsellProduct.name?.[currentLanguage] || upsellProduct.name?.he || upsellProduct.name?.en || upsellProduct.name || '' })}</h3>
-                            <p className="text-lg font-semibold text-indigo-400">{t('upsellPrice', { price: upsellProduct.price })}</p>
+                            <p className="text-lg font-semibold text-white">{t('upsellPrice', { price: upsellProduct.price })}</p>
                             
                             <div>
                                 <label className="block mb-2 text-sm font-medium">{t('uploadPersonalDesignLabel')}</label>
