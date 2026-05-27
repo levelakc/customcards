@@ -50,6 +50,27 @@ export default function PersonalDesignPage() {
         setCrop(initialCrop);
     };
 
+    const handleResetCrop = () => {
+        if (imgRef.current) {
+            onImageLoad({ currentTarget: imgRef.current });
+        }
+    };
+
+    const handleFullSize = () => {
+        if (imgRef.current) {
+            const { width, height } = imgRef.current;
+            const fullCrop = {
+                unit: 'px',
+                x: 0,
+                y: 0,
+                width: width,
+                height: height
+            };
+            setCrop(fullCrop);
+            setCompletedCrop(fullCrop);
+        }
+    };
+
     const handleImageUpload = (event) => {
         const file = event.target.files[0];
         if (file) {
@@ -281,12 +302,26 @@ export default function PersonalDesignPage() {
                             />
                         </ReactCrop>
                     )}
-                    <button 
-                        onClick={getCroppedImg}
-                        className="mt-6 bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2 px-8 rounded-lg transition-colors"
-                    >
-                        {t('done')}
-                    </button>
+                    <div className="mt-6 flex flex-wrap gap-3 justify-center">
+                        <button 
+                            onClick={handleResetCrop}
+                            className="bg-gray-700 hover:bg-gray-600 text-white font-bold py-2 px-6 rounded-lg transition-colors"
+                        >
+                            {t('resetCrop')}
+                        </button>
+                        <button 
+                            onClick={handleFullSize}
+                            className="bg-gray-700 hover:bg-gray-600 text-white font-bold py-2 px-6 rounded-lg transition-colors"
+                        >
+                            {t('fullSize')}
+                        </button>
+                        <button 
+                            onClick={getCroppedImg}
+                            className="bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2 px-8 rounded-lg transition-colors"
+                        >
+                            {t('done')}
+                        </button>
+                    </div>
                 </div>
             </Modal>
         </div>
