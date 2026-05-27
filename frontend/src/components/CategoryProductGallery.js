@@ -1,82 +1,33 @@
-import React, { useState, useEffect, useCallback, useRef } from 'react';
+import React, { useState, useMemo } from 'react';
 import { useRouter } from '../contexts/RouterContext';
 import { useTranslation } from 'react-i18next';
-import * as api from '../api/api';
+import { useData } from '../contexts/DataContext';
 import ProductCard from './ProductCard'; // Assuming ProductCard is in the same directory or accessible
-import { nameToKeyMap, getDefaultEngraving } from '../utils/colorUtils'; // Import color utility functions
+import { nameToKeyMap } from '../utils/colorUtils'; // Import color utility functions
 
 export default function CategoryProductGallery() {
     const { navigate } = useRouter();
     const { t, i18n } = useTranslation();
-    const [categoriesWithRandomProduct, setCategoriesWithRandomProduct] = useState([]);
-    const [loading, setLoading] = useState(true);
-    const [error, setError] = useState(null);
-    const [colorIndexes, setColorIndexes] = useState({}); // State to manage color indexes for each product
-    const colorIntervalRef = useRef(null); // Ref to store the interval ID
+    const { products: allProducts, categories: allCategories, isGlobalLoading } = useData();
+    const [colorIndexes] = useState({}); // State to manage color indexes for each product
 
     const currentLanguage = i18n.language || 'he';
 
-    const fetchCategoryProducts = useCallback(async () => {
-        setLoading(true);
-        setError(null);
-        try {
-            const fetchedCategories = await api.getCategories();
+    const categoriesWithRandomProduct = useMemo(() => {
+        if (!allCategories.length || !allProducts.length) return [];
 
-            if (!fetchedCategories || fetchedCategories.length === 0) {
-                setCategoriesWithRandomProduct([]);
-                setLoading(false);
-                return;
+        return allCategories.map(category => {
+            const productsInCategory = allProducts.filter(p => String(p.category?._id) === String(category._id));
+            if (productsInCategory.length > 0) {
+                const randomIndex = Math.floor(Math.random() * productsInCategory.length);
+                return { category, product: productsInCategory[randomIndex] };
             }
+            return { category, product: null };
+        }).filter(item => item.product !== null);
+    }, [allCategories, allProducts]);
 
-            const results = await Promise.all(
-                fetchedCategories.map(async (category) => {
-                    try {
-                        const products = await api.searchProducts({ category: category._id });
-                        if (products && products.length > 0) {
-                            const randomIndex = Math.floor(Math.random() * products.length);
-                            return { category, product: products[randomIndex] };
-                        }
-                        return { category, product: null }; // Category with no products
-                    } catch (prodErr) {
-                        console.error(`Failed to fetch products for category ${category._id}:`, prodErr);
-                        return { category, product: null };
-                    }
-                })
-            );
-            const validResults = results.filter(item => item.product !== null);
-            setCategoriesWithRandomProduct(validResults);
-
-            // Initialize color indexes for newly fetched products
-            const initialColorIndexes = {};
-            validResults.forEach(({ product }) => {
-                if (product && product._id) {
-                    initialColorIndexes[product._id] = 0;
-                }
-            });
-            setColorIndexes(initialColorIndexes);
-
-        } catch (err) {
-            console.error("Failed to fetch categories or products in fetchCategoryProducts:", err);
-            setError(t('failedToLoadCategories')); // Localize error message
-        } finally {
-            setLoading(false);
-        }
-    }, [t]);
-
-    useEffect(() => {
-        fetchCategoryProducts();
-    }, [fetchCategoryProducts]);
-
-    // Removed heavy setInterval that caused main thread jank. Colors will now be static on initial load.
-    // Effect for dynamic color changing removed.
-
-    if (loading) {
-
+    if (isGlobalLoading) {
         return <div className="text-center text-white py-10">{t('loadingCategoriesAndProducts')}</div>;
-    }
-
-    if (error) {
-        return <div className="text-center text-red-500 py-10">{error}</div>;
     }
 
     if (categoriesWithRandomProduct.length === 0) {
