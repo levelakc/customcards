@@ -147,7 +147,7 @@ export default function PrizeWheelModal({ onClose }) {
                     <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12"></path></svg>
                 </button>
 
-                <h2 className="text-3xl font-bold font-dancing gold-gradient-text text-center mb-6">
+                <h2 dir="auto" className="text-3xl font-bold gold-gradient-text text-center mb-6">
                     {t('spinToWin') || 'Spin to Win!'}
                 </h2>
 
