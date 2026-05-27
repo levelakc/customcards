@@ -78,6 +78,10 @@ export default function PersonalDesignPage() {
             reader.onload = () => {
                 setOriginalImage(reader.result);
                 setIsCropModalOpen(true);
+                // Reset input value to allow selecting the same file again
+                if (event.target) {
+                    event.target.value = '';
+                }
             };
             reader.readAsDataURL(file);
         }
