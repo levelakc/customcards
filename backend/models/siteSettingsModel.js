@@ -6,6 +6,8 @@ const siteSettingsSchema = mongoose.Schema({
     videoOpacity: { type: Number, required: true, default: 0.3, min: 0, max: 1 },
     // --- NEW FIELD ---
     logoUrl: { type: String, default: 'https://placehold.co/120x40/4A5568/FFFFFF?text=VIPCard' },
+    heroTitle: { type: String, default: 'כרטיסי אשראי ממתכת. העיצוב שלך.' },
+    heroDescription: { type: String, default: 'הפוך את כרטיס הפלסטיק המשעמם שלך ליצירת אומנות ממתכת יוקרתית.' },
     wheelPrizes: [{
         label: { type: String, required: true },
         discount: { type: Number, required: true },

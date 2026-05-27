@@ -113,6 +113,29 @@ function SiteSettingsPage() {
                     <button type="button" onClick={saveWheelPrizes} className="bg-indigo-600 hover:bg-indigo-700 px-4 py-2 rounded font-bold w-full">{t('savePrizes') || 'Save Prizes'}</button>
                 </div>
 
+                {/* --- HERO SETTINGS --- */}
+                <div className="space-y-4 pt-4 border-t border-gray-700">
+                    <h3 className="text-lg font-semibold text-white border-b border-gray-700 pb-2">{t('heroSettings') || 'Hero Section Settings'}</h3>
+                    <div>
+                        <label className="block mb-1">{t('heroTitle') || 'Hero Title'}</label>
+                        <input 
+                            type="text" 
+                            value={localSettings.heroTitle || ''} 
+                            onChange={(e) => setLocalSettings(s => ({...s, heroTitle: e.target.value}))} 
+                            className="w-full bg-gray-700 rounded p-2 border border-gray-600"
+                        />
+                    </div>
+                    <div>
+                        <label className="block mb-1">{t('heroDescription') || 'Hero Description'}</label>
+                        <textarea 
+                            value={localSettings.heroDescription || ''} 
+                            onChange={(e) => setLocalSettings(s => ({...s, heroDescription: e.target.value}))} 
+                            className="w-full bg-gray-700 rounded p-2 border border-gray-600 h-24"
+                        />
+                    </div>
+                    <button type="button" onClick={() => handleUrlUpdate('heroTitle', localSettings.heroTitle).then(() => handleUrlUpdate('heroDescription', localSettings.heroDescription))} className="bg-indigo-600 px-4 py-2 rounded text-white">{t('save')}</button>
+                </div>
+
                 <div className="space-y-4 pt-4 border-t border-gray-700">
                     <h3 className="text-lg font-semibold text-white border-b border-gray-700 pb-2">{t('siteLogo')}</h3>
                     <div className="flex items-center space-x-4 space-x-reverse">

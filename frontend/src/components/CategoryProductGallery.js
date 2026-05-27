@@ -67,31 +67,8 @@ export default function CategoryProductGallery() {
         fetchCategoryProducts();
     }, [fetchCategoryProducts]);
 
-    // Effect for dynamic color changing
-    useEffect(() => {
-        if (categoriesWithRandomProduct.length > 0) {
-            colorIntervalRef.current = setInterval(() => {
-                setColorIndexes(prevIndexes => {
-                    const newIndexes = { ...prevIndexes };
-                    categoriesWithRandomProduct.forEach(({ product }) => {
-                        if (product && product._id && product.availableColors) {
-                            const availableColors = product.availableColors || [];
-                            if (availableColors.length > 1) {
-                                newIndexes[product._id] = ((prevIndexes[product._id] || 0) + 1) % availableColors.length;
-                            }
-                        }
-                    });
-                    return newIndexes;
-                });
-            }, 1500); // Change color every 1.5 seconds
-        }
-
-        return () => {
-            if (colorIntervalRef.current) {
-                clearInterval(colorIntervalRef.current);
-            }
-        };
-    }, [categoriesWithRandomProduct]);
+    // Removed heavy setInterval that caused main thread jank. Colors will now be static on initial load.
+    // Effect for dynamic color changing removed.
 
     if (loading) {
 

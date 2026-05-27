@@ -61,15 +61,6 @@ const uploadToCloudinary = (file, options) => {
 
         let uploadOptions = { ...options };
 
-        // If the uploaded file is a PNG or JPEG, request Cloudinary to convert it to SVG
-        if (file.mimetype === 'image/png' || file.mimetype === 'image/jpeg') {
-            uploadOptions.format = 'svg';
-            // Optionally, you might want to set a specific transformation for vectorization quality
-            // For example, `uploadOptions.transformation = [{ effect: "vectorize" }];`
-            // However, 'format: "svg"' often implies a default vectorization if possible.
-            // We'll stick to just format for now to keep it simple and rely on Cloudinary's defaults.
-        }
-
         cloudinary.uploader.upload(dataURI, uploadOptions, (error, result) => {
             if (error) {
                 return reject(error);

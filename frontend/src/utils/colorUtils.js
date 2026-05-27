@@ -47,7 +47,7 @@ export const cardColorOptions = {
     gold:     { nameKey: 'gold',       engraving: ['black'],    bgColor: 'bg-yellow-500' },
     silver:   { nameKey: 'silver',       engraving: ['black'],    bgColor: 'bg-gray-300' },
     roseGold: { nameKey: 'roseGold',  engraving: ['black'],    bgColor: 'gradient-roseGold' },
-    colorful: { nameKey: 'colorful',    engraving: ['silver'],   bgColor: 'gradient-colorful' },
+    colorful: { nameKey: 'colorful',    engraving: ['black'],   bgColor: 'gradient-colorful' },
     black:    { nameKey: 'black',       engraving: ['silver', 'gold'], bgColor: 'gradient-black' },
 };
 

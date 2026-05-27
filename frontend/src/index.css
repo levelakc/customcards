@@ -171,6 +171,20 @@ div.userway_buttons_wrapper {
 }
 
 /* --- Futuristic Browse Styles --- */
+
+@keyframes spin3D {
+    0% { transform: rotateY(0deg); }
+    100% { transform: rotateY(-360deg); }
+}
+
+.carousel-spin {
+    animation: spin3D 45s linear infinite;
+}
+
+.carousel-spin-paused {
+    animation-play-state: paused;
+}
+
 .filter-glass {
     background: rgba(17, 24, 39, 0.7);
     backdrop-filter: blur(20px);

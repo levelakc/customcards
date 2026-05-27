@@ -27,11 +27,59 @@ export default function PersonalDesignPage() {
     const handleImageUpload = (event) => {
         const file = event.target.files[0];
         if (file) {
-            setUploadedImage(URL.createObjectURL(file));
-            // Reset transformations when a new image is uploaded
-            setScale(1);
-            setRotation(0);
-            setPosition({ x: 45, y: 10 });
+            if (file.type === 'image/svg+xml') {
+                setUploadedImage(URL.createObjectURL(file));
+                setScale(1);
+                setRotation(0);
+                setPosition({ x: 45, y: 10 });
+            } else {
+                // Process raster image (PNG/JPG) to remove background and create pencil sketch effect
+                const img = new Image();
+                img.onload = () => {
+                    const canvas = document.createElement('canvas');
+                    const ctx = canvas.getContext('2d');
+                    canvas.width = img.width;
+                    canvas.height = img.height;
+                    
+                    // Draw original image
+                    ctx.drawImage(img, 0, 0);
+                    
+                    const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+                    const data = imageData.data;
+                    
+                    // Apply thresholding: light pixels become transparent, dark pixels become black
+                    for (let i = 0; i < data.length; i += 4) {
+                        const r = data[i];
+                        const g = data[i + 1];
+                        const b = data[i + 2];
+                        const alpha = data[i + 3];
+                        
+                        // Ignore already transparent pixels
+                        if (alpha === 0) continue;
+                        
+                        // Calculate brightness (average)
+                        const brightness = (r + g + b) / 3;
+                        
+                        if (brightness > 200) {
+                            // If pixel is light (white/near white background), make it transparent
+                            data[i + 3] = 0;
+                        } else {
+                            // If pixel is dark, make it solid black (pencil lines)
+                            data[i] = 0;     // R
+                            data[i + 1] = 0; // G
+                            data[i + 2] = 0; // B
+                            data[i + 3] = 255; // Alpha
+                        }
+                    }
+                    
+                    ctx.putImageData(imageData, 0, 0);
+                    setUploadedImage(canvas.toDataURL('image/png'));
+                    setScale(1);
+                    setRotation(0);
+                    setPosition({ x: 45, y: 10 });
+                };
+                img.src = URL.createObjectURL(file);
+            }
         }
     };
     

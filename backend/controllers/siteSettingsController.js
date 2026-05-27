@@ -21,7 +21,7 @@ const getSiteSettings = async (req, res) => {
 // @desc    Update site settings (admin only)
 // @route   PUT /api/settings
 const updateSiteSettings = async (req, res) => {
-    const { backgroundVideoUrl, videoOpacity, logoUrl, wheelPrizes } = req.body;
+    const { backgroundVideoUrl, videoOpacity, logoUrl, wheelPrizes, heroTitle, heroDescription } = req.body;
     let settings = await SiteSettings.findOne({ key: 'siteSettings' });
 
     if (settings) {
@@ -29,6 +29,8 @@ const updateSiteSettings = async (req, res) => {
         if (videoOpacity !== undefined) settings.videoOpacity = videoOpacity; 
         if (logoUrl !== undefined) settings.logoUrl = logoUrl;
         if (wheelPrizes !== undefined) settings.wheelPrizes = wheelPrizes;
+        if (heroTitle !== undefined) settings.heroTitle = heroTitle;
+        if (heroDescription !== undefined) settings.heroDescription = heroDescription;
         
         const updatedSettings = await settings.save();
         res.json(updatedSettings);

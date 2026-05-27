@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
+import { useSiteSettings } from '../contexts/SiteSettingsContext';
 import * as api from '../api/api';
 import Carousel3D from '../components/Carousel3D';
 import CategoryProductGallery from '../components/CategoryProductGallery'; // Import the new component
@@ -13,6 +14,7 @@ const MAX_CAROUSEL_ITEMS = 12;
 
 export default function HomePage() {
     const { t, i18n } = useTranslation();
+    const { settings } = useSiteSettings();
     const [featured, setFeatured] = useState([]);
     // const [allCategories, setAllCategories] = useState([]); // Removed
     const [backgroundVideoUrl, setBackgroundVideoUrl] = useState('');
@@ -148,10 +150,10 @@ export default function HomePage() {
                         }}
                     >
                         <span className="shimmer-text">
-                            {t('heroTitle')}
+                            {settings?.heroTitle || t('heroTitle')}
                         </span>
                     </h1>
-                    <p className="text-xl md:text-2xl mb-8 drop-shadow-md">{t('heroDescription')}</p>
+                    <p className="text-xl md:text-2xl mb-8 drop-shadow-md">{settings?.heroDescription || t('heroDescription')}</p>
                     <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
                         <button 
                             onClick={handleScrollToDesigns} 
