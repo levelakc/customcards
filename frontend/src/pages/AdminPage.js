@@ -51,11 +51,11 @@ function SiteSettingsPage() {
         }
     };
 
-    const handleUrlUpdate = async (key, value) => {
+    const handleSettingsUpdate = async (updateData) => {
         try {
-            await api.updateSiteSettings({ [key]: value }, token);
-            updateLocalSettings({ [key]: value });
-            setMessage(`${key} ${t('updatedSuccessfully')}`);
+            await api.updateSiteSettings(updateData, token);
+            updateLocalSettings(updateData);
+            setMessage(t('updatedSuccessfully'));
             fetchSettings();
         } catch (err) {
             setMessage(`${t('error')} ${err.message}`);
@@ -66,10 +66,6 @@ function SiteSettingsPage() {
         const newPrizes = [...(localSettings.wheelPrizes || [])];
         newPrizes[index] = { ...newPrizes[index], [field]: value };
         setLocalSettings(s => ({ ...s, wheelPrizes: newPrizes }));
-    };
-
-    const saveWheelPrizes = () => {
-        handleUrlUpdate('wheelPrizes', localSettings.wheelPrizes);
     };
 
     return (
@@ -110,7 +106,7 @@ function SiteSettingsPage() {
                             </div>
                         </div>
                     ))}
-                    <button type="button" onClick={saveWheelPrizes} className="bg-indigo-600 hover:bg-indigo-700 px-4 py-2 rounded font-bold w-full">{t('savePrizes') || 'Save Prizes'}</button>
+                    <button type="button" onClick={() => handleSettingsUpdate({ wheelPrizes: localSettings.wheelPrizes })} className="bg-indigo-600 hover:bg-indigo-700 px-4 py-2 rounded font-bold w-full">{t('savePrizes') || 'Save Prizes'}</button>
                 </div>
 
                 {/* --- HERO SETTINGS --- */}
@@ -133,7 +129,13 @@ function SiteSettingsPage() {
                             className="w-full bg-gray-700 rounded p-2 border border-gray-600 h-24"
                         />
                     </div>
-                    <button type="button" onClick={() => handleUrlUpdate('heroTitle', localSettings.heroTitle).then(() => handleUrlUpdate('heroDescription', localSettings.heroDescription))} className="bg-indigo-600 px-4 py-2 rounded text-white">{t('save')}</button>
+                    <button 
+                        type="button" 
+                        onClick={() => handleSettingsUpdate({ heroTitle: localSettings.heroTitle, heroDescription: localSettings.heroDescription })} 
+                        className="bg-indigo-600 px-4 py-2 rounded text-white font-bold hover:bg-indigo-700 transition-colors"
+                    >
+                        {t('save')}
+                    </button>
                 </div>
 
                 <div className="space-y-4 pt-4 border-t border-gray-700">
@@ -156,24 +158,23 @@ function SiteSettingsPage() {
                         <label className="block mb-1">{t('pasteLogoLink')}</label>
                         <div className="flex gap-2">
                             <input type="text" value={localSettings.logoUrl || ''} onChange={(e) => setLocalSettings(s => ({...s, logoUrl: e.target.value}))} className="w-full bg-gray-700 rounded p-2 border border-gray-600"/>
-                            <button type="button" onClick={() => handleUrlUpdate('logoUrl', localSettings.logoUrl)} className="bg-indigo-600 px-4 rounded">{t('save')}</button>
-                        </div>
-                    </div>
-                </div>
+                            <button type="button" onClick={() => handleSettingsUpdate({ logoUrl: localSettings.logoUrl })} className="bg-indigo-600 px-4 rounded">{t('save')}</button>
+                            </div>
+                            </div>
+                            </div>
 
-                <div className="space-y-4 pt-4 border-t border-gray-700">
-                    <h3 className="text-lg font-semibold text-white border-b border-gray-700 pb-2">{t('backgroundVideo')}</h3>
-                    <div>
-                        <label className="block mb-1">{t('uploadNewVideo')}</label>
-                        <input type="file" accept="video/mp4,video/webm,video/ogg" onChange={(e) => handleFileUpload(e, 'video')} className="w-full text-sm text-gray-400 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-indigo-50 file:text-indigo-700 hover:file:bg-indigo-100"/>
-                        <p className="text-xs text-gray-400 mt-1">{t('currentVideoLabel')}: {localSettings.backgroundVideoUrl}</p>
-                    </div>
-                    <div>
-                        <label htmlFor="opacity" className="block mb-2 text-sm font-medium">{t('videoOpacity')}: {Math.round((localSettings.videoOpacity || 0) * 100)}%</label>
-                        <input id="opacity" type="range" min="0" max="1" step="0.05" value={localSettings.videoOpacity || 0} onChange={(e) => handleUrlUpdate('videoOpacity', parseFloat(e.target.value))} className="w-full h-2 bg-gray-600 rounded-lg appearance-none cursor-pointer"/>
-                    </div>
-                </div>
-
+                            <div className="space-y-4 pt-4 border-t border-gray-700">
+                            <h3 className="text-lg font-semibold text-white border-b border-gray-700 pb-2">{t('backgroundVideo')}</h3>
+                            <div>
+                            <label className="block mb-1">{t('uploadNewVideo')}</label>
+                            <input type="file" accept="video/mp4,video/webm,video/ogg" onChange={(e) => handleFileUpload(e, 'video')} className="w-full text-sm text-gray-400 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-indigo-50 file:text-indigo-700 hover:file:bg-indigo-100"/>
+                            <p className="text-xs text-gray-400 mt-1">{t('currentVideoLabel')}: {localSettings.backgroundVideoUrl}</p>
+                            </div>
+                            <div>
+                            <label htmlFor="opacity" className="block mb-2 text-sm font-medium">{t('videoOpacity')}: {Math.round((localSettings.videoOpacity || 0) * 100)}%</label>
+                            <input id="opacity" type="range" min="0" max="1" step="0.05" value={localSettings.videoOpacity || 0} onChange={(e) => handleSettingsUpdate({ videoOpacity: parseFloat(e.target.value) })} className="w-full h-2 bg-gray-600 rounded-lg appearance-none cursor-pointer"/>
+                            </div>
+                            </div>
                 {uploading && <p>{t('uploadingFile')}...</p>}
             </div>
         </div>

@@ -1,7 +1,9 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useCallback } from 'react';
+import ReactCrop, { centerCrop, makeAspectCrop } from 'react-image-crop';
 import { useCart } from '../contexts/CartContext';
 import { UploadIcon } from '../components/Icons';
 import CreditCardPreview from '../components/CreditCardPreview';
+import Modal from '../components/Modal';
 import { cardColorOptions, engravingColorNameKeys } from '../utils/colorUtils';
 import { useTranslation } from 'react-i18next'; // Import useTranslation
 
@@ -10,6 +12,12 @@ export default function PersonalDesignPage() {
     const [cardColor, setCardColor] = useState('black');
     const [engravingColor, setEngravingColor] = useState('silver');
     const [uploadedImage, setUploadedImage] = useState(null);
+    const [originalImage, setOriginalImage] = useState(null);
+    const [isCropModalOpen, setIsCropModalOpen] = useState(false);
+    const [crop, setCrop] = useState();
+    const [completedCrop, setCompletedCrop] = useState();
+    const imgRef = useRef(null);
+    
     const [showSuccessMessage, setShowSuccessMessage] = useState(false);
     const { t } = useTranslation(); // Initialize useTranslation
     
@@ -24,64 +32,89 @@ export default function PersonalDesignPage() {
         setEngravingColor(cardColorOptions[colorKey].engraving[0]);
     };
 
+    const onImageLoad = (e) => {
+        const { width, height } = e.currentTarget;
+        const initialCrop = centerCrop(
+            makeAspectCrop(
+                {
+                    unit: '%',
+                    width: 90,
+                },
+                1, // Default aspect ratio for cropping
+                width,
+                height
+            ),
+            width,
+            height
+        );
+        setCrop(initialCrop);
+    };
+
     const handleImageUpload = (event) => {
         const file = event.target.files[0];
         if (file) {
-            if (file.type === 'image/svg+xml') {
-                setUploadedImage(URL.createObjectURL(file));
-                setScale(1);
-                setRotation(0);
-                setPosition({ x: 45, y: 10 });
-            } else {
-                // Process raster image (PNG/JPG) to remove background and create pencil sketch effect
-                const img = new Image();
-                img.onload = () => {
-                    const canvas = document.createElement('canvas');
-                    const ctx = canvas.getContext('2d');
-                    canvas.width = img.width;
-                    canvas.height = img.height;
-                    
-                    // Draw original image
-                    ctx.drawImage(img, 0, 0);
-                    
-                    const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
-                    const data = imageData.data;
-                    
-                    // Apply thresholding: light pixels become transparent, dark pixels become black
-                    for (let i = 0; i < data.length; i += 4) {
-                        const r = data[i];
-                        const g = data[i + 1];
-                        const b = data[i + 2];
-                        const alpha = data[i + 3];
-                        
-                        // Ignore already transparent pixels
-                        if (alpha === 0) continue;
-                        
-                        // Calculate brightness (average)
-                        const brightness = (r + g + b) / 3;
-                        
-                        if (brightness > 200) {
-                            // If pixel is light (white/near white background), make it transparent
-                            data[i + 3] = 0;
-                        } else {
-                            // If pixel is dark, make it solid black (pencil lines)
-                            data[i] = 0;     // R
-                            data[i + 1] = 0; // G
-                            data[i + 2] = 0; // B
-                            data[i + 3] = 255; // Alpha
-                        }
-                    }
-                    
-                    ctx.putImageData(imageData, 0, 0);
-                    setUploadedImage(canvas.toDataURL('image/png'));
-                    setScale(1);
-                    setRotation(0);
-                    setPosition({ x: 45, y: 10 });
-                };
-                img.src = URL.createObjectURL(file);
-            }
+            const reader = new FileReader();
+            reader.onload = () => {
+                setOriginalImage(reader.result);
+                setIsCropModalOpen(true);
+            };
+            reader.readAsDataURL(file);
         }
     };
+
+    const getCroppedImg = useCallback(() => {
+        if (!completedCrop || !imgRef.current) return;
+
+        const image = imgRef.current;
+        const canvas = document.createElement('canvas');
+        const scaleX = image.naturalWidth / image.width;
+        const scaleY = image.naturalHeight / image.height;
+        canvas.width = completedCrop.width;
+        canvas.height = completedCrop.height;
+        const ctx = canvas.getContext('2d');
+
+        ctx.drawImage(
+            image,
+            completedCrop.x * scaleX,
+            completedCrop.y * scaleY,
+            completedCrop.width * scaleX,
+            completedCrop.height * scaleY,
+            0,
+            0,
+            completedCrop.width,
+            completedCrop.height
+        );
+
+        // After cropping, apply the pencil sketch/background removal logic
+        const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+        const data = imageData.data;
+        
+        for (let i = 0; i < data.length; i += 4) {
+            const r = data[i];
+            const g = data[i + 1];
+            const b = data[i + 2];
+            const alpha = data[i + 3];
+            
+            if (alpha === 0) continue;
+            
+            const brightness = (r + g + b) / 3;
+            if (brightness > 200) {
+                data[i + 3] = 0;
+            } else {
+                data[i] = 0;
+                data[i + 1] = 0;
+                data[i + 2] = 0;
+                data[i + 3] = 255;
+            }
+        }
+        
+        ctx.putImageData(imageData, 0, 0);
+        setUploadedImage(canvas.toDataURL('image/png'));
+        setIsCropModalOpen(false);
+        setScale(1);
+        setRotation(0);
+        setPosition({ x: 45, y: 10 });
+    }, [completedCrop]);
     
     const handleAddToCart = () => {
         if (!uploadedImage) {
@@ -161,15 +194,25 @@ export default function PersonalDesignPage() {
                             <h3 className="text-lg font-semibold mb-3">{t('uploadDesignTitle')}</h3>
                             <input 
                                 type="file" 
-                                accept="image/svg+xml,image/png,image/jpeg" 
+                                accept="image/png,image/jpeg" 
                                 ref={fileInputRef} 
                                 onChange={handleImageUpload} 
                                 className="hidden" 
                             />
-                            <button onClick={() => fileInputRef.current.click()} className="w-full flex items-center justify-center gap-2 bg-gray-700 hover:bg-gray-600 text-white font-bold py-3 px-4 rounded-md transition-colors">
-                                <UploadIcon />
-                                <span>{uploadedImage ? t('replaceFileButton') : t('selectFileButton')}</span>
-                            </button>
+                            <div className="flex gap-2">
+                                <button onClick={() => fileInputRef.current.click()} className="flex-grow flex items-center justify-center gap-2 bg-gray-700 hover:bg-gray-600 text-white font-bold py-3 px-4 rounded-md transition-colors">
+                                    <UploadIcon />
+                                    <span>{uploadedImage ? t('replaceFileButton') : t('selectFileButton')}</span>
+                                </button>
+                                {uploadedImage && (
+                                    <button 
+                                        onClick={() => setIsCropModalOpen(true)}
+                                        className="bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 px-6 rounded-md transition-colors"
+                                    >
+                                        {t('crop')}
+                                    </button>
+                                )}
+                            </div>
                         </div>
                         
                         {uploadedImage && (
@@ -220,6 +263,32 @@ export default function PersonalDesignPage() {
                     </div>
                 </div>
             </div>
+
+            <Modal isOpen={isCropModalOpen} onClose={() => setIsCropModalOpen(false)} title={t('crop')}>
+                <div className="flex flex-col items-center">
+                    {originalImage && (
+                        <ReactCrop
+                            crop={crop}
+                            onChange={(c) => setCrop(c)}
+                            onComplete={(c) => setCompletedCrop(c)}
+                        >
+                            <img 
+                                ref={imgRef}
+                                src={originalImage} 
+                                alt="Original" 
+                                onLoad={onImageLoad}
+                                className="max-w-full max-h-[60vh]"
+                            />
+                        </ReactCrop>
+                    )}
+                    <button 
+                        onClick={getCroppedImg}
+                        className="mt-6 bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2 px-8 rounded-lg transition-colors"
+                    >
+                        {t('done')}
+                    </button>
+                </div>
+            </Modal>
         </div>
     );
 }

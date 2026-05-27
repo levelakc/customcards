@@ -232,3 +232,6 @@ div.userway_buttons_wrapper {
 .animate-loading-bar {
   animation: loading-bar 2s infinite ease-in-out;
 }
+
+/* --- React Image Crop Styles --- */
+@import 'react-image-crop/dist/ReactCrop.css';
