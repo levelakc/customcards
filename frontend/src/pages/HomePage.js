@@ -10,7 +10,7 @@ import AboutUs from '../components/AboutUs';
 import Reviews from '../components/Reviews';
 import RealLifeGallery from '../components/RealLifeGallery'; 
 
-const MAX_CAROUSEL_ITEMS = 12;
+const MAX_CAROUSEL_ITEMS = 8;
 
 export default function HomePage() {
     const { t, i18n } = useTranslation();

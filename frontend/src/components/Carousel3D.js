@@ -54,8 +54,31 @@ export default function Carousel3D({ items }) {
                 }
             }
             rotationValue.current = currentRotation;
+            
             if (carouselInnerRef.current) {
                 carouselInnerRef.current.style.transform = `rotateY(${rotationValue.current}deg)`;
+                
+                // PERFORMANCE OPTIMIZATION: Render only visible cards
+                const children = carouselInnerRef.current.children;
+                for (let i = 0; i < children.length; i++) {
+                    const child = children[i];
+                    // Calculate the absolute angle of this item relative to the camera
+                    let absAngle = (i * itemAngle + rotationValue.current) % 360;
+                    
+                    // Normalize to -180 to 180 degrees
+                    if (absAngle > 180) absAngle -= 360;
+                    if (absAngle < -180) absAngle += 360;
+                    
+                    // If the card is facing away from the camera (more than 100 degrees left/right), hide it.
+                    // This prevents the browser from rendering and compositing complex SVGs that are hidden in the back.
+                    if (Math.abs(absAngle) > 100) {
+                        child.style.opacity = '0';
+                        child.style.visibility = 'hidden';
+                    } else {
+                        child.style.opacity = '1';
+                        child.style.visibility = 'visible';
+                    }
+                }
             }
             animationFrameId.current = requestAnimationFrame(animate);
         }, [itemAngle]);
@@ -192,7 +215,6 @@ export default function Carousel3D({ items }) {
                                                 product={item}
                                                 disableClick={true}
                                                 isMobile={isMobile}
-                                                hideDetails={true}
                                            />
                                         </div>
                                     );
