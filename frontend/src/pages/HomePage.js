@@ -132,16 +132,16 @@ export default function HomePage() {
                         </span>
                     </h1>
                     <p className="text-xl md:text-2xl mb-8 drop-shadow-md">{settings?.heroDescription || t('heroDescription')}</p>
-                    <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
+                    <div className="flex flex-col sm:flex-row items-center justify-center gap-6 mt-10">
                         <button 
                             onClick={handleScrollToDesigns} 
-                            className="bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 px-8 rounded-full text-lg transition duration-300 transform hover:scale-105"
+                            className="btn-premium btn-gold text-lg px-10"
                         >
                             {t('viewCollectionButton')}
                         </button>
                         <button 
                             onClick={handleScrollToPersonalDesign} 
-                            className="bg-green-600 hover:bg-green-700 text-white font-bold py-3 px-8 rounded-full text-lg transition duration-300 transform hover:scale-105"
+                            className="btn-premium btn-obsidian text-lg px-10"
                         >
                             {t('tryDesignYourselfButton')}
                         </button>

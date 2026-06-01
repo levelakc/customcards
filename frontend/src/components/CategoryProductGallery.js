@@ -46,9 +46,9 @@ export default function CategoryProductGallery() {
                     {categoriesWithRandomProduct.map(({ category, product }) => {
                         const categoryName = category.name?.[currentLanguage] || category.name?.he || category.name?.en || category.name || '';
                         return (
-                            <div key={category._id} className="bg-gray-700 rounded-lg shadow-xl overflow-hidden flex flex-col cursor-pointer" onClick={() => navigate('category', { id: category._id })}>
+                            <div key={category._id} className="glass-panel overflow-hidden flex flex-col cursor-pointer transition-all duration-500 hover:shadow-[0_0_30px_rgba(212,175,55,0.1)]" onClick={() => navigate('category', { id: category._id })}>
                                 <div className="p-4 flex flex-col items-center justify-center">
-                                    <h3 className="text-2xl font-semibold text-white text-center mb-4">{categoryName}</h3>
+                                    <h3 className="text-2xl font-bold text-white text-center mb-4 font-dancing">{categoryName}</h3>
                                 </div>
                                 {product && (
                                     <div className="p-4">
@@ -66,10 +66,10 @@ export default function CategoryProductGallery() {
                                         )}
                                     </div>
                                 )}
-                                <div className="p-4 flex flex-col items-center justify-center flex-grow">
+                                <div className="p-6 flex flex-col items-center justify-center flex-grow">
                                     <button
                                         onClick={(e) => { e.stopPropagation(); navigate('category', { id: category._id }); }} // Added e.stopPropagation()
-                                        className="bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2 px-6 rounded-full text-md transition duration-300 transform hover:scale-105"
+                                        className="btn-premium btn-gold w-full text-sm"
                                     >
                                         {t('viewCategory')}
                                     </button>

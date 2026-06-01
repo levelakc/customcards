@@ -71,7 +71,7 @@ const CheckoutForm = ({ guestInfo }) => {
                 ></textarea>
             </div>
             <PaymentElement id="payment-element" />
-            <button disabled={isLoading || !stripe || !elements} id="submit" className="w-full mt-6 bg-green-600 hover:bg-green-700 text-white font-bold py-3 rounded-lg text-lg disabled:bg-gray-500">
+            <button disabled={isLoading || !stripe || !elements} id="submit" className={`btn-premium w-full mt-10 text-xl py-4 ${isLoading || !stripe || !elements ? 'opacity-50 cursor-not-allowed' : 'btn-gold'}`}>
                 <span id="button-text">
                     {isLoading ? t('processingPayment') : t('payNow')}
                 </span>
@@ -140,11 +140,11 @@ export default function CheckoutPage() {
                     <LanguageSwitcher />
                     <CurrencySwitcher />
                 </div>
-                <h1 className="text-4xl font-extrabold mb-8 text-center font-dancing">{t('checkout')}</h1>
-                <div className="bg-gray-800 p-8 rounded-lg shadow-xl">
+                <h1 className="text-5xl font-extrabold mb-12 text-center gold-gradient-text font-dancing">{t('checkout')}</h1>
+                <div className="glass-panel p-10">
                     {!user && (
-                        <div className="mb-6">
-                            <h2 className="text-2xl font-bold text-white mb-4">{t('shippingDetails')}</h2>
+                        <div className="mb-10">
+                            <h2 className="text-2xl font-bold text-white mb-6 gold-gradient-text border-b border-gray-700 pb-2">{t('shippingDetails')}</h2>
                             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                                 <div>
                                     <label htmlFor="name" className="block text-sm font-medium text-gray-300">{t('fullName')}</label>

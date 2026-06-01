@@ -136,18 +136,18 @@ export default function PrizeWheelModal({ onClose }) {
     };
 
     return (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm p-4">
-            <div className="bg-gray-900 border border-gold-500/30 p-8 rounded-3xl shadow-2xl max-w-md w-full relative overflow-hidden">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/90 backdrop-blur-md p-4">
+            <div className="glass-panel p-10 max-w-md w-full relative overflow-hidden border-gold-500/30">
                 
                 {/* Close Button */}
                 <button 
                     onClick={onClose}
-                    className="absolute top-4 right-4 text-gray-400 hover:text-white transition-colors"
+                    className="absolute top-6 right-6 text-gray-400 hover:text-gold-500 transition-colors"
                 >
-                    <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                    <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12"></path></svg>
                 </button>
 
-                <h2 dir="auto" className="text-3xl font-bold gold-gradient-text text-center mb-6">
+                <h2 dir="auto" className="text-4xl font-extrabold gold-gradient-text text-center mb-10 font-dancing">
                     {t('spinToWin') || 'Spin to Win!'}
                 </h2>
 
@@ -197,7 +197,7 @@ export default function PrizeWheelModal({ onClose }) {
                         <button 
                             onClick={spinWheel}
                             disabled={isSpinning}
-                            className={`w-full py-4 rounded-xl font-bold text-lg transition-all ${isSpinning ? 'bg-gray-700 text-gray-500 cursor-not-allowed' : 'bg-gold-500 text-black hover:bg-gold-400 shadow-[0_0_15px_rgba(212,175,55,0.4)]'}`}
+                            className={`btn-premium w-full text-xl py-4 ${isSpinning ? 'opacity-50 cursor-not-allowed' : 'btn-gold'}`}
                         >
                             {isSpinning ? (t('spinning') || 'Spinning...') : (t('spinNow') || 'SPIN NOW')}
                         </button>
@@ -205,14 +205,14 @@ export default function PrizeWheelModal({ onClose }) {
                         result.discount > 0 ? (
                             <button 
                                 onClick={handleClaim}
-                                className="w-full py-4 rounded-xl font-bold text-lg bg-gold-500 text-black hover:bg-gold-400 shadow-[0_0_15px_rgba(212,175,55,0.4)] transition-all"
+                                className="btn-premium btn-gold w-full text-xl py-4"
                             >
                                 {user ? (t('claimPrize') || 'Claim Promo Code') : (t('loginToClaim') || 'Login / Register to Claim')}
                             </button>
                         ) : (
                             <button 
                                 onClick={onClose}
-                                className="w-full py-4 rounded-xl font-bold text-lg bg-gray-700 text-white hover:bg-gray-600 transition-all"
+                                className="btn-premium btn-obsidian w-full text-xl py-4"
                             >
                                 {t('close') || 'Close'}
                             </button>

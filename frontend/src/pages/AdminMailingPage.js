@@ -39,36 +39,36 @@ export default function AdminMailingPage() {
     };
 
     return (
-        <div className="bg-gray-800 p-6 rounded-lg shadow-lg">
-            <h2 className="text-2xl font-bold text-white mb-6">{t('emailBroadcast') || 'Email Broadcast System'}</h2>
-            <p className="text-gray-400 mb-6">{t('emailBroadcastDesc') || 'Send an email to all registered users.'}</p>
+        <div className="glass-panel p-8">
+            <h2 className="text-3xl font-extrabold gold-gradient-text mb-6 font-dancing">{t('emailBroadcast') || 'Email Broadcast System'}</h2>
+            <p className="text-gray-400 mb-8">{t('emailBroadcastDesc') || 'Send an email to all registered users.'}</p>
             
             {status.message && (
-                <div className={`p-4 mb-6 rounded-md ${status.isError ? 'bg-red-900/50 text-red-200' : 'bg-green-900/50 text-green-200'}`}>
+                <div className={`p-4 mb-8 rounded-lg font-bold text-center ${status.isError ? 'bg-red-900/40 text-red-200 border border-red-500/50' : 'bg-green-900/40 text-green-200 border border-green-500/50'}`}>
                     {status.message}
                 </div>
             )}
 
-            <form onSubmit={handleSend} className="space-y-6">
+            <form onSubmit={handleSend} className="space-y-8">
                 <div>
-                    <label className="block text-sm font-medium text-gray-300 mb-2">{t('emailSubject') || 'Subject'}</label>
+                    <label className="block text-xs uppercase tracking-widest text-gold-500 font-bold mb-3">{t('emailSubject') || 'Subject'}</label>
                     <input 
                         type="text" 
                         required
                         value={subject}
                         onChange={(e) => setSubject(e.target.value)}
-                        className="w-full bg-gray-700 border border-gray-600 rounded-md py-2 px-4 text-white focus:outline-none focus:border-indigo-500"
+                        className="w-full bg-black/40 border border-white/10 rounded-xl py-3 px-6 text-white focus:outline-none focus:border-gold-500/50 transition-all"
                         placeholder={t('emailSubjectPlaceholder') || 'Enter email subject...'}
                     />
                 </div>
                 <div>
-                    <label className="block text-sm font-medium text-gray-300 mb-2">{t('emailBody') || 'HTML Body'}</label>
+                    <label className="block text-xs uppercase tracking-widest text-gold-500 font-bold mb-3">{t('emailBody') || 'HTML Body'}</label>
                     <textarea 
                         required
                         value={htmlBody}
                         onChange={(e) => setHtmlBody(e.target.value)}
                         rows="10"
-                        className="w-full bg-gray-700 border border-gray-600 rounded-md py-2 px-4 text-white focus:outline-none focus:border-indigo-500 font-mono text-sm"
+                        className="w-full bg-black/40 border border-white/10 rounded-xl py-4 px-6 text-white focus:outline-none focus:border-gold-500/50 font-mono text-sm"
                         placeholder={t('emailBodyPlaceholder') || 'Enter HTML content here...'}
                     ></textarea>
                 </div>
@@ -76,7 +76,7 @@ export default function AdminMailingPage() {
                     <button 
                         type="submit" 
                         disabled={status.loading}
-                        className="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 px-4 rounded-md transition-colors disabled:bg-indigo-400"
+                        className={`btn-premium w-full text-lg py-4 ${status.loading ? 'opacity-50 cursor-not-allowed' : 'btn-gold'}`}
                     >
                         {status.loading ? (t('sending') || 'Sending...') : (t('sendBroadcast') || 'Send to All Users')}
                     </button>

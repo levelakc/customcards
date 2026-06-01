@@ -111,13 +111,21 @@ export default function Navbar() {
                                     </div>
                                 </div>
                             ) : (
-                                <button onClick={() => navigate('login')} className="bg-transparent border border-gray-600 hover:border-gold-500 hover:text-gold-500 px-5 py-2 rounded-full text-sm font-bold transition-all duration-300 whitespace-nowrap">
+                                <button 
+                                    onClick={() => navigate('login')} 
+                                    className="btn-premium btn-gold py-1.5 px-6 text-xs whitespace-nowrap"
+                                >
                                     {t('loginRegister')}
                                 </button>
                             )}
                             
                             {isAdmin && (
-                                <button onClick={() => navigate('admin')} className="bg-indigo-900 bg-opacity-30 border border-indigo-500 text-indigo-300 hover:bg-indigo-800 px-4 py-2 rounded-full text-xs font-bold transition-all uppercase tracking-wider whitespace-nowrap">{t('adminPanel')}</button>
+                                <button 
+                                    onClick={() => navigate('admin')} 
+                                    className="btn-premium btn-obsidian py-1.5 px-6 text-xs whitespace-nowrap"
+                                >
+                                    {t('adminPanel')}
+                                </button>
                             )}
 
                             <button onClick={() => navigate('cart')} className="relative p-3 bg-gray-800 rounded-full hover:bg-gray-700 transition-all focus:outline-none shadow-inner border border-gray-700">

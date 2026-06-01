@@ -150,15 +150,15 @@ export default function ProductPage() {
                             <button
                                 type="button"
                                 onClick={handleAddToCart}
-                                className="mt-6 w-full bg-blue-600 border border-transparent rounded-md py-3 px-8 flex items-center justify-center text-base font-medium text-white hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+                                className="btn-premium btn-gold w-full text-xl py-4"
                             >
-                                הוסף לעגלה
+                                {t('addToCartButton')}
                             </button>
                         </form>
 
                         {showSuccessMessage && (
-                            <div className="mt-4 text-green-500 text-center">
-                                המוצר נוסף לעגלה בהצלחה!
+                            <div className="mt-4 text-green-500 text-center font-bold">
+                                {t('productAddedToCartSuccess')}
                             </div>
                         )}
 
@@ -186,12 +186,14 @@ export default function ProductPage() {
                     </div>
                 </div>
 
-                <button 
-                    onClick={() => navigate('all-categories')}
-                    className="block mx-auto mt-10 mb-10 px-6 py-3 bg-blue-600 text-white font-bold rounded-full shadow-lg hover:bg-blue-700 transition duration-300 ease-in-out focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-75"
-                >
-                    כל הקטגוריות
-                </button>
+                <div className="flex justify-center mt-12">
+                    <button 
+                        onClick={() => navigate('all-categories')}
+                        className="btn-premium btn-obsidian px-10"
+                    >
+                        {t('allCategoriesTitle')}
+                    </button>
+                </div>
 
                 {relatedProducts.length > 0 && (
                     <div className="mt-20">

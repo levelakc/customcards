@@ -325,8 +325,8 @@ export default function AdminDashboardPage() {
             </div>
 
             {/* Sales Trend Chart */}
-            <div className="bg-gray-800 p-6 rounded-lg shadow-lg mb-8">
-                <h3 className="text-xl font-semibold mb-4">{t('revenueTrend')}</h3>
+            <div className="glass-panel p-8 mb-12">
+                <h3 className="text-xl font-bold mb-6 gold-gradient-text">{t('revenueTrend')}</h3>
                 {salesTrendData && salesTrendData.length > 0 ? (
                     <Line data={lineChartData} options={lineChartOptions} />
                 ) : (
@@ -335,17 +335,17 @@ export default function AdminDashboardPage() {
             </div>
 
             {/* Product Performance & Sales by Category */}
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
-                <div className="bg-gray-800 p-6 rounded-lg shadow-lg">
-                    <h3 className="text-xl font-semibold mb-4">{t('top5Products')}</h3>
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 mb-12">
+                <div className="glass-panel p-8">
+                    <h3 className="text-xl font-bold mb-6 gold-gradient-text">{t('top5Products')}</h3>
                     {topProducts && topProducts.length > 0 ? (
                         <Bar data={topProductsChartData} options={topProductsChartOptions} />
                     ) : (
                         <p className="text-gray-400">{t('noTopProducts')}</p>
                     )}
                 </div>
-                <div className="bg-gray-800 p-6 rounded-lg shadow-lg">
-                    <h3 className="text-xl font-semibold mb-4">{t('salesByCategory')}</h3>
+                <div className="glass-panel p-8">
+                    <h3 className="text-xl font-bold mb-6 gold-gradient-text">{t('salesByCategory')}</h3>
                     {salesByCategory && salesByCategory.length > 0 ? (
                         <Pie data={salesByCategoryChartData} options={salesByCategoryChartOptions} />
                     ) : (
@@ -355,17 +355,17 @@ export default function AdminDashboardPage() {
             </div>
 
             {/* Recent Orders */}
-            <div className="bg-gray-800 p-6 rounded-lg shadow-lg">
-                <h3 className="text-xl font-semibold mb-4">{t('recentOrders')}</h3>
+            <div className="glass-panel p-8">
+                <h3 className="text-xl font-bold mb-6 gold-gradient-text">{t('recentOrders')}</h3>
                 {recentOrders.length > 0 ? (
-                    <ul className="divide-y divide-gray-700">
+                    <ul className="divide-y divide-gray-800">
                         {recentOrders.map(order => (
-                            <li key={order._id} className="py-3 flex justify-between items-center">
+                            <li key={order._id} className="py-4 flex justify-between items-center">
                                 <div>
-                                    <p className="font-medium">{t('orderId')} {order._id}</p>
-                                    <p className="text-sm text-gray-400">{t('user')} {order.user?.name || t('guestUser')}</p>
+                                    <p className="font-bold text-white">{t('orderId')} {order._id}</p>
+                                    <p className="text-xs text-gray-500 mt-1 uppercase tracking-wider">{t('user')} {order.user?.name || t('guestUser')}</p>
                                 </div>
-                                <p className="font-bold">{getSymbol()}{convert(order.totalPrice).toFixed(2)}</p>
+                                <p className="font-black text-white text-lg">{getSymbol()}{convert(order.totalPrice).toFixed(2)}</p>
                             </li>
                         ))}
                     </ul>
@@ -377,10 +377,9 @@ export default function AdminDashboardPage() {
     );
 }
 
-// Simple reusable card component for dashboard stats
 const DashboardCard = ({ title, value }) => (
-    <div className="bg-gray-800 p-5 rounded-lg shadow-md flex flex-col items-center justify-center text-center">
-        <h3 className="text-lg font-semibold text-gray-300 mb-2">{title}</h3>
-        <p className="text-4xl font-bold text-white">{value}</p>
+    <div className="glass-panel p-8 flex flex-col items-center justify-center text-center transition-all duration-500 hover:shadow-[0_0_20px_rgba(212,175,55,0.15)]">
+        <h3 className="text-xs uppercase tracking-widest text-gold-500 mb-4 font-bold">{title}</h3>
+        <p className="text-4xl font-black text-white drop-shadow-md">{value}</p>
     </div>
 );

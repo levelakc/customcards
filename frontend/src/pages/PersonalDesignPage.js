@@ -224,15 +224,18 @@ export default function PersonalDesignPage() {
                                 onChange={handleImageUpload} 
                                 className="hidden" 
                             />
-                            <div className="flex gap-2">
-                                <button onClick={() => fileInputRef.current.click()} className="flex-grow flex items-center justify-center gap-2 bg-gray-700 hover:bg-gray-600 text-white font-bold py-3 px-4 rounded-md transition-colors">
+                            <div className="flex gap-4">
+                                <button 
+                                    onClick={() => fileInputRef.current.click()} 
+                                    className="flex-grow btn-premium btn-obsidian"
+                                >
                                     <UploadIcon />
-                                    <span>{uploadedImage ? t('replaceFileButton') : t('selectFileButton')}</span>
+                                    <span className="mr-2">{uploadedImage ? t('replaceFileButton') : t('selectFileButton')}</span>
                                 </button>
                                 {uploadedImage && (
                                     <button 
                                         onClick={() => setIsCropModalOpen(true)}
-                                        className="bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 px-6 rounded-md transition-colors"
+                                        className="btn-premium btn-silver px-8"
                                     >
                                         {t('crop')}
                                     </button>
@@ -241,8 +244,8 @@ export default function PersonalDesignPage() {
                         </div>
                         
                         {uploadedImage && (
-                            <div className="space-y-4 bg-gray-800 p-4 rounded-lg">
-                                <h3 className="text-lg font-semibold">{t('adjustDesignTitle')}</h3>
+                            <div className="space-y-4 glass-panel p-6 border-gold-500/20">
+                                <h3 className="text-xl font-bold gold-gradient-text">{t('adjustDesignTitle')}</h3>
                                 <p className="text-sm text-gray-400 mb-3">{t('adjustDesignDescription')}</p>
 
                                 {/* SCALE SLIDER */}
@@ -281,7 +284,7 @@ export default function PersonalDesignPage() {
                             </div>
                         )}
                         
-                        <button onClick={handleAddToCart} className="w-full bg-green-600 hover:bg-green-700 text-white font-bold py-3 px-6 rounded-lg text-lg transition-transform transform hover:scale-105">
+                        <button onClick={handleAddToCart} className="btn-premium btn-gold text-xl w-full py-4 mt-4">
                             {t('addToCartButton')}
                         </button>
                         {showSuccessMessage && (<div className="text-center text-green-400 font-bold">{t('productAddedToCartSuccess')}</div>)}

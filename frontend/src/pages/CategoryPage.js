@@ -68,21 +68,23 @@ export default function CategoryPage() {
     return (
         <div className="bg-gray-900 min-h-screen">
             <div className="max-w-7xl mx-auto py-12 px-4 sm:px-6 lg:px-8">
-                <div className="flex flex-col md:flex-row md:items-center justify-between mb-8 gap-4">
-                    <h1 className="text-4xl font-extrabold text-white font-dancing">{categoryName}</h1>
-                    
-                    <div className="relative w-full md:w-64">
-                        <input
-                            type="text"
-                            placeholder={t('filterDesigns')}
-                            value={searchTerm}
-                            onChange={(e) => setSearchTerm(e.target.value)}
-                            className="w-full bg-gray-800 text-white border border-gray-700 rounded-full py-2 px-4 pl-10 focus:outline-none focus:border-gold-500 transition-colors"
-                        />
-                        <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                            <svg className="h-5 w-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-                            </svg>
+                <div className="glass-panel p-8 mb-12">
+                    <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
+                        <h1 className="text-4xl font-extrabold gold-gradient-text font-dancing">{categoryName}</h1>
+                        
+                        <div className="relative w-full md:w-80">
+                            <input
+                                type="text"
+                                placeholder={t('filterDesigns')}
+                                value={searchTerm}
+                                onChange={(e) => setSearchTerm(e.target.value)}
+                                className="w-full bg-gray-800 text-white border border-gray-700 rounded-full py-3 px-6 pl-12 focus:outline-none focus:border-gold-500 transition-colors"
+                            />
+                            <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                                <svg className="h-5 w-5 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                                </svg>
+                            </div>
                         </div>
                     </div>
                 </div>

@@ -84,38 +84,32 @@ export default function BrowsePage() {
                     
                     {/* Futuristic Sidebar Filters */}
                     <aside className={`${isSidebarOpen ? 'block' : 'hidden'} lg:block lg:w-80 flex-shrink-0`}>
-                        <div className="filter-glass rounded-3xl p-8 sticky top-28 z-30 shadow-[0_20px_50px_rgba(0,0,0,0.5)] border border-white/5 space-y-10">
+                        <div className="glass-panel p-8 sticky top-28 z-30 space-y-10">
                             
                             {/* Search Section */}
                             <div>
-                                <div className="flex items-center gap-3 mb-4">
-                                    <div className="w-1.5 h-1.5 rounded-full bg-indigo-500 animate-pulse"></div>
-                                    <span className="text-[10px] uppercase tracking-[0.3em] text-gray-500 font-black">{t('search')}</span>
-                                </div>
+                                <h3 className="text-xs uppercase tracking-widest text-gold-500 font-bold mb-4">{t('search')}</h3>
                                 <div className="relative group">
                                     <input 
                                         type="text"
                                         value={searchTerm}
                                         onChange={handleSearchChange}
                                         placeholder={t('filterDesigns')}
-                                        className="w-full bg-black/40 border border-white/10 rounded-2xl py-4 pr-12 pl-4 focus:outline-none focus:border-gold-500/50 transition-all shadow-inner text-sm text-white placeholder:text-gray-600"
+                                        className="w-full bg-black/40 border border-white/10 rounded-xl py-3 pr-12 pl-4 focus:outline-none focus:border-gold-500/50 transition-all text-sm text-white"
                                     />
-                                    <svg className="absolute right-4 top-3.5 h-5 w-5 text-gray-500 group-focus-within:text-gold-500 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <svg className="absolute right-4 top-2.5 h-5 w-5 text-gray-500 group-focus-within:text-gold-500 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
                                     </svg>
                                 </div>
                             </div>
 
-                            {/* Categories Section */}
+                            {/* Collections Section */}
                             <div className="border-t border-white/5 pt-8">
-                                <div className="flex items-center gap-3 mb-6">
-                                    <div className="w-1.5 h-1.5 rounded-full bg-gold-500 animate-pulse"></div>
-                                    <span className="text-[10px] uppercase tracking-[0.3em] text-gray-500 font-black">{t('collections')}</span>
-                                </div>
+                                <h3 className="text-xs uppercase tracking-widest text-gold-500 font-bold mb-6">{t('collections')}</h3>
                                 <div className="flex flex-col gap-3">
                                     <button 
                                         onClick={() => handleCategoryClick(null)}
-                                        className={`category-pill w-full text-right px-6 py-3 rounded-2xl text-xs font-black uppercase tracking-widest transition-all duration-500 border ${!selectedCategory ? 'bg-gold-500 text-black border-gold-500 shadow-[0_10px_30px_rgba(212,175,55,0.3)]' : 'bg-white/5 border-white/5 text-gray-500 hover:border-white/20 hover:text-white'}`}
+                                        className={`btn-premium text-xs py-3 ${!selectedCategory ? 'btn-gold' : 'btn-obsidian border-white/10 text-gray-400 hover:text-white'}`}
                                     >
                                         {t('allProducts')}
                                     </button>
@@ -123,7 +117,7 @@ export default function BrowsePage() {
                                         <button 
                                             key={cat._id}
                                             onClick={() => handleCategoryClick(cat._id)}
-                                            className={`category-pill w-full text-right px-6 py-3 rounded-2xl text-xs font-black uppercase tracking-widest transition-all duration-500 border ${selectedCategory === cat._id ? 'bg-gold-500 text-black border-gold-500 shadow-[0_10px_30px_rgba(212,175,55,0.3)]' : 'bg-white/5 border-white/5 text-gray-500 hover:border-white/20 hover:text-white'}`}
+                                            className={`btn-premium text-xs py-3 ${selectedCategory === cat._id ? 'btn-gold' : 'btn-obsidian border-white/10 text-gray-400 hover:text-white'}`}
                                         >
                                             {cat.name}
                                         </button>
@@ -201,7 +195,7 @@ export default function BrowsePage() {
                                 <p className="text-gray-500 mb-8 max-w-md mx-auto">{t('noSalesByCategory')}</p>
                                 <button 
                                     onClick={() => updateFilters({ category: null, colors: null, q: null })}
-                                    className="px-8 py-3 bg-gray-800 hover:bg-gray-700 text-gold-500 border border-gold-500/30 rounded-full font-bold transition-all"
+                                    className="btn-premium btn-obsidian px-10"
                                 >
                                     {t('clearAllFilters')}
                                 </button>

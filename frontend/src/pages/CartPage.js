@@ -89,8 +89,8 @@ export default function CartPage() {
         <div className="bg-gray-900 min-h-screen text-white">
             <div className="max-w-4xl mx-auto py-12 px-4 sm:px-6 lg:px-8">
                 <h1 className="text-4xl font-extrabold mb-8 font-dancing">{t('yourCartTitle')}</h1>
-                <div className="bg-gray-800 rounded-lg shadow-xl">
-                    <ul className="divide-y divide-gray-700">
+                <div className="glass-panel overflow-hidden">
+                    <ul className="divide-y divide-gray-800">
                         {cartItems.map(item => (
                             <li key={item.cartItemId} className="p-4 sm:p-6 flex items-center space-x-4 space-x-reverse">
                                 <div className="w-32 h-auto flex-shrink-0">
@@ -139,7 +139,7 @@ export default function CartPage() {
                         </div>
                         <button 
                             onClick={handleProceedToCheckout} 
-                            className="w-full bg-green-600 hover:bg-green-700 text-white font-bold py-3 rounded-lg text-lg"
+                            className="btn-premium btn-gold w-full text-xl py-4"
                         >
                             {t('proceedToCheckoutButton')}
                         </button>

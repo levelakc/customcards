@@ -66,7 +66,7 @@ const ProductCard = ({ product, disableClick = false, isMobile }) => {
     return (
         <div 
             onClick={handleClick}
-            className="group flex flex-col h-full cursor-pointer relative bg-gray-800 rounded-lg overflow-hidden shadow-lg hover:shadow-2xl transition-shadow duration-300"
+            className="glass-panel group flex flex-col h-full cursor-pointer relative overflow-hidden transition-all duration-500 hover:shadow-[0_0_30px_rgba(212,175,55,0.15)] transform hover:-translate-y-2"
         >
             {/* Share Button Overlay */}
             <button 
@@ -104,7 +104,7 @@ const ProductCard = ({ product, disableClick = false, isMobile }) => {
                 <p className="text-white font-black text-lg mb-3">₪{product.price}</p>
                 <button 
                     onClick={handleButtonClick}
-                    className="w-full bg-indigo-600 text-white font-semibold py-2.5 rounded-lg hover:bg-indigo-500 hover:shadow-[0_0_15px_rgba(79,70,229,0.5)] transition-all"
+                    className="btn-premium btn-gold py-2 w-full text-sm"
                 >
                     {t('viewDetailsButton')}
                 </button>
