@@ -251,9 +251,12 @@ div.userway_buttons_wrapper {
 }
 
 .btn-gold {
-    background: linear-gradient(135deg, #bf953f, #fcf6ba, #b38728, #fbf5b7, #aa8238);
-    color: #1a1a1a;
-    box-shadow: 0 4px 15px rgba(191, 149, 63, 0.3);
+    background: linear-gradient(135deg, rgba(191, 149, 63, 0.7), rgba(252, 246, 186, 0.7), rgba(179, 135, 40, 0.7), rgba(251, 245, 183, 0.7), rgba(170, 130, 56, 0.7));
+    color: #ffffff;
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    border: 1px solid rgba(212, 175, 55, 0.3);
+    box-shadow: 0 4px 15px rgba(191, 149, 63, 0.2);
 }
 
 .btn-gold:hover {

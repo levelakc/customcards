@@ -9,17 +9,17 @@ export default function AboutUs() {
                 <h2 className="text-3xl font-extrabold mb-8">{t('howItWorksTitle')}</h2>
                 <div className="grid md:grid-cols-3 gap-8 text-lg">
                     <div className="flex flex-col items-center">
-                        <div className="bg-indigo-600 rounded-full w-16 h-16 flex items-center justify-center text-2xl font-bold mb-4">1</div>
+                        <div className="glass-panel w-16 h-16 flex items-center justify-center text-2xl font-bold mb-6 border-gold-500/50 gold-gradient-text">1</div>
                         <h3 className="font-bold mb-2">{t('placeAnOrderTitle')}</h3>
                         <p className="text-gray-400">{t('placeAnOrderDescription')}</p>
                     </div>
                     <div className="flex flex-col items-center">
-                        <div className="bg-indigo-600 rounded-full w-16 h-16 flex items-center justify-center text-2xl font-bold mb-4">2</div>
+                        <div className="glass-panel w-16 h-16 flex items-center justify-center text-2xl font-bold mb-6 border-gold-500/50 gold-gradient-text">2</div>
                         <h3 className="font-bold mb-2">{t('weContactYouTitle')}</h3>
                         <p className="text-gray-400">{t('weContactYouDescription')}</p>
                     </div>
                     <div className="flex flex-col items-center">
-                        <div className="bg-indigo-600 rounded-full w-16 h-16 flex items-center justify-center text-2xl font-bold mb-4">3</div>
+                        <div className="glass-panel w-16 h-16 flex items-center justify-center text-2xl font-bold mb-6 border-gold-500/50 gold-gradient-text">3</div>
                         <h3 className="font-bold mb-2">{t('homeDeliveryTitle')}</h3>
                         <p className="text-gray-400">{t('homeDeliveryDescription')}</p>
                     </div>
