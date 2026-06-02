@@ -73,13 +73,10 @@ export default function Carousel3D({ items }) {
     const handleNext = () => changePage(1);
     const handlePrev = () => changePage(-1);
 
-    if (!items || items.length === 0) {
-        return <div className="text-center text-white py-10">טוען מוצרים...</div>;
-    }
-
     // Always render CURRENT page, PREVIOUS page, and NEXT page
     // This ensures cards are visible on both left and right during any rotation
     const renderedIndices = useMemo(() => {
+        if (!items || items.length === 0) return [];
         const indices = new Set();
         const pagesToRender = [
             (currentPage - 1 + totalPages) % totalPages, // Previous
@@ -96,6 +93,10 @@ export default function Carousel3D({ items }) {
 
         return Array.from(indices);
     }, [currentPage, totalPages, cardsPerPage, items]);
+
+    if (!items || items.length === 0) {
+        return <div className="text-center text-white py-10">טוען מוצרים...</div>;
+    }
 
     return (
         <div className="w-full flex relative min-h-[450px] md:min-h-[600px] items-center justify-center overflow-x-hidden px-4 sm:px-12 md:px-24">
