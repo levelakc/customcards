@@ -1,9 +1,9 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import ProductCard from './ProductCard';
 
-const DRAG_SENSITIVITY = 0.04;
+const DRAG_SENSITIVITY = 0.06;
 const INERTIA_DAMPING = 0.96;
-const AUTO_ROTATE_SPEED = -0.1;
+const AUTO_ROTATE_SPEED = -0.15;
 const MOBILE_BREAKPOINT = 768;
 
 export default function Carousel3D({ items }) {
@@ -13,6 +13,7 @@ export default function Carousel3D({ items }) {
     const elementRef = useRef(null);
     const carouselInnerRef = useRef(null); // New ref for the inner carousel div
     const isDragging = useRef(false);
+    const [dragging, setDragging] = useState(false); // New state to trigger effect
     const dragStart = useRef({ x: 0, rotation: 0, lastX: 0, lastTime: 0 });
     const velocity = useRef(0);
     const animationFrameId = useRef(null);
@@ -34,8 +35,7 @@ export default function Carousel3D({ items }) {
     
             if (isDragging.current) {
                 isSnapping.current = false;
-                currentRotation += velocity.current * DRAG_SENSITIVITY * 0.1;
-                velocity.current *= 0.8;
+                // Rotation is handled in handleDragMove for direct tracking
             } else if (isSnapping.current) {
                 const closestAngle = Math.round(currentRotation / itemAngle) * itemAngle;
                 currentRotation += (closestAngle - currentRotation) * 0.1;
@@ -94,6 +94,7 @@ export default function Carousel3D({ items }) {
     
         const handleDragStart = useCallback((e) => {
             isDragging.current = true;
+            setDragging(true);
             isSnapping.current = false;
             velocity.current = 0;
             autoRotate.current = false; 
@@ -110,7 +111,8 @@ export default function Carousel3D({ items }) {
         const handleDragMove = useCallback((e) => {
             if (!isDragging.current) return;
             if (e.touches) {
-                e.preventDefault(); 
+                // Do not preventDefault here for mouse events to avoid blocking other interactions
+                // but for touches it's often needed to prevent scrolling
             }
             const clientX = e.touches ? e.touches[0].clientX : e.clientX;
             
@@ -119,18 +121,19 @@ export default function Carousel3D({ items }) {
             const timeDelta = now - dragStart.current.lastTime;
             
             if (timeDelta > 0) {
-                velocity.current = (moveDelta / timeDelta) * 20; 
+                velocity.current = (moveDelta / timeDelta) * 15; 
             }
     
+            // Update rotation directly for real-time tracking
+            rotationValue.current += moveDelta * DRAG_SENSITIVITY * 10;
+            
             dragStart.current.lastX = clientX;
             dragStart.current.lastTime = now;
-            
-            // Do not set rotation here directly. Let the animate loop handle it using velocity.
-            // setRotation(dragStart.current.rotation + (deltaX * DRAG_SENSITIVITY)); 
         }, []);
     
         const handleDragEnd = useCallback(() => {
             isDragging.current = false;
+            setDragging(false);
             if (Math.abs(velocity.current) < 0.5) { // If velocity is low, snap
                 isSnapping.current = true;
                 autoRotate.current = false; // Disable auto-rotate during snap
@@ -167,16 +170,31 @@ export default function Carousel3D({ items }) {
     const cardWidth = (isMobile ? Math.min(160, window.innerWidth * 0.7) : 220);
 
 
+    useEffect(() => {
+        const handleMove = (e) => handleDragMove(e);
+        const handleEnd = () => handleDragEnd();
+
+        if (dragging) {
+            window.addEventListener('mousemove', handleMove);
+            window.addEventListener('touchmove', handleMove, { passive: false });
+            window.addEventListener('mouseup', handleEnd);
+            window.addEventListener('touchend', handleEnd);
+        }
+
+        return () => {
+            window.removeEventListener('mousemove', handleMove);
+            window.removeEventListener('touchmove', handleMove);
+            window.removeEventListener('mouseup', handleEnd);
+            window.removeEventListener('touchend', handleEnd);
+        };
+    }, [dragging, handleDragMove, handleDragEnd]);
+
     return (
         <div 
             ref={elementRef} 
             className="w-full flex relative min-h-[400px] md:min-h-[500px] max-h-screen items-center justify-center cursor-grab active:cursor-grabbing overflow-x-hidden overflow-y-hidden"
             onMouseDown={handleDragStart}
             onTouchStart={handleDragStart}
-            onMouseMove={handleDragMove}
-            onTouchMove={handleDragMove}
-            onMouseUp={handleDragEnd}
-            onTouchEnd={handleDragEnd}
             onMouseEnter={() => {
                 autoRotate.current = false;
             }}

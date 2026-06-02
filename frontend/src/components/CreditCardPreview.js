@@ -402,8 +402,8 @@ const CreditCardPreview = React.memo(function CreditCardPreview({
                 style={{
                     filter: isCarousel ? 'none' : 'drop-shadow(0 10px 10px rgba(0,0,0,0.4))'
                 }}
-                onMouseDown={handleDragStart}
-                onTouchStart={handleDragStart}
+                onMouseDown={isDraggable ? handleDragStart : undefined}
+                onTouchStart={isDraggable ? handleDragStart : undefined}
             >
                 <defs>
                     <linearGradient id={uniqueIds.silverGradient} x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stopColor="#c0c0c0" /><stop offset="100%" stopColor="#a9a9a9" /></linearGradient>
