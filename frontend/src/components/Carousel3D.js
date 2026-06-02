@@ -6,7 +6,7 @@ const ANIMATION_DURATION = 800; // 0.8 seconds
 export default function Carousel3D({ items }) {
     const [windowWidth, setWindowWidth] = useState(window.innerWidth);
     const [currentPage, setCurrentPage] = useState(0);
-    const [visiblePageIndices, setVisiblePageIndices] = useState([0]); // Currently rendering pages
+    const [visiblePageIndices, setVisiblePageIndices] = useState([0]);
     const [isAnimating, setIsAnimating] = useState(false);
     
     const carouselInnerRef = useRef(null);
@@ -48,7 +48,7 @@ export default function Carousel3D({ items }) {
 
         const nextPage = (currentPage + direction + totalPages) % totalPages;
         
-        // 1. Prepare: Add the next batch to DOM (Surrounding Page Rendering)
+        // Prepare: Add next/prev neighbors to DOM
         setVisiblePageIndices(prev => {
             const nextPages = [
                 (nextPage - 1 + totalPages) % totalPages,
@@ -60,7 +60,6 @@ export default function Carousel3D({ items }) {
         
         setIsAnimating(true);
 
-        // 2. Wait for DOM to update
         setTimeout(() => {
             const rotationStep = cardsPerPage * itemAngle;
             rotationValue.current += direction * -rotationStep;
@@ -70,7 +69,6 @@ export default function Carousel3D({ items }) {
                 carouselInnerRef.current.style.transform = `rotateY(${rotationValue.current}deg)`;
             }
 
-            // 3. Cleanup: Prune DOM to only keep current batch + neighbors
             setTimeout(() => {
                 setCurrentPage(nextPage);
                 setVisiblePageIndices([
@@ -89,6 +87,59 @@ export default function Carousel3D({ items }) {
 
     const handleNext = () => changePage(1);
     const handlePrev = () => changePage(-1);
+
+    // Initial Neighbor rendering
+    useEffect(() => {
+        if (totalPages > 1) {
+            setVisiblePageIndices([
+                (currentPage - 1 + totalPages) % totalPages,
+                currentPage,
+                (currentPage + 1) % totalPages
+            ]);
+        }
+    }, [totalPages, currentPage]);
+
+    // Visibility Logic: Dynamic Opacity based on Angle
+    useEffect(() => {
+        if (!carouselInnerRef.current) return;
+        
+        const updateVisibility = () => {
+            const children = carouselInnerRef.current.children;
+            for (let i = 0; i < children.length; i++) {
+                const child = children[i];
+                const index = parseInt(child.dataset.index);
+                if (isNaN(index)) continue;
+
+                let absAngle = (index * itemAngle + rotationValue.current) % 360;
+                if (absAngle > 180) absAngle -= 360;
+                if (absAngle < -180) absAngle += 360;
+
+                const absA = Math.abs(absAngle);
+                
+                // Show current page (roughly -60 to 60 deg) fully opaque
+                // Edge cards (roughly 60 to 110 deg) partially transparent
+                // Back cards hidden
+                if (absA < 60) {
+                    child.style.opacity = '1';
+                    child.style.visibility = 'visible';
+                } else if (absA < 120) {
+                    // Linear fade from 1.0 to 0.0 between 60 and 120 degrees
+                    const opacity = 1 - (absA - 60) / 60;
+                    child.style.opacity = opacity.toString();
+                    child.style.visibility = opacity > 0.01 ? 'visible' : 'hidden';
+                } else {
+                    child.style.opacity = '0';
+                    child.style.visibility = 'hidden';
+                }
+            }
+        };
+
+        updateVisibility();
+        if (isAnimating) {
+            const interval = setInterval(updateVisibility, 30);
+            return () => clearInterval(interval);
+        }
+    }, [isAnimating, itemAngle, windowWidth]);
 
     // Identify which card indices should be in the DOM
     const renderedIndices = useMemo(() => {
@@ -115,7 +166,7 @@ export default function Carousel3D({ items }) {
             <button 
                 onClick={handlePrev}
                 disabled={isAnimating}
-                className={`absolute left-2 sm:left-4 z-50 glass-panel p-3 sm:p-5 rounded-full border-gold-500/30 hover:border-gold-500/60 transition-all group active:scale-90 ${isAnimating ? 'opacity-30 cursor-not-allowed' : 'hover:shadow-[0_0_20px_rgba(212,175,55,0.4)]'}`}
+                className={`absolute left-2 sm:left-4 md:left-8 z-50 glass-panel p-3 sm:p-5 rounded-full border-gold-500/30 hover:border-gold-500/60 transition-all group active:scale-90 ${isAnimating ? 'opacity-30 cursor-not-allowed' : 'hover:shadow-[0_0_20px_rgba(212,175,55,0.4)]'}`}
                 aria-label="Previous"
             >
                 <svg className="w-6 h-6 sm:w-8 sm:h-8 text-white group-hover:text-gold-500 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -140,7 +191,7 @@ export default function Carousel3D({ items }) {
                             <div
                                 key={`${item._id}-${index}`}
                                 data-index={index}
-                                className="absolute h-auto"
+                                className="absolute h-auto transition-opacity duration-300"
                                 style={{
                                     width: `${cardWidth}px`,
                                     transform: `translateX(-50%) translateY(-50%) rotateY(${index * itemAngle}deg) translateZ(${radius}px)`,
@@ -166,7 +217,7 @@ export default function Carousel3D({ items }) {
             <button 
                 onClick={handleNext}
                 disabled={isAnimating}
-                className={`absolute right-2 sm:right-4 z-50 glass-panel p-3 sm:p-5 rounded-full border-gold-500/30 hover:border-gold-500/60 transition-all group active:scale-90 ${isAnimating ? 'opacity-30 cursor-not-allowed' : 'hover:shadow-[0_0_20px_rgba(212,175,55,0.4)]'}`}
+                className={`absolute right-2 sm:right-4 md:right-8 z-50 glass-panel p-3 sm:p-5 rounded-full border-gold-500/30 hover:border-gold-500/60 transition-all group active:scale-90 ${isAnimating ? 'opacity-30 cursor-not-allowed' : 'hover:shadow-[0_0_20px_rgba(212,175,55,0.4)]'}`}
                 aria-label="Next"
             >
                 <svg className="w-6 h-6 sm:w-8 sm:h-8 text-white group-hover:text-gold-500 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
