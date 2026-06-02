@@ -45,7 +45,8 @@ const CreditCardPreview = React.memo(function CreditCardPreview({
     onScaleChange,
     onRotationChange,
     isDraggable = true,
-    showTransformHandles = false
+    showTransformHandles = false,
+    isCarousel = false
 }) {
 
     const [svgContent, setSvgContent] = useState(null);
@@ -399,7 +400,7 @@ const CreditCardPreview = React.memo(function CreditCardPreview({
                 viewBox={`0 0 ${SVG_WIDTH} ${SVG_HEIGHT}`}
                 className={`w-full object-cover md:transform-style-3d md:rotate-x-5 md:-rotate-y-10 ${isDraggable ? (isDragging ? 'cursor-grabbing' : 'cursor-grab') : ''}`}
                 style={{
-                    filter: 'drop-shadow(0 10px 10px rgba(0,0,0,0.4))'
+                    filter: isCarousel ? 'none' : 'drop-shadow(0 10px 10px rgba(0,0,0,0.4))'
                 }}
                 onMouseDown={handleDragStart}
                 onTouchStart={handleDragStart}
@@ -457,7 +458,7 @@ const CreditCardPreview = React.memo(function CreditCardPreview({
                         </mask>
                     )}
                 </defs>
-                <g>
+                <g filter={isCarousel ? 'none' : `url(#${uniqueIds.shimmerFilter})`}>
                     {/* 1. Base Card Fill */}
                     <g>
                         <rect

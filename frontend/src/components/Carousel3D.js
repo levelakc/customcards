@@ -215,6 +215,7 @@ export default function Carousel3D({ items }) {
                                                 product={item}
                                                 disableClick={true}
                                                 isMobile={isMobile}
+                                                isCarousel={true}
                                            />
                                         </div>
                                     );

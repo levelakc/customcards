@@ -5,13 +5,13 @@ import { useTranslation } from 'react-i18next';
 import { nameToKeyMap, getDefaultEngraving } from '../utils/colorUtils';
 
 
-const ProductCard = ({ product, disableClick = false, isMobile }) => {
+const ProductCard = ({ product, disableClick = false, isMobile, isCarousel = false }) => {
     const { navigate } = useRouter();
     const { t, i18n } = useTranslation();
     const [colorIndex, setColorIndex] = useState(0);
 
     useEffect(() => {
-        if (!product || !product.availableColors || product.availableColors.length <= 1) return;
+        if (isCarousel || !product || !product.availableColors || product.availableColors.length <= 1) return;
 
         const intervalTime = 5000; // Longer interval on mobile
         const colorInterval = setInterval(() => {
@@ -19,7 +19,7 @@ const ProductCard = ({ product, disableClick = false, isMobile }) => {
         }, intervalTime);
 
         return () => clearInterval(colorInterval);
-    }, [product, isMobile]);
+    }, [product, isMobile, isCarousel]);
     
     if (!product) {
         return null;
@@ -90,6 +90,7 @@ const ProductCard = ({ product, disableClick = false, isMobile }) => {
                     scale={product.customization?.scale}
                     rotation={product.customization?.rotation}
                     isDraggable={false}
+                    isCarousel={isCarousel}
                 />
             </div>
             
