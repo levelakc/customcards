@@ -419,79 +419,40 @@ const CreditCardPreview = React.memo(function CreditCardPreview({
                 onTouchStart={handleDragStart}
             >
                 <defs>
-                    {/* Brushed Metal Texture Filter */}
+                    {/* Simplified Metallic Shimmer Filter (No noise) */}
                     <filter id={uniqueIds.shimmerFilter} x="-20%" y="-20%" width="140%" height="140%">
-                        {/* 1. Base Grain (stretched horizontally for brushed look) */}
-                        <feTurbulence type="fractalNoise" baseFrequency="0.8 0.02" numOctaves="4" seed="5" result="grain" />
-                        
-                        {/* 2. Emboss effect for the grain */}
-                        <feColorMatrix in="grain" type="saturate" values="0" result="bw-grain" />
-                        <feComponentTransfer in="bw-grain" result="high-contrast-grain">
-                            <feFuncR type="linear" slope="2" intercept="-0.5" />
-                            <feFuncG type="linear" slope="2" intercept="-0.5" />
-                            <feFuncB type="linear" slope="2" intercept="-0.5" />
-                        </feComponentTransfer>
-
-                        {/* 3. Apply the grain to the card surface with variable opacity */}
-                        <feComposite in="high-contrast-grain" in2="SourceGraphic" operator="soft-light" result="brushed-surface" />
-                        
-                        {/* 4. Specular Highlights (tangible metallic shine) */}
-                        <feSpecularLighting in="grain" surfaceScale="2" specularConstant="0.8" specularExponent="20" lightingColor="#ffffff" result="specular">
+                        <feSpecularLighting in="SourceAlpha" surfaceScale="2" specularConstant="0.7" specularExponent="25" lightingColor="#ffffff" result="specular">
                             <feDistantLight azimuth="225" elevation="45" />
                         </feSpecularLighting>
-                        
-                        <feComposite in="brushed-surface" in2="specular" operator="arithmetic" k1="0" k2="1" k3="0.4" k4="0" />
+                        <feComposite in="SourceGraphic" in2="specular" operator="arithmetic" k1="0" k2="1" k3="0.5" k4="0" />
                     </filter>
 
                     <linearGradient id={uniqueIds.silverGradient} x1="0%" y1="0%" x2="100%" y2="100%">
-                        <stop offset="0%" stopColor="#e0e0e0" />
-                        <stop offset="20%" stopColor="#ffffff" />
-                        <stop offset="40%" stopColor="#b0b0b0" />
-                        <stop offset="50%" stopColor="#d0d0d0" />
-                        <stop offset="60%" stopColor="#909090" />
-                        <stop offset="80%" stopColor="#ffffff" />
-                        <stop offset="100%" stopColor="#a0a0a0" />
+                        <stop offset="0%" stopColor="#e5e7eb" />
+                        <stop offset="50%" stopColor="#ffffff" />
+                        <stop offset="100%" stopColor="#9ca3af" />
                     </linearGradient>
 
                     <linearGradient id={uniqueIds.goldGradient} x1="0%" y1="0%" x2="100%" y2="100%">
-                        <stop offset="0%" stopColor="#bf953f" />
-                        <stop offset="20%" stopColor="#fcf6ba" />
-                        <stop offset="40%" stopColor="#b38728" />
-                        <stop offset="50%" stopColor="#fbf5b7" />
-                        <stop offset="60%" stopColor="#aa8238" />
-                        <stop offset="80%" stopColor="#fcf6ba" />
-                        <stop offset="100%" stopColor="#b38728" />
+                        <stop offset="0%" stopColor="#fde68a" />
+                        <stop offset="50%" stopColor="#fef3c7" />
+                        <stop offset="100%" stopColor="#b45309" />
                     </linearGradient>
 
                     <linearGradient id={uniqueIds.blackGradient} x1="0%" y1="0%" x2="100%" y2="100%">
-                        <stop offset="0%" stopColor="#2c2c2c" />
-                        <stop offset="15%" stopColor="#000000" />
-                        <stop offset="35%" stopColor="#1a1a1a" />
-                        <stop offset="50%" stopColor="#050505" />
-                        <stop offset="65%" stopColor="#222222" />
-                        <stop offset="85%" stopColor="#000000" />
-                        <stop offset="100%" stopColor="#111111" />
+                        <stop offset="0%" stopColor="#374151" />
+                        <stop offset="50%" stopColor="#111827" />
+                        <stop offset="100%" stopColor="#000000" />
                     </linearGradient>
 
                     <linearGradient id={uniqueIds.roseGoldGradient} x1="0%" y1="0%" x2="100%" y2="100%">
-                        <stop offset="0%" stopColor="#b76e79" />
-                        <stop offset="20%" stopColor="#f4c2c2" />
-                        <stop offset="40%" stopColor="#e0ac69" />
-                        <stop offset="50%" stopColor="#ffffff" stopOpacity="0.3" /> {/* Metallic shine */}
-                        <stop offset="60%" stopColor="#e0ac69" />
-                        <stop offset="80%" stopColor="#f4c2c2" />
-                        <stop offset="100%" stopColor="#b76e79" />
+                        <stop offset="0%" stopColor="#fda4af" />
+                        <stop offset="50%" stopColor="#fecdd3" />
+                        <stop offset="100%" stopColor="#be123c" />
                     </linearGradient>
 
                     <linearGradient id={uniqueIds.colorfulGradient} x1="0%" y1="100%" x2="100%" y2="0%">
-                        <stop offset="0%" stopColor="#6b21a8" />
-                        <stop offset="15%" stopColor="#c026d3" />
-                        <stop offset="30%" stopColor="#ffffff" stopOpacity="0.4" /> {/* Iridescent shimmer */}
-                        <stop offset="45%" stopColor="#db2777" />
-                        <stop offset="60%" stopColor="#ca8a04" />
-                        <stop offset="75%" stopColor="#ffffff" stopOpacity="0.3" /> {/* Iridescent shimmer */}
-                        <stop offset="85%" stopColor="#16a34a" />
-                        <stop offset="100%" stopColor="#2563eb" />
+                        <stop offset="0%" stopColor="#6b21a8" /><stop offset="20%" stopColor="#c026d3" /><stop offset="40%" stopColor="#db2777" /><stop offset="60%" stopColor="#ca8a04" /><stop offset="80%" stopColor="#16a34a" /><stop offset="100%" stopColor="#2563eb" />
                     </linearGradient>
                     
                     <radialGradient id={uniqueIds.spotlight} cx="25%" cy="25%" r="60%"><stop offset="0%" stopColor="white" stopOpacity="0.3" /><stop offset="100%" stopColor="white" stopOpacity="0" /></radialGradient>
