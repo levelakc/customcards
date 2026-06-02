@@ -18,32 +18,32 @@ export default function Carousel3D({ items }) {
     }, []);
 
     // Responsive Configuration
-    const { cardsPerPage, cardsToRender } = useMemo(() => {
-        if (windowWidth < 640) return { cardsPerPage: 1, cardsToRender: 3 }; // Current + Prev + Next
-        if (windowWidth < 1024) return { cardsPerPage: 2, cardsToRender: 6 }; // Current + Prev + Next
-        return { cardsPerPage: 4, cardsToRender: 12 }; // Current + Prev + Next (Full circle if items=12)
+    const cardsPerPage = useMemo(() => {
+        if (windowWidth < 640) return 1;
+        if (windowWidth < 1024) return 2;
+        return 4;
     }, [windowWidth]);
 
     const totalPages = Math.ceil((items?.length || 0) / cardsPerPage);
     const itemAngle = items && items.length > 0 ? 360 / items.length : 0;
     
-    // Dynamic Sizing
-    const isMobile = windowWidth < 768;
+    // Dynamic Sizing - Scale cards to fit screen width
     const cardWidth = useMemo(() => {
         if (windowWidth < 640) return Math.min(180, windowWidth * 0.7);
         if (windowWidth < 1024) return 200;
         return 240;
     }, [windowWidth]);
 
-    // Calculate radius to keep circular shape and prevent "clipping" on the sides
+    // Dynamic Radius with screen-width awareness to prevent clipping
     const radius = useMemo(() => {
         if (!items || items.length <= 1) return 0;
-        // Basic trig: radius = (width / 2) / tan(PI / items.length)
         let calculatedRadius = (cardWidth / 2) / Math.tan(Math.PI / items.length);
         
-        // Add breathing room based on screen size
-        const padding = windowWidth < 640 ? 40 : (windowWidth < 1024 ? 80 : 120);
-        return calculatedRadius + padding;
+        // Cap radius to ensure it fits within the viewport with some margin
+        const maxRadius = (windowWidth / 2) - 40; 
+        const padding = windowWidth < 640 ? 30 : 60;
+        
+        return Math.min(calculatedRadius + padding, maxRadius);
     }, [items, cardWidth, windowWidth]);
 
     const changePage = useCallback((direction) => {
@@ -73,46 +73,56 @@ export default function Carousel3D({ items }) {
     const handleNext = () => changePage(1);
     const handlePrev = () => changePage(-1);
 
-    // Always render CURRENT page, PREVIOUS page, and NEXT page
-    // This ensures cards are visible on both left and right during any rotation
-    const renderedIndices = useMemo(() => {
-        if (!items || items.length === 0) return [];
-        const indices = new Set();
-        const pagesToRender = [
-            (currentPage - 1 + totalPages) % totalPages, // Previous
-            currentPage,                                  // Current
-            (currentPage + 1) % totalPages               // Next
-        ];
+    // Visibility Logic: We need to hide cards that are in the "back" of the circle
+    // to keep rendering performance high. Since we use CSS transitions, we'll
+    // just use a simple state to track which cards are currently in the front arc.
+    useEffect(() => {
+        if (!carouselInnerRef.current) return;
+        
+        const updateVisibility = () => {
+            const children = carouselInnerRef.current.children;
+            for (let i = 0; i < children.length; i++) {
+                const child = children[i];
+                const index = parseInt(child.dataset.index);
+                if (isNaN(index)) continue;
 
-        pagesToRender.forEach(page => {
-            for (let i = 0; i < cardsPerPage; i++) {
-                const index = (page * cardsPerPage + i) % items.length;
-                if (items[index]) indices.add(index);
+                let absAngle = (index * itemAngle + rotationValue.current) % 360;
+                if (absAngle > 180) absAngle -= 360;
+                if (absAngle < -180) absAngle += 360;
+
+                // Show cards within a 120-degree arc at the front
+                const isVisible = Math.abs(absAngle) < 110;
+                child.style.opacity = isVisible ? '1' : '0';
+                child.style.visibility = isVisible ? 'visible' : 'hidden';
             }
-        });
+        };
 
-        return Array.from(indices);
-    }, [currentPage, totalPages, cardsPerPage, items]);
+        updateVisibility();
+        if (isAnimating) {
+            const interval = setInterval(updateVisibility, 50);
+            return () => clearInterval(interval);
+        }
+    }, [isAnimating, itemAngle, windowWidth]);
 
     if (!items || items.length === 0) {
         return <div className="text-center text-white py-10">טוען מוצרים...</div>;
     }
 
     return (
-        <div className="w-full flex relative min-h-[450px] md:min-h-[600px] items-center justify-center overflow-x-hidden px-4 sm:px-12 md:px-24">
+        <div className="w-full flex relative min-h-[450px] md:min-h-[600px] items-center justify-center overflow-x-hidden px-2 sm:px-12 md:px-24">
             {/* Left Arrow */}
             <button 
                 onClick={handlePrev}
                 disabled={isAnimating}
-                className={`absolute left-2 sm:left-4 md:left-8 z-50 glass-panel p-3 sm:p-4 rounded-full border-gold-500/30 hover:border-gold-500/60 transition-all group active:scale-95 ${isAnimating ? 'opacity-50 cursor-not-allowed' : 'hover:shadow-[0_0_15px_rgba(212,175,55,0.3)]'}`}
+                className={`absolute left-2 sm:left-4 z-50 glass-panel p-3 sm:p-5 rounded-full border-gold-500/30 hover:border-gold-500/60 transition-all group active:scale-90 ${isAnimating ? 'opacity-30 cursor-not-allowed' : 'hover:shadow-[0_0_20px_rgba(212,175,55,0.4)]'}`}
                 aria-label="Previous"
             >
-                <svg className="w-5 h-5 sm:w-6 sm:h-6 text-white group-hover:text-gold-500 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg className="w-6 h-6 sm:w-8 sm:h-8 text-white group-hover:text-gold-500 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M15 19l-7-7 7-7" />
                 </svg>
             </button>
 
-            <div className="w-full h-full" style={{ perspective: '2500px', transformStyle: 'preserve-3d' }}>
+            <div className="w-full h-full" style={{ perspective: '2000px', transformStyle: 'preserve-3d' }}>
                 <div
                     ref={carouselInnerRef} 
                     className="relative w-full h-full"
@@ -122,13 +132,13 @@ export default function Carousel3D({ items }) {
                         transform: `rotateY(${rotationValue.current}deg)`
                     }}
                 >
-                    {renderedIndices.map((index) => {
-                        const item = items[index];
+                    {items.map((item, index) => {
                         if (!item) return null;
                         return (
                             <div
                                 key={`${item._id}-${index}`}
-                                className="absolute h-auto"
+                                data-index={index}
+                                className="absolute h-auto transition-opacity duration-300"
                                 style={{
                                     width: `${cardWidth}px`,
                                     transform: `translateX(-50%) translateY(-50%) rotateY(${index * itemAngle}deg) translateZ(${radius}px)`,
@@ -141,7 +151,7 @@ export default function Carousel3D({ items }) {
                                <ProductCard
                                     product={item}
                                     disableClick={true}
-                                    isMobile={isMobile}
+                                    isMobile={windowWidth < 768}
                                     isCarousel={true}
                                />
                             </div>
@@ -154,10 +164,10 @@ export default function Carousel3D({ items }) {
             <button 
                 onClick={handleNext}
                 disabled={isAnimating}
-                className={`absolute right-2 sm:right-4 md:right-8 z-50 glass-panel p-3 sm:p-4 rounded-full border-gold-500/30 hover:border-gold-500/60 transition-all group active:scale-95 ${isAnimating ? 'opacity-50 cursor-not-allowed' : 'hover:shadow-[0_0_15px_rgba(212,175,55,0.3)]'}`}
+                className={`absolute right-2 sm:right-4 z-50 glass-panel p-3 sm:p-5 rounded-full border-gold-500/30 hover:border-gold-500/60 transition-all group active:scale-90 ${isAnimating ? 'opacity-30 cursor-not-allowed' : 'hover:shadow-[0_0_20px_rgba(212,175,55,0.4)]'}`}
                 aria-label="Next"
             >
-                <svg className="w-5 h-5 sm:w-6 sm:h-6 text-white group-hover:text-gold-500 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg className="w-6 h-6 sm:w-8 sm:h-8 text-white group-hover:text-gold-500 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M9 5l7 7-7 7" />
                 </svg>
             </button>
