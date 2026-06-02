@@ -11,15 +11,17 @@ const ProductCard = ({ product, disableClick = false, isMobile, isCarousel = fal
     const [colorIndex, setColorIndex] = useState(0);
 
     useEffect(() => {
-        if (isCarousel || !product || !product.availableColors || product.availableColors.length <= 1) return;
+        if (!product || !product.availableColors || product.availableColors.length <= 1) return;
 
-        const intervalTime = 5000; // Longer interval on mobile
+        // Use a slightly slower interval in the carousel to keep performance high
+        const intervalTime = isCarousel ? 3000 : 2500; 
+        
         const colorInterval = setInterval(() => {
             setColorIndex(prevIndex => (prevIndex + 1) % product.availableColors.length);
         }, intervalTime);
 
         return () => clearInterval(colorInterval);
-    }, [product, isMobile, isCarousel]);
+    }, [product, isCarousel]);
     
     if (!product) {
         return null;

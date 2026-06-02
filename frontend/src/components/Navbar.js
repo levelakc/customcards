@@ -24,6 +24,7 @@ export default function Navbar() {
     const allNavLinks = [
         { name: t('homePage'), page: 'home' },
         { name: t('browseProducts'), page: 'browse' },
+        { name: t('realLifeGalleryTitle') || 'Gallery', page: 'home', params: { scrollTo: 'gallery' } },
         ...categories.map(c => ({ 
             name: c.name, 
             page: 'category', 

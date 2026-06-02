@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useSiteSettings } from '../contexts/SiteSettingsContext';
 import { useData } from '../contexts/DataContext';
+import { useRouter } from '../contexts/RouterContext';
 import * as api from '../api/api';
 import Carousel3D from '../components/Carousel3D';
 import CategoryProductGallery from '../components/CategoryProductGallery'; // Import the new component
@@ -17,8 +18,19 @@ export default function HomePage() {
     const { t, i18n } = useTranslation();
     const { settings } = useSiteSettings();
     const { products, categories } = useData();
+    const { route } = useRouter();
     const designsSectionRef = useRef(null);
     const personalDesignSectionRef = useRef(null);
+    const gallerySectionRef = useRef(null);
+
+    // Handle scroll to gallery from navbar
+    useEffect(() => {
+        if (route.params?.scrollTo === 'gallery') {
+            setTimeout(() => {
+                gallerySectionRef.current?.scrollIntoView({ behavior: 'smooth' });
+            }, 100); // Small delay to ensure render
+        }
+    }, [route.params]);
 
     // FIX: useEffect hook to calculate and set the viewport height for mobile browsers
     useEffect(() => {
@@ -153,6 +165,26 @@ export default function HomePage() {
                 <AboutUs />
             </AnimatedSection>
 
+            {/* Promoted Section */}
+            {settings?.promotedProducts && settings.promotedProducts.length > 0 && (
+                <AnimatedSection animation="fade-in-up">
+                    <div className="py-20 bg-gray-900 border-t border-b border-gray-800">
+                        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                            <h2 className="text-4xl font-extrabold gold-gradient-text text-center mb-16 font-dancing">
+                                {settings.promotedTitle || t('ourTopPicks')}
+                            </h2>
+                            <div className="grid grid-cols-1 md:grid-cols-3 gap-10">
+                                {settings.promotedProducts.map(product => (
+                                    <div key={product._id} className="transition-all duration-500 hover:translate-y-[-8px]">
+                                        <ProductCard product={product} />
+                                    </div>
+                                ))}
+                            </div>
+                        </div>
+                    </div>
+                </AnimatedSection>
+            )}
+
             <AnimatedSection animation="fade-in-left">
                 <div ref={designsSectionRef} className="py-20">
                     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -173,7 +205,9 @@ export default function HomePage() {
             </AnimatedSection>
 
             <AnimatedSection animation="fade-in-left">
-                <RealLifeGallery />
+                <div ref={gallerySectionRef} className="scroll-mt-24">
+                    <RealLifeGallery />
+                </div>
             </AnimatedSection>
 
             <AnimatedSection animation="fade-in-right">

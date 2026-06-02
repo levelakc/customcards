@@ -3,7 +3,7 @@ import SiteSettings from '../models/siteSettingsModel.js';
 // @desc    Get site settings
 // @route   GET /api/settings
 const getSiteSettings = async (req, res) => {
-    let settings = await SiteSettings.findOne({ key: 'siteSettings' });
+    let settings = await SiteSettings.findOne({ key: 'siteSettings' }).populate('promotedProducts');
     if (!settings) {
         settings = await SiteSettings.create({
             wheelPrizes: [
@@ -21,7 +21,7 @@ const getSiteSettings = async (req, res) => {
 // @desc    Update site settings (admin only)
 // @route   PUT /api/settings
 const updateSiteSettings = async (req, res) => {
-    const { backgroundVideoUrl, videoOpacity, logoUrl, wheelPrizes, heroTitle, heroDescription } = req.body;
+    const { backgroundVideoUrl, videoOpacity, logoUrl, wheelPrizes, heroTitle, heroDescription, promotedTitle, promotedProducts } = req.body;
     let settings = await SiteSettings.findOne({ key: 'siteSettings' });
 
     if (settings) {
@@ -31,6 +31,8 @@ const updateSiteSettings = async (req, res) => {
         if (wheelPrizes !== undefined) settings.wheelPrizes = wheelPrizes;
         if (heroTitle !== undefined) settings.heroTitle = heroTitle;
         if (heroDescription !== undefined) settings.heroDescription = heroDescription;
+        if (promotedTitle !== undefined) settings.promotedTitle = promotedTitle;
+        if (promotedProducts !== undefined) settings.promotedProducts = promotedProducts;
         
         const updatedSettings = await settings.save();
         res.json(updatedSettings);

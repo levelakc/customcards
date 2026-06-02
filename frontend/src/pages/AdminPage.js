@@ -13,7 +13,7 @@ import CreditCardPreview from '../components/CreditCardPreview';
 import WalletPreview from '../components/WalletPreview'; // 1. Import WalletPreview
 import { ALL_CARD_COLORS, cardColorOptions } from '../utils/colorUtils';
 
-function SiteSettingsPage() {
+function SiteSettingsPage({ products }) {
     const { t } = useTranslation();
     const { token } = useAuth();
     const { settings, fetchSettings, updateLocalSettings } = useSiteSettings();
@@ -68,13 +68,68 @@ function SiteSettingsPage() {
         setLocalSettings(s => ({ ...s, wheelPrizes: newPrizes }));
     };
 
+    const handlePromotedProductToggle = (productId) => {
+        const currentPromoted = localSettings.promotedProducts || [];
+        const isAlreadyPromoted = currentPromoted.some(p => (p._id || p) === productId);
+        
+        let newPromoted;
+        if (isAlreadyPromoted) {
+            newPromoted = currentPromoted.filter(p => (p._id || p) !== productId);
+        } else {
+            if (currentPromoted.length >= 3) {
+                alert(t('max3PromotedProducts') || 'You can only promote 3 products');
+                return;
+            }
+            newPromoted = [...currentPromoted, productId];
+        }
+        
+        setLocalSettings(s => ({ ...s, promotedProducts: newPromoted }));
+    };
+
     return (
         <div>
             <h2 className="text-2xl font-bold mb-4">{t('siteSettings')}</h2>
             <div className="bg-gray-800 p-6 rounded-lg space-y-6 max-w-2xl">
                 {message && <p className={message.includes('Error') ? 'text-red-400' : 'text-green-400'}>{message}</p>}
                 
-                {/* --- WHEEL PRIZES --- */}
+                {/* --- PROMOTED SECTION --- */}
+                <div className="space-y-4">
+                    <h3 className="text-lg font-semibold text-white border-b border-gray-700 pb-2">{t('promotedSectionSettings') || 'Promoted Section Settings'}</h3>
+                    <div>
+                        <label className="block mb-1">{t('promotedTitle') || 'Promoted Section Title'}</label>
+                        <input 
+                            type="text" 
+                            value={localSettings.promotedTitle || ''} 
+                            onChange={(e) => setLocalSettings(s => ({...s, promotedTitle: e.target.value}))} 
+                            className="w-full bg-gray-700 rounded p-2 border border-gray-600"
+                        />
+                    </div>
+                    <div>
+                        <label className="block mb-2 font-medium">{t('select3PromotedProducts') || 'Select up to 3 products to promote:'}</label>
+                        <div className="grid grid-cols-2 gap-2 bg-gray-900 p-3 rounded-lg max-h-60 overflow-y-auto border border-gray-700">
+                            {products.map(product => {
+                                const isPromoted = (localSettings.promotedProducts || []).some(p => (p._id || p) === product._id);
+                                return (
+                                    <button
+                                        key={product._id}
+                                        type="button"
+                                        onClick={() => handlePromotedProductToggle(product._id)}
+                                        className={`text-right p-2 rounded text-xs transition-all border ${isPromoted ? 'bg-gold-500/20 border-gold-500 text-gold-500' : 'bg-gray-800 border-transparent text-gray-400 hover:border-gray-600'}`}
+                                    >
+                                        {product.name}
+                                    </button>
+                                );
+                            })}
+                        </div>
+                    </div>
+                    <button 
+                        type="button" 
+                        onClick={() => handleSettingsUpdate({ promotedTitle: localSettings.promotedTitle, promotedProducts: localSettings.promotedProducts })} 
+                        className="btn-premium btn-gold w-full"
+                    >
+                        {t('savePromotedSection') || 'Save Promoted Section'}
+                    </button>
+                </div>
                 <div className="space-y-4">
                     <h3 className="text-lg font-semibold text-white border-b border-gray-700 pb-2">{t('prizeWheelSettings') || 'Prize Wheel Settings'}</h3>
                     {localSettings.wheelPrizes?.map((prize, index) => (
@@ -670,7 +725,7 @@ export default function AdminPage() {
         {activeTab === 'orders' && <AdminOrdersPage />}
         {activeTab === 'users' && <AdminUsersPage />}
         {activeTab === 'reviews' && <AdminReviewsPage />}
-        {activeTab === 'settings' && <SiteSettingsPage />}
+        {activeTab === 'settings' && <SiteSettingsPage products={products} />}
       </div>
     );
 }

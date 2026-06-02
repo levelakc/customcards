@@ -8,6 +8,8 @@ const siteSettingsSchema = mongoose.Schema({
     logoUrl: { type: String, default: 'https://placehold.co/120x40/4A5568/FFFFFF?text=VIPCard' },
     heroTitle: { type: String, default: 'כרטיסי אשראי ממתכת. העיצוב שלך.' },
     heroDescription: { type: String, default: 'הפוך את כרטיס הפלסטיק המשעמם שלך ליצירת אומנות ממתכת יוקרתית.' },
+    promotedTitle: { type: String, default: 'הנבחרים שלנו' },
+    promotedProducts: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Product' }],
     wheelPrizes: [{
         label: { type: String, required: true },
         discount: { type: Number, required: true },
