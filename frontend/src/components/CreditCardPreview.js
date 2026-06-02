@@ -343,7 +343,13 @@ const CreditCardPreview = React.memo(function CreditCardPreview({
             >
                 <defs>
                     <linearGradient id={uniqueIds.silverGradient} x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stopColor="#e5e7eb" /><stop offset="50%" stopColor="#ffffff" /><stop offset="100%" stopColor="#9ca3af" /></linearGradient>
-                    <linearGradient id={uniqueIds.goldGradient} x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stopColor="#bf953f" /><stop offset="50%" stopColor="#fcf6ba" /><stop offset="100%" stopColor="#b38728" /></linearGradient>
+                    <linearGradient id={uniqueIds.goldGradient} x1="0%" y1="0%" x2="100%" y2="100%">
+                        <stop offset="0%" stopColor="#d4af37" />
+                        <stop offset="25%" stopColor="#f9d423" />
+                        <stop offset="50%" stopColor="#ffd700" />
+                        <stop offset="75%" stopColor="#ffbf00" />
+                        <stop offset="100%" stopColor="#b8860b" />
+                    </linearGradient>
                     <linearGradient id={uniqueIds.blackGradient} x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stopColor="#374151" /><stop offset="50%" stopColor="#111827" /><stop offset="100%" stopColor="#000000" /></linearGradient>
                     <linearGradient id={uniqueIds.roseGoldGradient} x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stopColor="#fda4af" /><stop offset="50%" stopColor="#fecdd3" /><stop offset="100%" stopColor="#be123c" /></linearGradient>
                     <linearGradient id={uniqueIds.colorfulGradient} x1="0%" y1="100%" x2="100%" y2="0%"><stop offset="0%" stopColor="#6b21a8" /><stop offset="20%" stopColor="#c026d3" /><stop offset="40%" stopColor="#db2777" /><stop offset="60%" stopColor="#ca8a04" /><stop offset="80%" stopColor="#16a34a" /><stop offset="100%" stopColor="#2563eb" /></linearGradient>

@@ -36,7 +36,7 @@ export const engravingColorClasses = {
 export const engravingColorHex = {
     black: '#000000',
     silver: '#D1D5DB', // A light gray for silver
-    gold: '#D4AF37',   // A golden yellow
+    gold: '#FFD700',   // A richer, more vibrant gold
 };
 
 /**
