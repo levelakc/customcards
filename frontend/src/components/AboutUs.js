@@ -9,24 +9,24 @@ export default function AboutUs() {
                 <h2 className="text-3xl font-extrabold mb-8">{t('howItWorksTitle')}</h2>
                 <div className="grid md:grid-cols-3 gap-8 text-lg">
                     <div className="flex flex-col items-center">
-                        <div className="glass-panel w-16 h-16 rounded-full flex items-center justify-center text-2xl font-bold mb-6 border-[#d4af37] bg-black shadow-[0_0_15px_rgba(212,175,55,0.2)]">
-                            <span className="text-white">1</span>
+                        <div className="btn-premium btn-obsidian w-16 h-16 rounded-full text-2xl font-bold mb-6 cursor-default">
+                            <span>1</span>
                         </div>
-                        <h3 className="font-bold mb-2 gold-gradient-text">{t('placeAnOrderTitle')}</h3>
+                        <h3 className="font-bold mb-2 text-white">{t('placeAnOrderTitle')}</h3>
                         <p className="text-gray-400">{t('placeAnOrderDescription')}</p>
                     </div>
                     <div className="flex flex-col items-center">
-                        <div className="glass-panel w-16 h-16 rounded-full flex items-center justify-center text-2xl font-bold mb-6 border-[#d4af37] bg-black shadow-[0_0_15px_rgba(212,175,55,0.2)]">
-                            <span className="text-white">2</span>
+                        <div className="btn-premium btn-obsidian w-16 h-16 rounded-full text-2xl font-bold mb-6 cursor-default">
+                            <span>2</span>
                         </div>
-                        <h3 className="font-bold mb-2 gold-gradient-text">{t('weContactYouTitle')}</h3>
+                        <h3 className="font-bold mb-2 text-white">{t('weContactYouTitle')}</h3>
                         <p className="text-gray-400">{t('weContactYouDescription')}</p>
                     </div>
                     <div className="flex flex-col items-center">
-                        <div className="glass-panel w-16 h-16 rounded-full flex items-center justify-center text-2xl font-bold mb-6 border-[#d4af37] bg-black shadow-[0_0_15px_rgba(212,175,55,0.2)]">
-                            <span className="text-white">3</span>
+                        <div className="btn-premium btn-obsidian w-16 h-16 rounded-full text-2xl font-bold mb-6 cursor-default">
+                            <span>3</span>
                         </div>
-                        <h3 className="font-bold mb-2 gold-gradient-text">{t('homeDeliveryTitle')}</h3>
+                        <h3 className="font-bold mb-2 text-white">{t('homeDeliveryTitle')}</h3>
                         <p className="text-gray-400">{t('homeDeliveryDescription')}</p>
                     </div>
                 </div>
