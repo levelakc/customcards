@@ -145,30 +145,7 @@ export default function Carousel3D({ items }) {
             document.body.style.cursor = '';
         }, []);
         
-        if (!items || items.length === 0) {
-            return <div className="text-center text-white py-10">טוען מוצרים...</div>;
-        }
-    
-    // The minimum radius needed to prevent cards from overlapping is (cardWidth / 2) / tan(PI / itemCount).
-    // We add a little extra padding.
-    const cardWidthForCalc = (isMobile ? 140 : 200);
-    let radius;
-
-    if (!items || items.length <= 1) { 
-        radius = 0; 
-    } else {
-        let calculatedRadius = (cardWidthForCalc / 2) / Math.tan(Math.PI / items.length);
-
-        if (isMobile) {
-            calculatedRadius = Math.max(calculatedRadius + 50, 200);
-        } else {
-            calculatedRadius = Math.max(calculatedRadius + 100, 350);
-        }
-        radius = calculatedRadius;
-    }
-
     const cardWidth = (isMobile ? Math.min(160, window.innerWidth * 0.7) : 220);
-
 
     useEffect(() => {
         const handleMove = (e) => handleDragMove(e);
@@ -188,6 +165,10 @@ export default function Carousel3D({ items }) {
             window.removeEventListener('touchend', handleEnd);
         };
     }, [dragging, handleDragMove, handleDragEnd]);
+
+    if (!items || items.length === 0) {
+        return <div className="text-center text-white py-10">טוען מוצרים...</div>;
+    }
 
     return (
         <div 
