@@ -155,10 +155,6 @@ export default function Carousel3D({ items }) {
             setDragging(false);
             if (Math.abs(velocity.current) < 0.5) { // If velocity is low, snap
                 isSnapping.current = true;
-                autoRotate.current = false; // Disable auto-rotate during snap
-            } else {
-                // If there's still momentum, let inertia continue, but ensure auto-rotate is eventually re-enabled
-                autoRotate.current = true; // Instantly re-enable auto-rotate after inertia starts
             }
             document.body.style.userSelect = '';
             document.body.style.cursor = '';
