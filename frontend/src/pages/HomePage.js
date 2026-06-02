@@ -5,6 +5,7 @@ import { useData } from '../contexts/DataContext';
 import { useRouter } from '../contexts/RouterContext';
 import * as api from '../api/api';
 import Carousel3D from '../components/Carousel3D';
+import ProductCard from '../components/ProductCard'; // Import ProductCard
 import CategoryProductGallery from '../components/CategoryProductGallery'; // Import the new component
 import PersonalDesignPage from './PersonalDesignPage';
 import AnimatedSection from '../components/AnimatedSection';
