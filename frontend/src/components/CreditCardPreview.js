@@ -301,6 +301,22 @@ const CreditCardPreview = React.memo(function CreditCardPreview({
     }, [cardColorKey, engravingColorKey, getContrastingEngravingColor]);
 
 
+    const logoFill = useMemo(() => {
+        // Map engraving color key to its corresponding gradient ID
+        switch (engravingColorKey) {
+            case 'gold':
+                return `url(#${uniqueIds.goldGradient}-engrave)`;
+            case 'silver':
+                return `url(#${uniqueIds.silverGradient}-engrave)`;
+            case 'black':
+                return `url(#${uniqueIds.blackGradient}-engrave)`;
+            default:
+                // Fallback to the effective engraving color (hex code) if no gradient matches
+                return effectiveEngravingColor;
+        }
+    }, [engravingColorKey, uniqueIds, effectiveEngravingColor]);
+
+
     const logoX = position.x * X_RATIO;
     const logoY = position.y * Y_RATIO;
     const unscaledLogoSvgWidth = logoWidth * X_RATIO;
@@ -376,19 +392,17 @@ const CreditCardPreview = React.memo(function CreditCardPreview({
                 default:
                     return 'black'; // Fallback for unknown gradients
             }
-        } else if (colorBg.startsWith('bg-')) {
-            // Map Tailwind classes to hex codes
-            switch (colorBg) {
-                case 'bg-yellow-500': return '#D4AF37'; // Gold
-                case 'bg-gray-300': return '#D1D5DB'; // Silver
-                case 'bg-white': return '#FFFFFF'; // White
-                case 'bg-blue-500': return '#3B82F6'; // Blue
-                case 'bg-red-500': return '#EF4444'; // Red
-                // Add more Tailwind to hex mappings as needed
-                default: return 'black'; // Default fallback
+        } else {
+            // Fallback for named colors, ensure they use metallic gradients if available
+            switch (cardColorKey) {
+                case 'gold':
+                    return `url(#${uniqueIds.goldGradient})`;
+                case 'silver':
+                    return `url(#${uniqueIds.silverGradient})`;
+                default:
+                    return 'black';
             }
         }
-        return 'black'; // Final fallback
     }, [cardColorKey, uniqueIds]);
 
     return (
@@ -405,24 +419,101 @@ const CreditCardPreview = React.memo(function CreditCardPreview({
                 onTouchStart={handleDragStart}
             >
                 <defs>
-                    <linearGradient id={uniqueIds.silverGradient} x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stopColor="#c0c0c0" /><stop offset="100%" stopColor="#a9a9a9" /></linearGradient>
-                    <linearGradient id={uniqueIds.goldGradient} x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stopColor="#d4af37" /><stop offset="100%" stopColor="#b8860b" /></linearGradient>
-                    <linearGradient id={uniqueIds.blackGradient} x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stopColor="#222222" /><stop offset="100%" stopColor="#000000" /></linearGradient>
-                    <linearGradient id={uniqueIds.roseGoldGradient} x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stopColor="#E5B4A3" /><stop offset="100%" stopColor="#C98E7A" /></linearGradient>
-                    <linearGradient id={uniqueIds.roseGoldGradient} x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stopColor="#E5B4A3" /><stop offset="100%" stopColor="#C98E7A" /></linearGradient>
+                    {/* Brushed Metal Texture Filter */}
+                    <filter id={uniqueIds.shimmerFilter} x="-20%" y="-20%" width="140%" height="140%">
+                        {/* 1. Base Grain (stretched horizontally for brushed look) */}
+                        <feTurbulence type="fractalNoise" baseFrequency="0.8 0.02" numOctaves="4" seed="5" result="grain" />
+                        
+                        {/* 2. Emboss effect for the grain */}
+                        <feColorMatrix in="grain" type="saturate" values="0" result="bw-grain" />
+                        <feComponentTransfer in="bw-grain" result="high-contrast-grain">
+                            <feFuncR type="linear" slope="2" intercept="-0.5" />
+                            <feFuncG type="linear" slope="2" intercept="-0.5" />
+                            <feFuncB type="linear" slope="2" intercept="-0.5" />
+                        </feComponentTransfer>
+
+                        {/* 3. Apply the grain to the card surface with variable opacity */}
+                        <feComposite in="high-contrast-grain" in2="SourceGraphic" operator="soft-light" result="brushed-surface" />
+                        
+                        {/* 4. Specular Highlights (tangible metallic shine) */}
+                        <feSpecularLighting in="grain" surfaceScale="2" specularConstant="0.8" specularExponent="20" lightingColor="#ffffff" result="specular">
+                            <feDistantLight azimuth="225" elevation="45" />
+                        </feSpecularLighting>
+                        
+                        <feComposite in="brushed-surface" in2="specular" operator="arithmetic" k1="0" k2="1" k3="0.4" k4="0" />
+                    </filter>
+
+                    <linearGradient id={uniqueIds.silverGradient} x1="0%" y1="0%" x2="100%" y2="100%">
+                        <stop offset="0%" stopColor="#e0e0e0" />
+                        <stop offset="20%" stopColor="#ffffff" />
+                        <stop offset="40%" stopColor="#b0b0b0" />
+                        <stop offset="50%" stopColor="#d0d0d0" />
+                        <stop offset="60%" stopColor="#909090" />
+                        <stop offset="80%" stopColor="#ffffff" />
+                        <stop offset="100%" stopColor="#a0a0a0" />
+                    </linearGradient>
+
+                    <linearGradient id={uniqueIds.goldGradient} x1="0%" y1="0%" x2="100%" y2="100%">
+                        <stop offset="0%" stopColor="#bf953f" />
+                        <stop offset="20%" stopColor="#fcf6ba" />
+                        <stop offset="40%" stopColor="#b38728" />
+                        <stop offset="50%" stopColor="#fbf5b7" />
+                        <stop offset="60%" stopColor="#aa8238" />
+                        <stop offset="80%" stopColor="#fcf6ba" />
+                        <stop offset="100%" stopColor="#b38728" />
+                    </linearGradient>
+
+                    <linearGradient id={uniqueIds.blackGradient} x1="0%" y1="0%" x2="100%" y2="100%">
+                        <stop offset="0%" stopColor="#2c2c2c" />
+                        <stop offset="15%" stopColor="#000000" />
+                        <stop offset="35%" stopColor="#1a1a1a" />
+                        <stop offset="50%" stopColor="#050505" />
+                        <stop offset="65%" stopColor="#222222" />
+                        <stop offset="85%" stopColor="#000000" />
+                        <stop offset="100%" stopColor="#111111" />
+                    </linearGradient>
+
+                    <linearGradient id={uniqueIds.roseGoldGradient} x1="0%" y1="0%" x2="100%" y2="100%">
+                        <stop offset="0%" stopColor="#b76e79" />
+                        <stop offset="20%" stopColor="#f4c2c2" />
+                        <stop offset="40%" stopColor="#e0ac69" />
+                        <stop offset="50%" stopColor="#ffffff" stopOpacity="0.3" /> {/* Metallic shine */}
+                        <stop offset="60%" stopColor="#e0ac69" />
+                        <stop offset="80%" stopColor="#f4c2c2" />
+                        <stop offset="100%" stopColor="#b76e79" />
+                    </linearGradient>
+
                     <linearGradient id={uniqueIds.colorfulGradient} x1="0%" y1="100%" x2="100%" y2="0%">
-                        <stop offset="0%" stopColor="#6b21a8" /><stop offset="20%" stopColor="#c026d3" /><stop offset="40%" stopColor="#db2777" /><stop offset="60%" stopColor="#ca8a04" /><stop offset="80%" stopColor="#16a34a" /><stop offset="100%" stopColor="#2563eb" />
+                        <stop offset="0%" stopColor="#6b21a8" />
+                        <stop offset="15%" stopColor="#c026d3" />
+                        <stop offset="30%" stopColor="#ffffff" stopOpacity="0.4" /> {/* Iridescent shimmer */}
+                        <stop offset="45%" stopColor="#db2777" />
+                        <stop offset="60%" stopColor="#ca8a04" />
+                        <stop offset="75%" stopColor="#ffffff" stopOpacity="0.3" /> {/* Iridescent shimmer */}
+                        <stop offset="85%" stopColor="#16a34a" />
+                        <stop offset="100%" stopColor="#2563eb" />
                     </linearGradient>
                     
-                    <filter id={uniqueIds.shimmerFilter} x="-20%" y="-20%" width="140%" height="140%">
-                        <feDistantLight azimuth="225" elevation="30" />
-                        <feSpecularLighting in="SourceAlpha" surfaceScale="3" specularConstant="0.5" specularExponent="15" lightingColor="white" result="specular" />
-                        <feComposite in="SourceGraphic" in2="specular" operator="arithmetic" k1="0" k2="1" k3="1" k4="0" />
-                    </filter>
-                    
-                    <radialGradient id={uniqueIds.spotlight} cx="25%" cy="25%" r="60%"><stop offset="0%" stopColor="white" stopOpacity="0.35" /><stop offset="100%" stopColor="white" stopOpacity="0" /></radialGradient>
-                    <radialGradient id={uniqueIds.blackSpotlight} cx="25%" cy="25%" r="60%"><stop offset="0%" stopColor="white" stopOpacity="0.15" /><stop offset="100%" stopColor="white" stopOpacity="0" /></radialGradient>
-                    <radialGradient id={uniqueIds.silverSpotlight} cx="25%" cy="25%" r="60%"><stop offset="0%" stopColor="white" stopOpacity="0.9" /><stop offset="100%" stopColor="white" stopOpacity="0" /></radialGradient>
+                    <radialGradient id={uniqueIds.spotlight} cx="25%" cy="25%" r="60%"><stop offset="0%" stopColor="white" stopOpacity="0.3" /><stop offset="100%" stopColor="white" stopOpacity="0" /></radialGradient>
+                    <radialGradient id={uniqueIds.blackSpotlight} cx="30%" cy="20%" r="70%"><stop offset="0%" stopColor="white" stopOpacity="0.1" /><stop offset="100%" stopColor="white" stopOpacity="0" /></radialGradient>
+                    <radialGradient id={uniqueIds.silverSpotlight} cx="25%" cy="25%" r="60%"><stop offset="0%" stopColor="white" stopOpacity="0.4" /><stop offset="100%" stopColor="white" stopOpacity="0" /></radialGradient>
+
+                    {/* Engraving Gradients */}
+                    <linearGradient id={`${uniqueIds.silverGradient}-engrave`} x1="0%" y1="0%" x2="100%" y2="100%">
+                        <stop offset="0%" stopColor="#d1d5db" />
+                        <stop offset="50%" stopColor="#ffffff" />
+                        <stop offset="100%" stopColor="#9ca3af" />
+                    </linearGradient>
+                    <linearGradient id={`${uniqueIds.goldGradient}-engrave`} x1="0%" y1="0%" x2="100%" y2="100%">
+                        <stop offset="0%" stopColor="#bf953f" />
+                        <stop offset="50%" stopColor="#fcf6ba" />
+                        <stop offset="100%" stopColor="#b38728" />
+                    </linearGradient>
+                    <linearGradient id={`${uniqueIds.blackGradient}-engrave`} x1="0%" y1="0%" x2="100%" y2="100%">
+                        <stop offset="0%" stopColor="#333333" />
+                        <stop offset="50%" stopColor="#000000" />
+                        <stop offset="100%" stopColor="#111111" />
+                    </linearGradient>
 
                     <filter id="white-mask-filter">
                         <feColorMatrix type="matrix" values="0 0 0 0 1
@@ -430,17 +521,18 @@ const CreditCardPreview = React.memo(function CreditCardPreview({
                                                               0 0 0 0 1
                                                               0 0 0 1 0" />
                     </filter>
-                                        <linearGradient id={uniqueIds.simStripes} x1="0" y1="0" x2="1" y2="0">
-                                            <stop offset="30%" stopColor="#D4AF37" />
-                                            <stop offset="30.5%" stopColor="#A9A9A9" />
-                                            <stop offset="32.5%" stopColor="#A9A9A9" />
-                                            <stop offset="33%" stopColor="#D4AF37" />
-                                            <stop offset="66%" stopColor="#D4AF37" />
-                                            <stop offset="66.5%" stopColor="#A9A9A9" />
-                                            <stop offset="68.5%" stopColor="#A9A9A9" />
-                                            <stop offset="69%" stopColor="#D4AF37" />
-                                        </linearGradient>
-                                        
+
+                    <linearGradient id={uniqueIds.simStripes} x1="0" y1="0" x2="1" y2="0">
+                        <stop offset="30%" stopColor="#D4AF37" />
+                        <stop offset="30.5%" stopColor="#A9A9A9" />
+                        <stop offset="32.5%" stopColor="#A9A9A9" />
+                        <stop offset="33%" stopColor="#D4AF37" />
+                        <stop offset="66%" stopColor="#D4AF37" />
+                        <stop offset="66.5%" stopColor="#A9A9A9" />
+                        <stop offset="68.5%" stopColor="#A9A9A9" />
+                        <stop offset="69%" stopColor="#D4AF37" />
+                    </linearGradient>
+
                     {finalLogoUrl && (
                         <mask id={uniqueIds.mask}>
                             {svgContent ? (
@@ -457,17 +549,26 @@ const CreditCardPreview = React.memo(function CreditCardPreview({
                         </mask>
                     )}
                 </defs>
-                <g>
+                <g filter={`url(#${uniqueIds.shimmerFilter})`}>
                     {/* 1. Base Card Fill */}
-                    <g>
-                        <rect
-                            width={SVG_WIDTH}
-                            height={SVG_HEIGHT}
-                            rx="20"
-                            fill={cardFill}
-                        />
-                    </g>
+                    <rect
+                        width={SVG_WIDTH}
+                        height={SVG_HEIGHT}
+                        rx="20"
+                        fill={cardFill}
+                    />
                     
+                    {/* Beveled Edge Highlight */}
+                    <rect
+                        x="1" y="1"
+                        width={SVG_WIDTH - 2}
+                        height={SVG_HEIGHT - 2}
+                        rx="19"
+                        fill="none"
+                        stroke="rgba(255,255,255,0.2)"
+                        strokeWidth="1"
+                    />
+
                     {/* 2. Logo Group (Draw logo BEFORE the general spotlight) */}
                     {finalLogoUrl && (
                         <g>
@@ -482,7 +583,8 @@ const CreditCardPreview = React.memo(function CreditCardPreview({
                                     height={unscaledLogoSvgHeight} 
                                     width={unscaledLogoSvgWidth}   
                                     mask={`url(#${uniqueIds.mask})`}
-                                    fill={effectiveEngravingColor}
+                                    fill={logoFill}
+                                    style={{ filter: 'drop-shadow(0 1px 1px rgba(0,0,0,0.3))' }} // Slight inset/engraved shadow
                                 />
                             </g>
                             
