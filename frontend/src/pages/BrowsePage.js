@@ -10,11 +10,20 @@ export default function BrowsePage() {
     const { route, navigate } = useRouter();
     const { products, categories, isGlobalLoading } = useData();
     const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+    const [shuffledProducts, setShuffledProducts] = useState([]);
 
     // Derived state from URL params
     const selectedCategory = route.params.category || null;
     const selectedColors = route.params.colors ? route.params.colors.split(',') : [];
     const searchTerm = route.params.q || '';
+
+    // Shuffle products on initial load or when products change
+    useEffect(() => {
+        if (products && products.length > 0) {
+            const shuffled = [...products].sort(() => 0.5 - Math.random());
+            setShuffledProducts(shuffled);
+        }
+    }, [products]);
 
     const updateFilters = (newParams) => {
         const updatedParams = { ...route.params, ...newParams };
@@ -42,7 +51,7 @@ export default function BrowsePage() {
         updateFilters({ q: e.target.value });
     };
 
-    const filteredProducts = products.filter(product => {
+    const filteredProducts = shuffledProducts.filter(product => {
         const matchesCategory = !selectedCategory || product.category?._id === selectedCategory;
         const matchesColor = selectedColors.length === 0 || 
             (product.availableColors && product.availableColors.some(color => selectedColors.includes(color)));

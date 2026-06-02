@@ -29,7 +29,6 @@ const CARD_WIDTH_MM = 85.6;
 const CARD_HEIGHT_MM = 53.98;
 const X_RATIO = SVG_WIDTH / CARD_WIDTH_MM;
 const Y_RATIO = SVG_HEIGHT / CARD_HEIGHT_MM;
-// Removed unused variable: MOBILE_BREAKPOINT
 
 // Simple in-memory cache for SVG content
 const svgCache = new Map();
@@ -76,7 +75,6 @@ const CreditCardPreview = React.memo(function CreditCardPreview({
 
     const finalLogoUrl = useMemo(() => {
         const url = (logoUrl && logoUrl.startsWith('/uploads')) ? `${api.BASE_URL}${logoUrl}` : logoUrl;
-    
         return url;
     }, [logoUrl]);
 
@@ -129,8 +127,6 @@ const CreditCardPreview = React.memo(function CreditCardPreview({
         }
     }, [finalLogoUrl]);
 
-
-
     const getSVGPoint = (e) => {
         if (!svgRef.current) return { x: 0, y: 0 };
         const point = svgRef.current.createSVGPoint();
@@ -144,7 +140,7 @@ const CreditCardPreview = React.memo(function CreditCardPreview({
     const handleDragStart = (e) => {
         if (!isDraggable) return;
         if (e.cancelable) e.preventDefault();
-        e.stopPropagation(); // Stop event propagation
+        e.stopPropagation();
         setIsDragging(true);
         const startPoint = getSVGPoint(e);
         dragStartOffset.current = {
@@ -176,21 +172,19 @@ const CreditCardPreview = React.memo(function CreditCardPreview({
     };
 
     useEffect(() => {
-        const throttledHandleMove = throttle(handleDragMove, 50); // Throttle to 50ms
+        const throttledHandleMove = throttle(handleDragMove, 50);
         const handleEnd = () => handleDragEnd();
         
-        const options = { passive: false };
-
         if (isDragging) {
             window.addEventListener('mousemove', throttledHandleMove);
-            window.addEventListener('touchmove', throttledHandleMove, options);
+            window.addEventListener('touchmove', throttledHandleMove, { passive: false });
             window.addEventListener('mouseup', handleEnd);
             window.addEventListener('touchend', handleEnd);
         }
 
         return () => {
             window.removeEventListener('mousemove', throttledHandleMove);
-            window.removeEventListener('touchmove', throttledHandleMove, options);
+            window.removeEventListener('touchmove', throttledHandleMove);
             window.removeEventListener('mouseup', handleEnd);
             window.removeEventListener('touchend', handleEnd);
         };
@@ -202,12 +196,8 @@ const CreditCardPreview = React.memo(function CreditCardPreview({
         setIsResizing(true);
         const startPoint = getSVGPoint(e);
         
-        // Use the scaled width and height to calculate the current center
         const centerX = logoX + (unscaledLogoSvgWidth * scale) / 2;
         const centerY = logoY + (unscaledLogoSvgHeight * scale) / 2;
-        
-        // We use the UN-OFFSET boundary for drag calculation 
-        // to ensure the scale and rotation math is based on the actual corner.
         const originalCorner = transformBoundaries.drag[cornerIndex];
 
         setResizeStart({
@@ -226,34 +216,21 @@ const CreditCardPreview = React.memo(function CreditCardPreview({
         const newPoint = getSVGPoint(e);
 
         const { initialCenter, initialCorner, initialScale, initialRotation } = resizeStart;
-
-        const originalVector = {
-            x: initialCorner.x - initialCenter.x,
-            y: initialCorner.y - initialCenter.y,
-        };
-
-        const newVector = {
-            x: newPoint.x - initialCenter.x,
-            y: newPoint.y - initialCenter.y,
-        };
-
+        const originalVector = { x: initialCorner.x - initialCenter.x, y: initialCorner.y - initialCenter.y };
+        const newVector = { x: newPoint.x - initialCenter.x, y: newPoint.y - initialCenter.y };
         const originalDist = Math.sqrt(originalVector.x ** 2 + originalVector.y ** 2);
         const newDist = Math.sqrt(newVector.x ** 2 + newVector.y ** 2);
 
         if (originalDist === 0) return;
 
         const scaleFactor = newDist / originalDist;
-        if (onScaleChange) {
-            onScaleChange(initialScale * scaleFactor);
-        }
+        if (onScaleChange) onScaleChange(initialScale * scaleFactor);
 
         const originalAngle = Math.atan2(originalVector.y, originalVector.x) * (180 / Math.PI);
         const newAngle = Math.atan2(newVector.y, newVector.x) * (180 / Math.PI);
         const angleDiff = newAngle - originalAngle;
 
-        if (onRotationChange) {
-            onRotationChange(initialRotation + angleDiff);
-        }
+        if (onRotationChange) onRotationChange(initialRotation + angleDiff);
 
     }, [isResizing, resizeStart, onScaleChange, onRotationChange]);
 
@@ -263,21 +240,19 @@ const CreditCardPreview = React.memo(function CreditCardPreview({
     };
 
     useEffect(() => {
-        const throttledHandleMove = throttle(handleCornerDragMove, 50); // Throttle to 50ms
+        const throttledHandleMove = throttle(handleCornerDragMove, 50);
         const handleEnd = () => handleCornerDragEnd();
-
-        const options = { passive: false };
 
         if (isResizing) {
             window.addEventListener('mousemove', throttledHandleMove);
-            window.addEventListener('touchmove', throttledHandleMove, options);
+            window.addEventListener('touchmove', throttledHandleMove, { passive: false });
             window.addEventListener('mouseup', handleEnd);
             window.addEventListener('touchend', handleEnd);
         }
 
         return () => {
             window.removeEventListener('mousemove', throttledHandleMove);
-            window.removeEventListener('touchmove', throttledHandleMove, options);
+            window.removeEventListener('touchmove', throttledHandleMove);
             window.removeEventListener('mouseup', handleEnd);
             window.removeEventListener('touchend', handleEnd);
         };
@@ -288,11 +263,9 @@ const CreditCardPreview = React.memo(function CreditCardPreview({
         if (options && options.engraving.includes(engravingKey)) {
             return engravingColorHex[engravingKey];
         }
-        // If the selected engraving color is not available for the card, use the default.
         const defaultEngraving = getDefaultEngraving(cardKey);
         return engravingColorHex[defaultEngraving] || engravingColorHex.silver;
     }, []);
-
 
     const logoWidth = CARD_WIDTH_MM;
     const logoHeight = CARD_WIDTH_MM / svgRatio;
@@ -301,24 +274,16 @@ const CreditCardPreview = React.memo(function CreditCardPreview({
         return getContrastingEngravingColor(cardColorKey, engravingColorKey);
     }, [cardColorKey, engravingColorKey, getContrastingEngravingColor]);
 
-
     const logoX = position.x * X_RATIO;
     const logoY = position.y * Y_RATIO;
     const unscaledLogoSvgWidth = logoWidth * X_RATIO;
     const unscaledLogoSvgHeight = logoHeight * X_RATIO;
-    // These are the visually perceived width/height after scaling
     const currentLogoSvgWidth = unscaledLogoSvgWidth * scale;
     const currentLogoSvgHeight = unscaledLogoSvgHeight * scale;
 
     const transformBoundaries = useMemo(() => {
-        // Calculate center based on current position and *scaled* size
         const centerX = logoX + currentLogoSvgWidth / 2;
         const centerY = logoY + currentLogoSvgHeight / 2;
-        
-        // Factor to move the handles inward (1.0 = corner, 0.75 = 1/4 of the way toward center)
-        const inwardFactor = 1.0; 
-
-        // 1. Calculate the corners of the *currently scaled* bounding box *before* rotation
         const corners = [
             { x: logoX, y: logoY },
             { x: logoX + currentLogoSvgWidth, y: logoY },
@@ -338,58 +303,31 @@ const CreditCardPreview = React.memo(function CreditCardPreview({
             };
         };
         
-        // 2. Return the original (un-offset) points for accurate drag calculation
         const unoffsetRotatedCorners = corners.map(p => rotatePoint(p, rotation));
-
-        // 3. Calculate the offset points for rendering the handle
-        const offsetRenderPoints = unoffsetRotatedCorners.map(p => {
-            const dx = p.x - centerX;
-            const dy = p.y - centerY;
-            return {
-                x: centerX + dx * inwardFactor,
-                y: centerY + dy * inwardFactor,
-            };
-        });
-        
-        return {
-            drag: unoffsetRotatedCorners, // Used by handleCornerDragStart
-            render: offsetRenderPoints, // Used for rendering the circles
-        };
-        
+        return { drag: unoffsetRotatedCorners, render: unoffsetRotatedCorners };
     }, [logoX, logoY, currentLogoSvgWidth, currentLogoSvgHeight, rotation]);
 
     const cardFill = useMemo(() => {
         const option = cardColorOptions[cardColorKey];
-        if (!option) return 'black'; // Default fallback
+        if (!option) return 'black';
 
         const colorBg = option.bgColor;
-
         if (colorBg.startsWith('gradient')) {
-            // Map to existing SVG gradients based on the key derived from the gradient string
-            const gradientKey = colorBg.replace('gradient-', ''); // e.g., 'black', 'roseGold', 'visa', 'colorful'
+            const gradientKey = colorBg.replace('gradient-', '');
             switch (gradientKey) {
-                case 'colorful':
-                    return `url(#${uniqueIds.colorfulGradient})`;
-                case 'roseGold':
-                    return `url(#${uniqueIds.roseGoldGradient})`;
-                case 'black':
-                    return `url(#${uniqueIds.blackGradient})`;
-                default:
-                    return 'black'; // Fallback for unknown gradients
+                case 'colorful': return `url(#${uniqueIds.colorfulGradient})`;
+                case 'roseGold': return `url(#${uniqueIds.roseGoldGradient})`;
+                case 'black': return `url(#${uniqueIds.blackGradient})`;
+                default: return 'black';
             }
         } else if (colorBg.startsWith('bg-')) {
-            // Map Tailwind classes to hex codes
             switch (colorBg) {
-                case 'bg-yellow-500': return '#D4AF37'; // Gold
-                case 'bg-gray-300': return '#D1D5DB'; // Silver
-                case 'bg-white': return '#FFFFFF'; // White
-                case 'bg-blue-500': return '#3B82F6'; // Blue
-                case 'bg-red-500': return '#EF4444'; // Red
-                // Add more Tailwind to hex mappings as needed
-                default: return 'black'; // Default fallback
+                case 'bg-yellow-500': return `url(#${uniqueIds.goldGradient})`;
+                case 'bg-gray-300': return `url(#${uniqueIds.silverGradient})`;
+                default: return 'black';
             }
         }
-        return 'black'; // Final fallback
+        return 'black';
     }, [cardColorKey, uniqueIds]);
 
     return (
@@ -399,26 +337,22 @@ const CreditCardPreview = React.memo(function CreditCardPreview({
                 xmlns="http://www.w3.org/2000/svg"
                 viewBox={`0 0 ${SVG_WIDTH} ${SVG_HEIGHT}`}
                 className={`w-full object-cover md:transform-style-3d md:rotate-x-5 md:-rotate-y-10 ${isDraggable ? (isDragging ? 'cursor-grabbing' : 'cursor-grab') : ''}`}
-                style={{
-                    filter: isCarousel ? 'none' : 'drop-shadow(0 10px 10px rgba(0,0,0,0.4))'
-                }}
+                style={{ filter: isCarousel ? 'none' : 'drop-shadow(0 10px 10px rgba(0,0,0,0.4))' }}
                 onMouseDown={isDraggable ? handleDragStart : undefined}
                 onTouchStart={isDraggable ? handleDragStart : undefined}
             >
                 <defs>
-                    <linearGradient id={uniqueIds.silverGradient} x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stopColor="#c0c0c0" /><stop offset="100%" stopColor="#a9a9a9" /></linearGradient>
-                    <linearGradient id={uniqueIds.goldGradient} x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stopColor="#d4af37" /><stop offset="100%" stopColor="#b8860b" /></linearGradient>
-                    <linearGradient id={uniqueIds.blackGradient} x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stopColor="#222222" /><stop offset="100%" stopColor="#000000" /></linearGradient>
-                    <linearGradient id={uniqueIds.roseGoldGradient} x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stopColor="#E5B4A3" /><stop offset="100%" stopColor="#C98E7A" /></linearGradient>
-                    <linearGradient id={uniqueIds.roseGoldGradient} x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stopColor="#E5B4A3" /><stop offset="100%" stopColor="#C98E7A" /></linearGradient>
-                    <linearGradient id={uniqueIds.colorfulGradient} x1="0%" y1="100%" x2="100%" y2="0%">
-                        <stop offset="0%" stopColor="#6b21a8" /><stop offset="20%" stopColor="#c026d3" /><stop offset="40%" stopColor="#db2777" /><stop offset="60%" stopColor="#ca8a04" /><stop offset="80%" stopColor="#16a34a" /><stop offset="100%" stopColor="#2563eb" />
-                    </linearGradient>
+                    <linearGradient id={uniqueIds.silverGradient} x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stopColor="#e5e7eb" /><stop offset="50%" stopColor="#ffffff" /><stop offset="100%" stopColor="#9ca3af" /></linearGradient>
+                    <linearGradient id={uniqueIds.goldGradient} x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stopColor="#bf953f" /><stop offset="50%" stopColor="#fcf6ba" /><stop offset="100%" stopColor="#b38728" /></linearGradient>
+                    <linearGradient id={uniqueIds.blackGradient} x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stopColor="#374151" /><stop offset="50%" stopColor="#111827" /><stop offset="100%" stopColor="#000000" /></linearGradient>
+                    <linearGradient id={uniqueIds.roseGoldGradient} x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stopColor="#fda4af" /><stop offset="50%" stopColor="#fecdd3" /><stop offset="100%" stopColor="#be123c" /></linearGradient>
+                    <linearGradient id={uniqueIds.colorfulGradient} x1="0%" y1="100%" x2="100%" y2="0%"><stop offset="0%" stopColor="#6b21a8" /><stop offset="20%" stopColor="#c026d3" /><stop offset="40%" stopColor="#db2777" /><stop offset="60%" stopColor="#ca8a04" /><stop offset="80%" stopColor="#16a34a" /><stop offset="100%" stopColor="#2563eb" /></linearGradient>
                     
                     <filter id={uniqueIds.shimmerFilter} x="-20%" y="-20%" width="140%" height="140%">
-                        <feDistantLight azimuth="225" elevation="30" />
-                        <feSpecularLighting in="SourceAlpha" surfaceScale="3" specularConstant="0.5" specularExponent="15" lightingColor="white" result="specular" />
-                        <feComposite in="SourceGraphic" in2="specular" operator="arithmetic" k1="0" k2="1" k3="1" k4="0" />
+                        <feSpecularLighting in="SourceAlpha" surfaceScale="2" specularConstant="0.7" specularExponent="25" lightingColor="#ffffff" result="specular">
+                            <feDistantLight azimuth="225" elevation="45" />
+                        </feSpecularLighting>
+                        <feComposite in="SourceGraphic" in2="specular" operator="arithmetic" k1="0" k2="1" k3="0.5" k4="0" />
                     </filter>
                     
                     <radialGradient id={uniqueIds.spotlight} cx="25%" cy="25%" r="60%"><stop offset="0%" stopColor="white" stopOpacity="0.35" /><stop offset="100%" stopColor="white" stopOpacity="0" /></radialGradient>
@@ -431,85 +365,35 @@ const CreditCardPreview = React.memo(function CreditCardPreview({
                                                               0 0 0 0 1
                                                               0 0 0 1 0" />
                     </filter>
-                                        <linearGradient id={uniqueIds.simStripes} x1="0" y1="0" x2="1" y2="0">
-                                            <stop offset="30%" stopColor="#D4AF37" />
-                                            <stop offset="30.5%" stopColor="#A9A9A9" />
-                                            <stop offset="32.5%" stopColor="#A9A9A9" />
-                                            <stop offset="33%" stopColor="#D4AF37" />
-                                            <stop offset="66%" stopColor="#D4AF37" />
-                                            <stop offset="66.5%" stopColor="#A9A9A9" />
-                                            <stop offset="68.5%" stopColor="#A9A9A9" />
-                                            <stop offset="69%" stopColor="#D4AF37" />
-                                        </linearGradient>
+                    <linearGradient id={uniqueIds.simStripes} x1="0" y1="0" x2="1" y2="0">
+                        <stop offset="30%" stopColor="#D4AF37" /><stop offset="30.5%" stopColor="#A9A9A9" /><stop offset="32.5%" stopColor="#A9A9A9" /><stop offset="33%" stopColor="#D4AF37" /><stop offset="66%" stopColor="#D4AF37" /><stop offset="66.5%" stopColor="#A9A9A9" /><stop offset="68.5%" stopColor="#A9A9A9" /><stop offset="69%" stopColor="#D4AF37" />
+                    </linearGradient>
                                         
                     {finalLogoUrl && (
                         <mask id={uniqueIds.mask}>
                             {svgContent ? (
                                 <g dangerouslySetInnerHTML={{ __html: svgContent }} filter="url(#white-mask-filter)" />
                             ) : (
-                                <image 
-                                    href={finalLogoUrl} 
-                                    x="0" y="0" 
-                                    width="100%" height="100%" 
-                                    preserveAspectRatio="xMidYMid meet" 
-                                    filter="url(#white-mask-filter)"
-                                />
+                                <image href={finalLogoUrl} x="0" y="0" width="100%" height="100%" preserveAspectRatio="xMidYMid meet" filter="url(#white-mask-filter)" />
                             )}
                         </mask>
                     )}
                 </defs>
                 <g filter={isCarousel ? 'none' : `url(#${uniqueIds.shimmerFilter})`}>
-                    {/* 1. Base Card Fill */}
-                    <g>
-                        <rect
-                            width={SVG_WIDTH}
-                            height={SVG_HEIGHT}
-                            rx="20"
-                            fill={cardFill}
-                        />
-                    </g>
-                    
-                    {/* 2. Logo Group (Draw logo BEFORE the general spotlight) */}
+                    <rect width={SVG_WIDTH} height={SVG_HEIGHT} rx="20" fill={cardFill} />
                     {finalLogoUrl && (
                         <g>
-                            {/* The transformed group for the logo */}
-                            <g
-                                transform={`translate(${logoX}, ${logoY}) scale(${scale}) rotate(${rotation}, ${unscaledLogoSvgWidth / 2}, ${unscaledLogoSvgHeight / 2})`}
-                                style={{ willChange: 'transform' }}
-                            >
-                                <rect
-                                    x="0"
-                                    y="0"
-                                    height={unscaledLogoSvgHeight} 
-                                    width={unscaledLogoSvgWidth}   
-                                    mask={`url(#${uniqueIds.mask})`}
-                                    fill={effectiveEngravingColor}
-                                />
+                            <g transform={`translate(${logoX}, ${logoY}) scale(${scale}) rotate(${rotation}, ${unscaledLogoSvgWidth / 2}, ${unscaledLogoSvgHeight / 2})`} style={{ willChange: 'transform' }}>
+                                <rect x="0" y="0" height={unscaledLogoSvgHeight} width={unscaledLogoSvgWidth} mask={`url(#${uniqueIds.mask})`} fill={effectiveEngravingColor} />
                             </g>
-                            
-                            {/* Four Transform Handles (using the offset position for rendering) */}
                             {showTransformHandles && transformBoundaries.render.map((pos, i) => (
-                                <circle 
-                                    key={i} 
-                                    cx={pos.x} 
-                                    cy={pos.y} 
-                                    r="4" 
-                                    fill="white" 
-                                    stroke="black" 
-                                    strokeWidth="1" 
-                                    cursor="pointer" 
-                                    onMouseDown={(e) => handleCornerDragStart(e, i)} 
-                                    onTouchStart={(e) => handleCornerDragStart(e, i)} 
-                                />
+                                <circle key={i} cx={pos.x} cy={pos.y} r="4" fill="white" stroke="black" strokeWidth="1" cursor="pointer" onMouseDown={(e) => handleCornerDragStart(e, i)} onTouchStart={(e) => handleCornerDragStart(e, i)} />
                             ))}
                         </g>
                     )}
-
-                    {/* 3. Spotlight Effects (Draw OVER the logo) */}
                     {cardColorKey === 'black' && ( <rect width={SVG_WIDTH} height={SVG_HEIGHT} rx="20" fill={`url(#${uniqueIds.blackSpotlight})`} /> )}
                     {cardColorKey === 'silver' && ( <rect width={SVG_WIDTH} height={SVG_HEIGHT} rx="20" fill={`url(#${uniqueIds.silverSpotlight})`} /> )}
                     {cardColorKey !== 'black' && cardColorKey !== 'silver' && ( <rect width={SVG_WIDTH} height={SVG_HEIGHT} rx="20" fill={`url(#${uniqueIds.spotlight})`} /> )}
-
                 </g>
                 <path d="M40,85 h30 a5,5 0 0 1 5,5 v20 a5,5 0 0 1 -5,5 h-30 a5,5 0 0 1 -5,-5 v-20 a5,5 0 0 1 5,-5 z" fill={`url(#${uniqueIds.simStripes})`} opacity="0.9" stroke="black" strokeWidth="0.5" />
             </svg>

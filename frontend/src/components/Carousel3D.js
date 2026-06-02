@@ -161,7 +161,7 @@ export default function Carousel3D({ items }) {
     }
 
     return (
-        <div className="w-full flex relative min-h-[450px] md:min-h-[600px] items-center justify-center overflow-x-hidden px-2 sm:px-12 md:px-24">
+        <div className="w-full flex relative min-h-[500px] md:min-h-[650px] items-center justify-center overflow-x-hidden px-2 sm:px-12 md:px-24">
             {/* Left Arrow */}
             <button 
                 onClick={handlePrev}
