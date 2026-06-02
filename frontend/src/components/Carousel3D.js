@@ -1,9 +1,9 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import ProductCard from './ProductCard';
 
-const DRAG_SENSITIVITY = 0.05;
-const INERTIA_DAMPING = 0.95;
-const AUTO_ROTATE_SPEED = -0.05;
+const DRAG_SENSITIVITY = 0.04;
+const INERTIA_DAMPING = 0.96;
+const AUTO_ROTATE_SPEED = -0.1;
 const MOBILE_BREAKPOINT = 768;
 
 export default function Carousel3D({ items }) {
@@ -69,9 +69,9 @@ export default function Carousel3D({ items }) {
                     if (absAngle > 180) absAngle -= 360;
                     if (absAngle < -180) absAngle += 360;
                     
-                    // If the card is facing away from the camera (more than 100 degrees left/right), hide it.
+                    // If the card is facing away from the camera (more than 90 degrees left/right), hide it.
                     // This prevents the browser from rendering and compositing complex SVGs that are hidden in the back.
-                    if (Math.abs(absAngle) > 100) {
+                    if (Math.abs(absAngle) > 90) {
                         child.style.opacity = '0';
                         child.style.visibility = 'hidden';
                     } else {
@@ -208,7 +208,7 @@ export default function Carousel3D({ items }) {
                                                 WebkitBackfaceVisibility: 'hidden',
                                                 top: '50%',
                                                 left: '50%', // Changed from insetInlineStart
-                                                willChange: 'transform'
+                                                willChange: 'transform, opacity'
                                             }}
                                         >
                                            <ProductCard
