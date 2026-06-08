@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useData } from '../contexts/DataContext';
 import ProductCard from '../components/ProductCard';
 import { useTranslation } from 'react-i18next';
-import { ALL_CARD_COLORS } from '../utils/colorUtils';
+import { ALL_CARD_COLORS, nameToKeyMap } from '../utils/colorUtils';
 import { useRouter } from '../contexts/RouterContext';
 
 export default function BrowsePage() {
@@ -53,8 +53,13 @@ export default function BrowsePage() {
 
     const filteredProducts = shuffledProducts.filter(product => {
         const matchesCategory = !selectedCategory || product.category?._id === selectedCategory;
+        
+        // Normalize product colors to keys (e.g., 'שחור' -> 'black') for consistent filtering
+        const productColorKeys = (product.availableColors || []).map(c => nameToKeyMap[c] || c);
+        
         const matchesColor = selectedColors.length === 0 || 
-            (product.availableColors && product.availableColors.some(color => selectedColors.includes(color)));
+            productColorKeys.some(color => selectedColors.includes(color));
+            
         const matchesSearch = !searchTerm || product.name.toLowerCase().includes(searchTerm.toLowerCase()) || 
             (product.description && product.description.toLowerCase().includes(searchTerm.toLowerCase()));
         
@@ -140,23 +145,31 @@ export default function BrowsePage() {
                                     <div className="w-1.5 h-1.5 rounded-full bg-pink-500 animate-pulse"></div>
                                     <span className="text-[10px] uppercase tracking-[0.3em] text-gray-500 font-black">{t('finish')}</span>
                                 </div>
-                                <div className="grid grid-cols-4 gap-4">
-                                    {ALL_CARD_COLORS.map(color => (
+                                <div className="grid grid-cols-5 gap-3">
+                                    {['gold', 'silver', 'black', 'roseGold', 'colorful'].map(color => (
                                         <button 
                                             key={color}
                                             onClick={() => toggleColor(color)}
-                                            className={`w-full aspect-square rounded-2xl border-2 transition-all duration-500 transform hover:scale-110 flex items-center justify-center relative overflow-hidden ${selectedColors.includes(color) ? 'border-gold-500 color-dot-active' : 'border-white/10 hover:border-white/30'}`}
+                                            className={`w-full aspect-square rounded-xl border-2 transition-all duration-500 transform hover:scale-110 flex items-center justify-center relative overflow-hidden ${selectedColors.includes(color) ? 'border-gold-500 shadow-[0_0_10px_rgba(212,175,55,0.3)]' : 'border-white/10 hover:border-white/30'}`}
                                             title={t(color)}
                                         >
                                             <div 
-                                                className="absolute inset-1 rounded-[10px] shadow-inner"
+                                                className="absolute inset-1 rounded-lg shadow-inner"
                                                 style={{ 
-                                                    backgroundColor: color === 'gold' ? '#d4af37' : color === 'silver' ? '#c0c0c0' : color === 'black' ? '#111' : color === 'roseGold' ? '#b76e79' : color === 'colorful' ? 'linear-gradient(45deg, #f06, #4a90e2, #2ecc71)' : '#333',
-                                                    background: color === 'colorful' ? 'linear-gradient(45deg, #f06, #4a90e2, #2ecc71)' : undefined
+                                                    backgroundColor: 
+                                                        color === 'gold' ? '#d4af37' : 
+                                                        color === 'silver' ? '#c0c0c0' : 
+                                                        color === 'black' ? '#111' : 
+                                                        color === 'roseGold' ? '#b76e79' : 
+                                                        '#333',
+                                                    background: 
+                                                        color === 'colorful' ? 'linear-gradient(45deg, #f06, #4a90e2, #2ecc71)' : 
+                                                        color === 'roseGold' ? 'linear-gradient(135deg, #b76e79 0%, #ffc0cb 100%)' :
+                                                        undefined
                                                 }}
                                             />
                                             {selectedColors.includes(color) && (
-                                                <svg className="w-5 h-5 text-white z-10 drop-shadow-[0_2px_4px_rgba(0,0,0,0.5)]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <svg className="w-4 h-4 text-white z-10 drop-shadow-[0_2px_4px_rgba(0,0,0,0.5)]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="4" d="M5 13l4 4L19 7" />
                                                 </svg>
                                             )}
