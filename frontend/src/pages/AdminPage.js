@@ -62,6 +62,10 @@ function SiteSettingsPage({ products }) {
         }
     };
 
+    const isErrorMessage = (msg) => {
+        return msg && (msg.includes('Error') || msg.includes('שגיאה') || msg.includes(t('error')));
+    };
+
     const handleWheelPrizeUpdate = (index, field, value) => {
         const newPrizes = [...(localSettings.wheelPrizes || [])];
         newPrizes[index] = { ...newPrizes[index], [field]: value };
@@ -90,7 +94,7 @@ function SiteSettingsPage({ products }) {
         <div>
             <h2 className="text-2xl font-bold mb-4">{t('siteSettings')}</h2>
             <div className="bg-gray-800 p-6 rounded-lg space-y-6 max-w-2xl">
-                {message && <p className={message.includes('Error') ? 'text-red-400' : 'text-green-400'}>{message}</p>}
+                {message && <p className={isErrorMessage(message) ? 'text-red-400' : 'text-green-400'}>{message}</p>}
                 
                 {/* --- PROMOTED SECTION --- */}
                 <div className="space-y-4">
@@ -124,7 +128,10 @@ function SiteSettingsPage({ products }) {
                     </div>
                     <button 
                         type="button" 
-                        onClick={() => handleSettingsUpdate({ promotedTitle: localSettings.promotedTitle, promotedProducts: localSettings.promotedProducts })} 
+                        onClick={() => handleSettingsUpdate({ 
+                            promotedTitle: localSettings.promotedTitle, 
+                            promotedProducts: (localSettings.promotedProducts || []).map(p => p._id || p) 
+                        })} 
                         className="btn-premium btn-gold w-full"
                     >
                         {t('savePromotedSection') || 'Save Promoted Section'}
@@ -139,7 +146,7 @@ function SiteSettingsPage({ products }) {
                                 value={prize.label} 
                                 onChange={(e) => handleWheelPrizeUpdate(index, 'label', e.target.value)} 
                                 className="w-full bg-gray-700 rounded p-1 text-sm border border-gray-600"
-                                placeholder="Label"
+                                placeholder={t('label')}
                             />
                             <div className="flex gap-2 w-full md:w-auto">
                                 <input 
@@ -148,15 +155,15 @@ function SiteSettingsPage({ products }) {
                                     onChange={(e) => handleWheelPrizeUpdate(index, 'discount', Number(e.target.value))} 
                                     className="w-16 bg-gray-700 rounded p-1 text-sm border border-gray-600"
                                     placeholder="%"
-                                    title="Discount %"
+                                    title={t('discountPercentage')}
                                 />
                                 <input 
                                     type="number" 
                                     value={prize.probability} 
                                     onChange={(e) => handleWheelPrizeUpdate(index, 'probability', Number(e.target.value))} 
                                     className="w-16 bg-gray-700 rounded p-1 text-sm border border-gray-600"
-                                    placeholder="Prob"
-                                    title="Probability"
+                                    placeholder={t('probPlaceholder')}
+                                    title={t('probability')}
                                 />
                             </div>
                         </div>

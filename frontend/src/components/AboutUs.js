@@ -37,7 +37,7 @@ export default function AboutUs() {
                         <path strokeLinecap="round" strokeLinejoin="round" d="M16.5 10.5V6.75a4.5 4.5 0 1 0-9 0v3.75m-.75 11.25h10.5a2.25 2.25 0 0 0 2.25-2.25v-6.75a2.25 2.25 0 0 0-2.25-2.25H6.75a2.25 2.25 0 0 0-2.25 2.25v6.75a2.25 2.25 0 0 0 2.25 2.25Z" />
                     </svg>
                     <p className="text-gray-300 text-xl">
-                        {t('securityMessageStart')} <a href="https://stripe.com" target="_blank" rel="noopener noreferrer" className="text-indigo-400 hover:underline">Stripe.com</a> {t('securityMessageAnd')} <a href="https://www.bit.co.il/" target="_blank" rel="noopener noreferrer" className="text-indigo-400 hover:underline">Bit</a>.
+                        {t('securityMessageStart')} <a href="https://make.com" target="_blank" rel="noopener noreferrer" className="text-indigo-400 hover:underline">Make.com</a> {t('securityMessageAnd')} <a href="https://www.bit.co.il/" target="_blank" rel="noopener noreferrer" className="text-indigo-400 hover:underline">Bit</a>.
                     </p>
                 </div>
             </div>

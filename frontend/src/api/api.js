@@ -339,20 +339,14 @@ export const updateSiteSettings = async (settingsData, token) => {
 };
 
 // --- NEW PAYMENT FUNCTIONS ---
-export const getStripeApiKey = async () => {
-    const response = await fetch(`${BASE_URL}/api/config/stripe-key`, { headers: getLanguageHeaders() });
-    if (!response.ok) throw new Error('Could not get Stripe key');
-    return await response.json();
-};
-
-export const createPaymentIntent = async (paymentData, token) => {
-    const response = await fetch(`${BASE_URL}/api/config/create-payment-intent`, {
+export const processMakePayment = async (paymentData, token) => {
+    const response = await fetch(`${BASE_URL}/api/payment/make`, {
         method: 'POST',
         headers: { ...getAuthHeaders(token), ...getLanguageHeaders() },
         body: JSON.stringify(paymentData),
     });
     const data = await response.json();
-    if (!response.ok) throw new Error(data.message || 'Could not create payment intent');
+    if (!response.ok) throw new Error(data.message || 'Could not process payment');
     return data;
 };
 

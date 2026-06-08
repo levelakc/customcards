@@ -1,9 +1,8 @@
 import express from 'express';
 const router = express.Router();
-import { createPaymentIntent, getStripeApiKey } from '../controllers/paymentController.js';
+import { processMakePayment } from '../controllers/makePaymentController.js';
 import { guestOrProtect } from '../middleware/authMiddleware.js';
 
-router.post('/create-payment-intent', guestOrProtect, createPaymentIntent);
-router.get('/stripe-key', getStripeApiKey);
+router.post('/make', guestOrProtect, processMakePayment);
 
 export default router;

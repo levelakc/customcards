@@ -1,7 +1,5 @@
 import React, { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
-import { loadStripe } from '@stripe/stripe-js';
-import { Elements, PaymentElement, useStripe, useElements } from '@stripe/react-stripe-js';
 import * as api from '../api/api';
 import { useCart } from '../contexts/CartContext';
 import { useRouter } from '../contexts/RouterContext';
@@ -15,48 +13,57 @@ const DELIVERY_FEE_ILS = 50; // Fixed delivery fee in ILS
 // --- The Main Checkout Form Component ---
 const CheckoutForm = ({ guestInfo }) => {
     const { t } = useTranslation();
-    const stripe = useStripe();
-    const elements = useElements();
-    const { createOrder } = useCart();
+    const { createOrder, cartItems } = useCart();
     const { navigate } = useRouter();
     const { token } = useAuth();
     const [message, setMessage] = useState(null);
     const [isLoading, setIsLoading] = useState(false);
-    const [messageToDesigner, setMessageToDesigner] = useState(''); // New state for message
+    const [messageToDesigner, setMessageToDesigner] = useState('');
+    const [paymentMethod, setPaymentMethod] = useState('visa'); // Default to visa
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-        if (!stripe || !elements) return;
-
         setIsLoading(true);
+        setMessage(null);
 
-        const { error: stripeError, paymentIntent } = await stripe.confirmPayment({
-            elements,
-            confirmParams: {},
-            redirect: 'if_required',
-        });
-
-        if (stripeError) {
-            setMessage(stripeError.message);
-            setIsLoading(false);
-            return;
-        }
-
-        if (paymentIntent && paymentIntent.status === 'succeeded') {
-            const result = await createOrder(token, messageToDesigner, guestInfo); // Pass the message and guest info
-            if (result.success) {
-                navigate('order-success');
-            } else {
-                setMessage(result.error || 'Failed to save order.');
+        try {
+            // 1. Create the order in our database first
+            const orderResult = await createOrder(token, messageToDesigner, guestInfo);
+            
+            if (!orderResult.success) {
+                throw new Error(orderResult.error || 'Failed to save order.');
             }
-        }
 
-        setIsLoading(false);
+            // 2. Process payment with Make.com
+            // We send the order details (or just the latest order) and payment method
+            const paymentData = {
+                paymentMethod,
+                orderDetails: {
+                    items: cartItems,
+                    guestInfo,
+                    messageToDesigner,
+                    totalAmount: cartItems.reduce((sum, item) => sum + item.price * item.quantity, 0) + DELIVERY_FEE_ILS
+                }
+            };
+
+            const result = await api.processMakePayment(paymentData, token);
+
+            if (result.url) {
+                // Redirect user to the Make.com webhook / payment page
+                window.location.href = result.url;
+            } else {
+                // If no URL returned, assume success or manual handle (unlikely given requirement)
+                navigate('order-success');
+            }
+        } catch (error) {
+            setMessage(error.message);
+            setIsLoading(false);
+        }
     };
 
     return (
         <form id="payment-form" onSubmit={handleSubmit}>
-            <div className="mb-4">
+            <div className="mb-6">
                 <label htmlFor="messageToDesigner" className="block text-sm font-medium text-gray-300 mb-1">
                     {t('messageToDesigner')}
                 </label>
@@ -70,8 +77,43 @@ const CheckoutForm = ({ guestInfo }) => {
                     placeholder={t('designerPlaceholder')}
                 ></textarea>
             </div>
-            <PaymentElement id="payment-element" />
-            <button disabled={isLoading || !stripe || !elements} id="submit" className={`btn-premium w-full mt-10 text-xl py-4 ${isLoading || !stripe || !elements ? 'opacity-50 cursor-not-allowed' : 'btn-gold'}`}>
+
+            <div className="mb-8">
+                <h3 className="text-xl font-bold text-white mb-4 border-b border-gray-700 pb-2">{t('choosePaymentMethod')}</h3>
+                <div className="space-y-4">
+                    <label className={`flex items-center p-4 border rounded-lg cursor-pointer transition-colors ${paymentMethod === 'visa' ? 'border-gold bg-gray-800' : 'border-gray-600 hover:bg-gray-800'}`}>
+                        <input
+                            type="radio"
+                            name="paymentMethod"
+                            value="visa"
+                            checked={paymentMethod === 'visa'}
+                            onChange={() => setPaymentMethod('visa')}
+                            className="hidden"
+                        />
+                        <div className={`w-5 h-5 rounded-full border-2 mr-3 flex items-center justify-center ${paymentMethod === 'visa' ? 'border-gold' : 'border-gray-500'}`}>
+                            {paymentMethod === 'visa' && <div className="w-2.5 h-2.5 rounded-full bg-gold"></div>}
+                        </div>
+                        <span className="text-lg">{t('visa')}</span>
+                    </label>
+
+                    <label className={`flex items-center p-4 border rounded-lg cursor-pointer transition-colors ${paymentMethod === 'bit' ? 'border-gold bg-gray-800' : 'border-gray-600 hover:bg-gray-800'}`}>
+                        <input
+                            type="radio"
+                            name="paymentMethod"
+                            value="bit"
+                            checked={paymentMethod === 'bit'}
+                            onChange={() => setPaymentMethod('bit')}
+                            className="hidden"
+                        />
+                        <div className={`w-5 h-5 rounded-full border-2 mr-3 flex items-center justify-center ${paymentMethod === 'bit' ? 'border-gold' : 'border-gray-500'}`}>
+                            {paymentMethod === 'bit' && <div className="w-2.5 h-2.5 rounded-full bg-gold"></div>}
+                        </div>
+                        <span className="text-lg">{t('bit')}</span>
+                    </label>
+                </div>
+            </div>
+
+            <button disabled={isLoading} id="submit" className={`btn-premium w-full mt-6 text-xl py-4 ${isLoading ? 'opacity-50 cursor-not-allowed' : 'btn-gold'}`}>
                 <span id="button-text">
                     {isLoading ? t('processingPayment') : t('payNow')}
                 </span>
@@ -85,10 +127,8 @@ const CheckoutForm = ({ guestInfo }) => {
 export default function CheckoutPage() {
     const { t } = useTranslation();
     const { getSymbol, convert } = useCurrency();
-    const [stripePromise, setStripePromise] = useState(null);
-    const [clientSecret, setClientSecret] = useState('');
     const { cartItems } = useCart();
-    const { user, token } = useAuth();
+    const { user } = useAuth();
     const [guestInfo, setGuestInfo] = useState({
         name: '',
         email: '',
@@ -102,36 +142,9 @@ export default function CheckoutPage() {
         setGuestInfo({ ...guestInfo, [e.target.name]: e.target.value });
     };
 
-    useEffect(() => {
-        api.getStripeApiKey().then(data => {
-            setStripePromise(loadStripe(data.publishableKey));
-        });
-    }, []);
-
-    useEffect(() => {
-        if (cartItems.length > 0) {
-            // Calculate total amount including delivery fee for payment intent
-            const itemsTotal = cartItems.reduce((sum, item) => sum + item.price * item.quantity, 0);
-            const amount = Math.round((itemsTotal + DELIVERY_FEE_ILS) * 100); // Add delivery fee here
-            
-            if (amount > 0) {
-                api.createPaymentIntent({ amount }, token).then(data => {
-                    setClientSecret(data.clientSecret);
-                });
-            }
-        }
-    }, [token, cartItems]);
-
     // Calculate totals for display
     const itemsTotal = cartItems.reduce((sum, item) => sum + item.price * item.quantity, 0);
     const finalIlsTotal = itemsTotal + DELIVERY_FEE_ILS;
-
-    // FIX: The options object is now simplified. The clientSecret contains all the
-    // necessary information for Stripe to render the correct payment methods.
-    const options = {
-        clientSecret,
-        appearance: { theme: 'night', labels: 'floating' },
-    };
 
     return (
         <div className="bg-gray-900 min-h-screen text-white">
@@ -200,11 +213,7 @@ export default function CheckoutPage() {
                         </div>
                     </div>
 
-                    {clientSecret && stripePromise && (
-                        <Elements options={options} stripe={stripePromise}>
-                            <CheckoutForm guestInfo={guestInfo} />
-                        </Elements>
-                    )}
+                    <CheckoutForm guestInfo={guestInfo} />
                 </div>
             </div>
         </div>

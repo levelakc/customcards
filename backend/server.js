@@ -79,7 +79,7 @@ app.use('/api/orders', orderRoutes);
 app.use('/api/upload', uploadRoutes);
 app.use('/api/reviews', reviewRoutes);
 app.use('/api/settings', siteSettingsRoutes);
-app.use('/api/config', paymentRoutes);
+app.use('/api/payment', paymentRoutes);
 app.use('/api/gallery', galleryRoutes);
 app.use('/api/admin', adminRoutes);
 
