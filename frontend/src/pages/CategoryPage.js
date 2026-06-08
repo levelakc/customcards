@@ -11,48 +11,9 @@ export default function CategoryPage() {
     const { t, i18n } = useTranslation();
     const { products, categories, isGlobalLoading } = useData();
     const [searchTerm, setSearchTerm] = useState('');
-    const [colorIndexes, setColorIndexes] = useState({}); // State to manage color indexes for each product
-    const colorIntervalRef = useRef(null); // Ref to store the interval ID
 
     const category = useMemo(() => categories.find(c => String(c._id) === String(id)), [categories, id]);
     const productsInCategory = useMemo(() => products.filter(p => String(p.category?._id) === String(id)), [products, id]);
-
-    useEffect(() => {
-        // Initialize color indexes for products in this category
-        const initialColorIndexes = {};
-        productsInCategory.forEach(product => {
-            if (product && product._id) {
-                initialColorIndexes[product._id] = 0;
-            }
-        });
-        setColorIndexes(initialColorIndexes);
-    }, [productsInCategory]);
-
-    // Effect for dynamic color changing
-    useEffect(() => {
-        if (productsInCategory.length > 0) {
-            colorIntervalRef.current = setInterval(() => {
-                setColorIndexes(prevIndexes => {
-                    const newIndexes = { ...prevIndexes };
-                    productsInCategory.forEach(product => {
-                        if (product && product._id && product.availableColors) {
-                            const availableColors = product.availableColors || [];
-                            if (availableColors.length > 1) {
-                                newIndexes[product._id] = ((prevIndexes[product._id] || 0) + 1) % availableColors.length;
-                            }
-                        }
-                    });
-                    return newIndexes;
-                });
-            }, 1500); // Change color every 1.5 seconds
-        }
-
-        return () => {
-            if (colorIntervalRef.current) {
-                clearInterval(colorIntervalRef.current);
-            }
-        };
-    }, [productsInCategory]);
 
     if (isGlobalLoading) return <div className="text-center p-10 text-white bg-gray-900 min-h-screen">טוען קטגוריה...</div>;
     if (!category) return <div className="text-center p-10 text-white bg-gray-900 min-h-screen">קטגוריה לא נמצאה.</div>;
@@ -92,23 +53,10 @@ export default function CategoryPage() {
                 <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-8">
                     {filteredProducts.length > 0 ? (
                         filteredProducts.map(product => {
-                            const cardColorKey = 
-                                product.availableColors && product.availableColors.length > 0
-                                    ? nameToKeyMap[product.availableColors[colorIndexes[product._id] || 0]] || 'black'
-                                    : 'black';
-                            const engravingColorKey = 
-                                product.availableColors && product.availableColors.length > 0
-                                    ? (product.customization?.engraveColors && product.customization.engraveColors.length > 0
-                                        ? product.customization.engraveColors[0]
-                                        : getDefaultEngraving(nameToKeyMap[product.availableColors[colorIndexes[product._id] || 0]] || 'black'))
-                                    : getDefaultEngraving('black');
-                            
                             return (
                                 <ProductCard 
                                     key={product._id} 
                                     product={product}
-                                    cardColorKey={cardColorKey}
-                                    engravingColorKey={engravingColorKey}
                                 />
                             );
                         })

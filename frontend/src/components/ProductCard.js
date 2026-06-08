@@ -5,13 +5,21 @@ import { useTranslation } from 'react-i18next';
 import { nameToKeyMap, getDefaultEngraving } from '../utils/colorUtils';
 
 
-const ProductCard = ({ product, disableClick = false, isMobile, isCarousel = false }) => {
+const ProductCard = ({ 
+    product, 
+    disableClick = false, 
+    isMobile, 
+    isCarousel = false,
+    cardColorKey: propCardColorKey,
+    engravingColorKey: propEngravingColorKey
+}) => {
     const { navigate } = useRouter();
     const { t, i18n } = useTranslation();
     const [colorIndex, setColorIndex] = useState(0);
 
     useEffect(() => {
-        if (!product || !product.availableColors || product.availableColors.length <= 1) return;
+        // If external color is provided, we don't cycle internally
+        if (propCardColorKey || !product || !product.availableColors || product.availableColors.length <= 1) return;
 
         // Use a slightly slower interval in the carousel to keep performance high
         const intervalTime = isCarousel ? 3000 : 2500; 
@@ -21,7 +29,7 @@ const ProductCard = ({ product, disableClick = false, isMobile, isCarousel = fal
         }, intervalTime);
 
         return () => clearInterval(colorInterval);
-    }, [product, isCarousel]);
+    }, [product, isCarousel, propCardColorKey]);
     
     if (!product) {
         return null;
@@ -32,9 +40,22 @@ const ProductCard = ({ product, disableClick = false, isMobile, isCarousel = fal
     const productDescription = (product.description?.[currentLanguage] || product.description || '').toString();
 
     const availableColors = product.availableColors || [];
-    const colorName = availableColors[colorIndex] || 'שחור';
-    const finalCardColor = nameToKeyMap[colorName] || 'black';
-    const finalEngravingColor = product.customization?.engraveColors?.[0] || getDefaultEngraving(finalCardColor);
+    
+    // Logic: Use prop if provided, otherwise use internal cycle, otherwise fallback to first available or black
+    const finalCardColor = useMemo(() => {
+        if (propCardColorKey) return propCardColorKey;
+        if (availableColors.length > 0) {
+            const colorName = availableColors[colorIndex];
+            return nameToKeyMap[colorName] || colorName || 'black';
+        }
+        return 'black';
+    }, [propCardColorKey, availableColors, colorIndex]);
+
+    const finalEngravingColor = useMemo(() => {
+        if (propEngravingColorKey) return propEngravingColorKey;
+        if (product.customization?.engraveColors?.[0]) return product.customization.engraveColors[0];
+        return getDefaultEngraving(finalCardColor);
+    }, [propEngravingColorKey, product.customization, finalCardColor]);
 
     const handleClick = (e) => {
         e.stopPropagation(); 
