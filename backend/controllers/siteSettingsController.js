@@ -34,7 +34,8 @@ const updateSiteSettings = async (req, res) => {
         if (promotedTitle !== undefined) settings.promotedTitle = promotedTitle;
         if (promotedProducts !== undefined) settings.promotedProducts = promotedProducts;
         
-        const updatedSettings = await settings.save();
+        await settings.save();
+        const updatedSettings = await SiteSettings.findOne({ key: 'siteSettings' }).populate('promotedProducts');
         res.json(updatedSettings);
     } else {
         res.status(404).json({ message: 'Settings not found' });

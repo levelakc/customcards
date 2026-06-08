@@ -53,8 +53,8 @@ function SiteSettingsPage({ products }) {
 
     const handleSettingsUpdate = async (updateData) => {
         try {
-            await api.updateSiteSettings(updateData, token);
-            updateLocalSettings(updateData);
+            const updatedSettings = await api.updateSiteSettings(updateData, token);
+            updateLocalSettings(updatedSettings);
             setMessage(t('updatedSuccessfully'));
             fetchSettings();
         } catch (err) {

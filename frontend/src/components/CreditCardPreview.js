@@ -350,20 +350,20 @@ const CreditCardPreview = React.memo(function CreditCardPreview({
                         <stop offset="75%" stopColor="#ffbf00" />
                         <stop offset="100%" stopColor="#b8860b" />
                     </linearGradient>
-                    <linearGradient id={uniqueIds.blackGradient} x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stopColor="#374151" /><stop offset="50%" stopColor="#111827" /><stop offset="100%" stopColor="#000000" /></linearGradient>
+                    <linearGradient id={uniqueIds.blackGradient} x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stopColor="#1f2937" /><stop offset="50%" stopColor="#0f172a" /><stop offset="100%" stopColor="#000000" /></linearGradient>
                     <linearGradient id={uniqueIds.roseGoldGradient} x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stopColor="#fda4af" /><stop offset="50%" stopColor="#fecdd3" /><stop offset="100%" stopColor="#be123c" /></linearGradient>
                     <linearGradient id={uniqueIds.colorfulGradient} x1="0%" y1="100%" x2="100%" y2="0%"><stop offset="0%" stopColor="#6b21a8" /><stop offset="20%" stopColor="#c026d3" /><stop offset="40%" stopColor="#db2777" /><stop offset="60%" stopColor="#ca8a04" /><stop offset="80%" stopColor="#16a34a" /><stop offset="100%" stopColor="#2563eb" /></linearGradient>
                     
                     <filter id={uniqueIds.shimmerFilter} x="-20%" y="-20%" width="140%" height="140%">
-                        <feSpecularLighting in="SourceAlpha" surfaceScale="2" specularConstant="0.7" specularExponent="25" lightingColor="#ffffff" result="specular">
+                        <feSpecularLighting in="SourceAlpha" surfaceScale="2" specularConstant="0.4" specularExponent="40" lightingColor="#ffffff" result="specular">
                             <feDistantLight azimuth="225" elevation="45" />
                         </feSpecularLighting>
-                        <feComposite in="SourceGraphic" in2="specular" operator="arithmetic" k1="0" k2="1" k3="0.5" k4="0" />
+                        <feComposite in="SourceGraphic" in2="specular" operator="arithmetic" k1="0" k2="1" k3="0.2" k4="0" />
                     </filter>
                     
-                    <radialGradient id={uniqueIds.spotlight} cx="25%" cy="25%" r="60%"><stop offset="0%" stopColor="white" stopOpacity="0.35" /><stop offset="100%" stopColor="white" stopOpacity="0" /></radialGradient>
-                    <radialGradient id={uniqueIds.blackSpotlight} cx="25%" cy="25%" r="60%"><stop offset="0%" stopColor="white" stopOpacity="0.15" /><stop offset="100%" stopColor="white" stopOpacity="0" /></radialGradient>
-                    <radialGradient id={uniqueIds.silverSpotlight} cx="25%" cy="25%" r="60%"><stop offset="0%" stopColor="white" stopOpacity="0.9" /><stop offset="100%" stopColor="white" stopOpacity="0" /></radialGradient>
+                    <radialGradient id={uniqueIds.spotlight} cx="25%" cy="25%" r="60%"><stop offset="0%" stopColor="white" stopOpacity="0.2" /><stop offset="100%" stopColor="white" stopOpacity="0" /></radialGradient>
+                    <radialGradient id={uniqueIds.blackSpotlight} cx="25%" cy="25%" r="60%"><stop offset="0%" stopColor="white" stopOpacity="0.08" /><stop offset="100%" stopColor="white" stopOpacity="0" /></radialGradient>
+                    <radialGradient id={uniqueIds.silverSpotlight} cx="25%" cy="25%" r="60%"><stop offset="0%" stopColor="white" stopOpacity="0.7" /><stop offset="100%" stopColor="white" stopOpacity="0" /></radialGradient>
 
                     <filter id="white-mask-filter">
                         <feColorMatrix type="matrix" values="0 0 0 0 1
