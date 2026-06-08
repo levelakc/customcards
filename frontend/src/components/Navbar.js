@@ -6,8 +6,9 @@ import { useCart } from '../contexts/CartContext';
 import { useSiteSettings } from '../contexts/SiteSettingsContext';
 import { useData } from '../contexts/DataContext';
 import * as api from '../api/api';
-import { ShoppingCartIcon, MenuIcon, XIcon, SearchIcon } from './Icons';
+import { ShoppingCartIcon, MenuIcon, XIcon, SearchIcon, UserIcon } from './Icons';
 import LanguageSwitcher from './LanguageSwitcher';
+import AuthDropdown from './AuthDropdown';
 
 
 
@@ -20,6 +21,7 @@ export default function Navbar() {
     const { categories } = useData();
     const [isMenuOpen, setIsMenuOpen] = useState(false);
     const [isMoreMenuOpen, setIsMoreMenuOpen] = useState(false);
+    const [isAuthOpen, setIsAuthOpen] = useState(false);
 
     const allNavLinks = [
         { name: t('homePage'), page: 'home' },
@@ -100,34 +102,33 @@ export default function Navbar() {
                             <button onClick={() => navigate('search')} className="relative p-2 rounded-full hover:bg-gray-800 transition-colors focus:outline-none">
                                 <SearchIcon />
                             </button>
-                            {isAuthenticated ? (
-                                <div className="flex flex-col items-center justify-center -mt-2">
-                                    <span className="px-3 py-1 text-sm font-bold gold-gradient-text">
-                                        {t('hello')}, {user.name}
-                                    </span>
-                                    <div className="flex items-center gap-3">
-                                        <button onClick={() => navigate('profile')} className="text-xs text-gray-300 hover:text-gold-500 transition-colors">{t('myProfile')}</button>
-                                        <span className="text-gray-600 text-xs">|</span>
-                                        <button onClick={handleLogout} className="text-xs text-red-400 hover:text-red-300 transition-colors">{t('logout')}</button>
-                                    </div>
-                                </div>
-                            ) : (
+
+                            <div className="relative">
                                 <button 
-                                    onClick={() => navigate('login')} 
-                                    className="btn-premium btn-gold py-1.5 px-6 text-xs whitespace-nowrap"
+                                    onClick={() => setIsAuthOpen(!isAuthOpen)} 
+                                    className={`p-2 rounded-full transition-all duration-300 focus:outline-none ${isAuthOpen ? 'bg-gold-500 text-black shadow-[0_0_15px_rgba(212,175,55,0.4)]' : 'hover:bg-gray-800 text-white'}`}
                                 >
-                                    {t('loginRegister')}
+                                    <UserIcon />
                                 </button>
-                            )}
-                            
-                            {isAdmin && (
-                                <button 
-                                    onClick={() => navigate('admin')} 
-                                    className="btn-premium btn-obsidian py-1.5 px-6 text-xs whitespace-nowrap"
-                                >
-                                    {t('adminPanel')}
-                                </button>
-                            )}
+                                
+                                {isAuthOpen && (
+                                    isAuthenticated ? (
+                                        <div className="absolute top-full mt-2 end-0 w-64 bg-gray-900 border border-gray-700 rounded-2xl shadow-2xl py-4 z-50 animate-fade-in">
+                                            <div className="px-6 py-3 border-b border-gray-800 mb-2">
+                                                <p className="text-xs text-gray-500 uppercase tracking-widest mb-1">{t('hello')}</p>
+                                                <p className="text-sm font-bold gold-gradient-text truncate">{user.name}</p>
+                                            </div>
+                                            <button onClick={() => { navigate('profile'); setIsAuthOpen(false); }} className="w-full text-right px-6 py-3 text-sm text-gray-300 hover:bg-gray-800 hover:text-gold transition-colors">{t('myProfile')}</button>
+                                            {isAdmin && <button onClick={() => { navigate('admin'); setIsAuthOpen(false); }} className="w-full text-right px-6 py-3 text-sm text-indigo-400 hover:bg-indigo-900/30 transition-colors">{t('adminPanel')}</button>}
+                                            <div className="border-t border-gray-800 mt-2 pt-2">
+                                                <button onClick={() => { handleLogout(); setIsAuthOpen(false); }} className="w-full text-right px-6 py-3 text-sm text-red-400 hover:bg-gray-800 transition-colors">{t('logout')}</button>
+                                            </div>
+                                        </div>
+                                    ) : (
+                                        <AuthDropdown onClose={() => setIsAuthOpen(false)} />
+                                    )
+                                )}
+                            </div>
 
                             <button onClick={() => navigate('cart')} className="relative p-3 bg-gray-800 rounded-full hover:bg-gray-700 transition-all focus:outline-none shadow-inner border border-gray-700">
                                 <ShoppingCartIcon />
@@ -176,13 +177,27 @@ export default function Navbar() {
                                         <div className="text-lg font-bold text-white">{user.name}</div>
                                         <div className="text-sm text-gray-400">{user.email}</div>
                                     </div>
+                                    <div className="p-2 bg-gold-500 rounded-full text-black">
+                                        <UserIcon />
+                                    </div>
                                 </div>
                                 <button onClick={() => {navigate('profile'); setIsMenuOpen(false);}} className="block w-full text-right rounded-lg px-4 py-3 text-base font-medium text-gray-300 hover:bg-gray-800 transition-colors">{t('myProfile')}</button>
                                 <button onClick={handleLogout} className="block w-full text-right rounded-lg px-4 py-3 text-base font-medium text-red-400 hover:bg-gray-800 transition-colors">{t('logout')}</button>
                             </div>
                         ) : (
                             <div className="px-4">
-                                <button onClick={() => { navigate('login'); setIsMenuOpen(false); }} className="w-full text-center bg-gold-600 text-white block px-4 py-4 rounded-xl text-base font-bold shadow-lg shadow-gold-900/20">{t('loginRegister')}</button>
+                                <button 
+                                    onClick={() => setIsAuthOpen(!isAuthOpen)} 
+                                    className="w-full flex items-center justify-between bg-gray-800 text-white px-6 py-4 rounded-xl text-base font-bold shadow-lg border border-gray-700"
+                                >
+                                    <span>{t('loginRegister')}</span>
+                                    <UserIcon />
+                                </button>
+                                {isAuthOpen && (
+                                    <div className="mt-4 relative">
+                                        <AuthDropdown onClose={() => { setIsAuthOpen(false); setIsMenuOpen(false); }} />
+                                    </div>
+                                )}
                             </div>
                         )}
                     </div>
