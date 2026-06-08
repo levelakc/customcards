@@ -18,6 +18,7 @@ export default function Footer() {
                     <ul className="space-y-4">
                         <li><button onClick={() => navigate('accessibility')} className="text-gray-400 hover:text-gold-500 transition-colors">{t('accessibility')}</button></li>
                         <li><button onClick={() => navigate('policy')} className="text-gray-400 hover:text-gold-500 transition-colors">{t('policyTitle')}</button></li>
+                        <li><button onClick={() => navigate('terms')} className="text-gray-400 hover:text-gold-500 transition-colors">{t('termsTitle')}</button></li>
                     </ul>
                 </div>
                 <div>

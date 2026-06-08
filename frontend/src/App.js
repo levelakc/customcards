@@ -26,6 +26,7 @@ import OrderSuccessPage from './pages/OrderSuccessPage';
 import ProfilePage from './pages/ProfilePage';
 import AccessibilityPage from './pages/AccessibilityPage';
 import PolicyPage from './pages/PolicyPage';
+import TermsPage from './pages/TermsPage';
 import CheckoutPage from './pages/CheckoutPage';
 import SearchPage from './pages/SearchPage';
 import AllCategoriesPage from './pages/AllCategoriesPage';
@@ -82,6 +83,7 @@ function AppContent() {
             case 'profile': return <ProfilePage />;
             case 'accessibility': return <AccessibilityPage />;
             case 'policy': return <PolicyPage />;
+            case 'terms': return <TermsPage />;
             case 'checkout': return <CheckoutPage />;
             case 'search': return <SearchPage />;
             case 'all-categories': return <AllCategoriesPage />;

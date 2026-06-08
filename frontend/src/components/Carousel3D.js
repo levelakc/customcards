@@ -203,7 +203,7 @@ export default function Carousel3D({ items }) {
                             >
                                <ProductCard
                                     product={item}
-                                    disableClick={true}
+                                    disableClick={false}
                                     isMobile={windowWidth < 768}
                                     isCarousel={true}
                                />
