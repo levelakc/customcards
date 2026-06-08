@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { useRouter } from '../contexts/RouterContext';
 import CreditCardPreview from './CreditCardPreview';
 import { useTranslation } from 'react-i18next';
@@ -31,31 +31,32 @@ const ProductCard = ({
         return () => clearInterval(colorInterval);
     }, [product, isCarousel, propCardColorKey]);
     
-    if (!product) {
-        return null;
-    }
-
+    // Derived values
     const currentLanguage = i18n.language || 'he';
-    const productName = (product.name?.[currentLanguage] || product.name || '').toString();
-    const productDescription = (product.description?.[currentLanguage] || product.description || '').toString();
-
-    const availableColors = product.availableColors || [];
     
     // Logic: Use prop if provided, otherwise use internal cycle, otherwise fallback to first available or black
     const finalCardColor = useMemo(() => {
         if (propCardColorKey) return propCardColorKey;
+        const availableColors = product?.availableColors || [];
         if (availableColors.length > 0) {
             const colorName = availableColors[colorIndex];
             return nameToKeyMap[colorName] || colorName || 'black';
         }
         return 'black';
-    }, [propCardColorKey, availableColors, colorIndex]);
+    }, [propCardColorKey, product, colorIndex]);
 
     const finalEngravingColor = useMemo(() => {
         if (propEngravingColorKey) return propEngravingColorKey;
-        if (product.customization?.engraveColors?.[0]) return product.customization.engraveColors[0];
+        if (product?.customization?.engraveColors?.[0]) return product.customization.engraveColors[0];
         return getDefaultEngraving(finalCardColor);
-    }, [propEngravingColorKey, product.customization, finalCardColor]);
+    }, [propEngravingColorKey, product, finalCardColor]);
+
+    if (!product) {
+        return null;
+    }
+
+    const productName = (product.name?.[currentLanguage] || product.name || '').toString();
+    const productDescription = (product.description?.[currentLanguage] || product.description || '').toString();
 
     const handleClick = (e) => {
         e.stopPropagation(); 
