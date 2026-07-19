@@ -46,7 +46,7 @@ export default function CategoryProductGallery() {
                     {categoriesWithRandomProduct.map(({ category, product }) => {
                         const categoryName = category.name?.[currentLanguage] || category.name?.he || category.name?.en || category.name || '';
                         return (
-                            <div key={category._id} className="glass-panel overflow-hidden flex flex-col cursor-pointer transition-all duration-500 hover:shadow-[0_0_30px_rgba(212,175,55,0.1)]" onClick={() => navigate('category', { id: category._id })}>
+                            <div key={category._id} className="overflow-hidden flex flex-col cursor-pointer transition-all duration-500 hover:shadow-[0_0_30px_rgba(212,175,55,0.1)] rounded-xl" onClick={() => navigate('category', { id: category._id })}>
                                 <div className="p-4 flex flex-col items-center justify-center">
                                     <h3 className="text-2xl font-bold text-white text-center mb-4 font-dancing">{categoryName}</h3>
                                 </div>

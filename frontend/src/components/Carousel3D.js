@@ -116,14 +116,10 @@ export default function Carousel3D({ items }) {
 
                 const absA = Math.abs(absAngle);
                 
-                // Show current page (roughly -60 to 60 deg) fully opaque
-                // Edge cards (roughly 60 to 110 deg) partially transparent
-                // Back cards hidden
                 if (absA < 60) {
                     child.style.opacity = '1';
                     child.style.visibility = 'visible';
                 } else if (absA < 120) {
-                    // Linear fade from 1.0 to 0.0 between 60 and 120 degrees
                     const opacity = 1 - (absA - 60) / 60;
                     child.style.opacity = opacity.toString();
                     child.style.visibility = opacity > 0.01 ? 'visible' : 'hidden';
@@ -134,12 +130,10 @@ export default function Carousel3D({ items }) {
             }
         };
 
+        // We only need to compute visibility once per rotation target
+        // CSS transitions handle the smooth 800ms visual change
         updateVisibility();
-        if (isAnimating) {
-            const interval = setInterval(updateVisibility, 30);
-            return () => clearInterval(interval);
-        }
-    }, [isAnimating, itemAngle, windowWidth]);
+    }, [rotationValue.current, itemAngle, windowWidth]);
 
     // Identify which card indices should be in the DOM
     const renderedIndices = useMemo(() => {
@@ -191,7 +185,7 @@ export default function Carousel3D({ items }) {
                             <div
                                 key={`${item._id}-${index}`}
                                 data-index={index}
-                                className="absolute h-auto transition-opacity duration-300"
+                                className="absolute h-auto transition-all duration-[800ms] ease-[cubic-bezier(0.4,0,0.2,1)]"
                                 style={{
                                     width: `${cardWidth}px`,
                                     transform: `translateX(-50%) translateY(-50%) rotateY(${index * itemAngle}deg) translateZ(${radius}px)`,

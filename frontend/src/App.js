@@ -66,9 +66,7 @@ function AppContent() {
         }
     }, [route]);
 
-    if (isGlobalLoading || !minLoadingComplete) {
-        return <LoadingScreen />;
-    }
+    const isLoading = isGlobalLoading || !minLoadingComplete;
 
     const renderPage = () => {
         switch (route.page) {
@@ -87,22 +85,30 @@ function AppContent() {
             case 'checkout': return <CheckoutPage />;
             case 'search': return <SearchPage />;
             case 'all-categories': return <AllCategoriesPage />;
-            case 'browse': return <BrowsePage />; // NEW: Add BrowsePage route
+            case 'browse': return <BrowsePage />;
             default: return <HomePage />;
         }
     };
 
     return (
-        <div dir={i18n.dir()} className="w-full overflow-x-hidden bg-gray-900 font-sans">
-            <Navbar />
-            <main className="pt-20">
-                <Breadcrumbs />
-                {renderPage()}
-            </main>
-            <Footer />
-            <CartPopup isVisible={showPopup} onClose={() => setShowPopup(false)} />
-            <FloatingWidgets />
-        </div>
+        <>
+            <div 
+                className={`fixed inset-0 z-[100] transition-opacity duration-1000 ease-in-out ${isLoading ? 'opacity-100' : 'opacity-0 pointer-events-none'}`}
+            >
+                <LoadingScreen />
+            </div>
+
+            <div dir={i18n.dir()} className="w-full overflow-x-hidden bg-gray-900 font-sans">
+                <Navbar />
+                <main className="pt-20">
+                    <Breadcrumbs />
+                    {renderPage()}
+                </main>
+                <Footer />
+                <CartPopup isVisible={showPopup} onClose={() => setShowPopup(false)} />
+                <FloatingWidgets />
+            </div>
+        </>
     );
 }
 
