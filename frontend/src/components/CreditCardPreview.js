@@ -60,6 +60,7 @@ const CreditCardPreview = React.memo(function CreditCardPreview({
         const randomString = Math.random().toString(36).substr(2, 9);
         return {
             mask: `logo-mask-${randomString}`,
+            whiteMaskFilter: `white-mask-filter-${randomString}`,
             silverGradient: `silver-gradient-${randomString}`,
             goldGradient: `gold-gradient-${randomString}`,
             blackGradient: `black-gradient-${randomString}`,

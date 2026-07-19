@@ -55,13 +55,7 @@ export default function CategoryProductGallery() {
                                         {product._id && (
                                             <ProductCard
                                                 product={product}
-                                                disableClick={true} // Changed to true
-                                                cardColorKey={
-                                                    product.availableColors && product.availableColors.length > 0
-                                                        ? nameToKeyMap[product.availableColors[colorIndexes[product._id] || 0]] || 'black'
-                                                        : 'black'
-                                                }
-                                                engravingColorKey={'silver'}
+                                                disableClick={true}
                                             />
                                         )}
                                     </div>
