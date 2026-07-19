@@ -87,6 +87,8 @@ export default function PersonalDesignPage() {
         }
     };
 
+    const [applyPencilEffect, setApplyPencilEffect] = useState(true);
+
     const getCroppedImg = useCallback(() => {
         if (!completedCrop || !imgRef.current) return;
 
@@ -110,36 +112,38 @@ export default function PersonalDesignPage() {
             completedCrop.height
         );
 
-        // After cropping, apply the pencil sketch/background removal logic
-        const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
-        const data = imageData.data;
-        
-        for (let i = 0; i < data.length; i += 4) {
-            const r = data[i];
-            const g = data[i + 1];
-            const b = data[i + 2];
-            const alpha = data[i + 3];
+        if (applyPencilEffect) {
+            // After cropping, apply the pencil sketch/background removal logic
+            const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+            const data = imageData.data;
             
-            if (alpha === 0) continue;
-            
-            const brightness = (r + g + b) / 3;
-            if (brightness > 200) {
-                data[i + 3] = 0;
-            } else {
-                data[i] = 0;
-                data[i + 1] = 0;
-                data[i + 2] = 0;
-                data[i + 3] = 255;
+            for (let i = 0; i < data.length; i += 4) {
+                const r = data[i];
+                const g = data[i + 1];
+                const b = data[i + 2];
+                const alpha = data[i + 3];
+                
+                if (alpha === 0) continue;
+                
+                const brightness = (r + g + b) / 3;
+                if (brightness > 200) {
+                    data[i + 3] = 0;
+                } else {
+                    data[i] = 0;
+                    data[i + 1] = 0;
+                    data[i + 2] = 0;
+                    data[i + 3] = 255;
+                }
             }
+            ctx.putImageData(imageData, 0, 0);
         }
         
-        ctx.putImageData(imageData, 0, 0);
         setUploadedImage(canvas.toDataURL('image/png'));
         setIsCropModalOpen(false);
         setScale(1);
         setRotation(0);
         setPosition({ x: 45, y: 10 });
-    }, [completedCrop]);
+    }, [completedCrop, applyPencilEffect]);
     
     const handleAddToCart = () => {
         if (!uploadedImage) {
@@ -309,6 +313,18 @@ export default function PersonalDesignPage() {
                             />
                         </ReactCrop>
                     )}
+                    <div className="mt-4 flex items-center">
+                        <input
+                            type="checkbox"
+                            id="applyPencilEffect"
+                            checked={applyPencilEffect}
+                            onChange={(e) => setApplyPencilEffect(e.target.checked)}
+                            className="w-4 h-4 text-indigo-600 bg-gray-700 border-gray-600 rounded focus:ring-indigo-500"
+                        />
+                        <label htmlFor="applyPencilEffect" className="ml-2 text-sm font-medium text-gray-300">
+                            {t('applyPencilEffect') || 'Apply Pencil Drawing Effect (Removes Background)'}
+                        </label>
+                    </div>
                     <div className="mt-6 flex flex-wrap gap-3 justify-center">
                         <button 
                             onClick={handleResetCrop}
