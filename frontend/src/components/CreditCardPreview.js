@@ -367,9 +367,9 @@ const CreditCardPreview = React.memo(function CreditCardPreview({
                     <radialGradient id={uniqueIds.silverSpotlight} cx="25%" cy="25%" r="60%"><stop offset="0%" stopColor="white" stopOpacity="0.7" /><stop offset="100%" stopColor="white" stopOpacity="0" /></radialGradient>
 
                     <filter id={uniqueIds.whiteMaskFilter}>
-                        <feColorMatrix type="matrix" values="-1 0 0 0 1
-                                                              0 -1 0 0 1
-                                                              0 0 -1 0 1
+                        <feColorMatrix type="matrix" values="0 0 0 0 1
+                                                              0 0 0 0 1
+                                                              0 0 0 0 1
                                                               0 0 0 1 0" />
                     </filter>
                     <linearGradient id={uniqueIds.simStripes} x1="0" y1="0" x2="1" y2="0">
