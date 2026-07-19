@@ -11,7 +11,8 @@ export default function PersonalDesignPage() {
     const { addToCart } = useCart();
     const [cardColor, setCardColor] = useState('black');
     const [engravingColor, setEngravingColor] = useState('silver');
-    const [uploadedImage, setUploadedImage] = useState(null);
+    const [baseCroppedImage, setBaseCroppedImage] = useState(null);
+    const [pencilImage, setPencilImage] = useState(null);
     const [originalImage, setOriginalImage] = useState(null);
     const [isCropModalOpen, setIsCropModalOpen] = useState(false);
     const [crop, setCrop] = useState();
@@ -112,8 +113,28 @@ export default function PersonalDesignPage() {
             completedCrop.height
         );
 
-        if (applyPencilEffect) {
-            // After cropping, apply the pencil sketch/background removal logic
+        setBaseCroppedImage(canvas.toDataURL('image/png'));
+        setIsCropModalOpen(false);
+        setScale(1);
+        setRotation(0);
+        setPosition({ x: 45, y: 10 });
+    }, [completedCrop]);
+    
+    // Process the base image to create the pencil effect version
+    React.useEffect(() => {
+        if (!baseCroppedImage) {
+            setPencilImage(null);
+            return;
+        }
+
+        const img = new Image();
+        img.onload = () => {
+            const canvas = document.createElement('canvas');
+            canvas.width = img.width;
+            canvas.height = img.height;
+            const ctx = canvas.getContext('2d');
+            ctx.drawImage(img, 0, 0);
+
             const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
             const data = imageData.data;
             
@@ -136,14 +157,12 @@ export default function PersonalDesignPage() {
                 }
             }
             ctx.putImageData(imageData, 0, 0);
-        }
-        
-        setUploadedImage(canvas.toDataURL('image/png'));
-        setIsCropModalOpen(false);
-        setScale(1);
-        setRotation(0);
-        setPosition({ x: 45, y: 10 });
-    }, [completedCrop, applyPencilEffect]);
+            setPencilImage(canvas.toDataURL('image/png'));
+        };
+        img.src = baseCroppedImage;
+    }, [baseCroppedImage]);
+    
+    const uploadedImage = applyPencilEffect ? (pencilImage || baseCroppedImage) : baseCroppedImage;
     
     const handleAddToCart = () => {
         if (!uploadedImage) {
@@ -252,6 +271,19 @@ export default function PersonalDesignPage() {
                                 <h3 className="text-xl font-bold gold-gradient-text">{t('adjustDesignTitle')}</h3>
                                 <p className="text-sm text-gray-400 mb-3">{t('adjustDesignDescription')}</p>
 
+                                <div className="flex items-center mb-4 bg-gray-800 p-3 rounded-lg border border-gray-700">
+                                    <input
+                                        type="checkbox"
+                                        id="applyPencilEffectMain"
+                                        checked={applyPencilEffect}
+                                        onChange={(e) => setApplyPencilEffect(e.target.checked)}
+                                        className="w-4 h-4 text-indigo-600 bg-gray-700 border-gray-600 rounded focus:ring-indigo-500"
+                                    />
+                                    <label htmlFor="applyPencilEffectMain" className="ml-2 text-sm font-medium text-gray-300">
+                                        {t('applyPencilEffect') || 'Apply Pencil Drawing Effect (Removes Background)'}
+                                    </label>
+                                </div>
+
                                 {/* SCALE SLIDER */}
                                 <div>
                                     <label htmlFor="scale-slider" className="block text-sm font-medium mb-1">
@@ -313,18 +345,6 @@ export default function PersonalDesignPage() {
                             />
                         </ReactCrop>
                     )}
-                    <div className="mt-4 flex items-center">
-                        <input
-                            type="checkbox"
-                            id="applyPencilEffect"
-                            checked={applyPencilEffect}
-                            onChange={(e) => setApplyPencilEffect(e.target.checked)}
-                            className="w-4 h-4 text-indigo-600 bg-gray-700 border-gray-600 rounded focus:ring-indigo-500"
-                        />
-                        <label htmlFor="applyPencilEffect" className="ml-2 text-sm font-medium text-gray-300">
-                            {t('applyPencilEffect') || 'Apply Pencil Drawing Effect (Removes Background)'}
-                        </label>
-                    </div>
                     <div className="mt-6 flex flex-wrap gap-3 justify-center">
                         <button 
                             onClick={handleResetCrop}

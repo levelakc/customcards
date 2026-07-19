@@ -370,7 +370,7 @@ export default function AdminPage() {
     const [uploading, setUploading] = useState(false);
     const [selectedFile, setSelectedFile] = useState(null);
     const [processedFile, setProcessedFile] = useState(null);
-    const [applyPencilEffect, setApplyPencilEffect] = useState(false);
+    const [applyPencilEffect, setApplyPencilEffect] = useState(true);
     const [previewUrl, setPreviewUrl] = useState('');
     const [customization, setCustomization] = useState({
         position: { x: 45, y: 10 },
@@ -480,7 +480,7 @@ export default function AdminPage() {
         setEditingId(null);
         setSelectedFile(null);
         setProcessedFile(null);
-        setApplyPencilEffect(false);
+        setApplyPencilEffect(true);
     };
     const handleSelectProductToEdit = (product) => {
         setIsEditing(true);
