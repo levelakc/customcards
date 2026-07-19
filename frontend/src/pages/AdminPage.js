@@ -369,6 +369,8 @@ export default function AdminPage() {
 
     const [uploading, setUploading] = useState(false);
     const [selectedFile, setSelectedFile] = useState(null);
+    const [processedFile, setProcessedFile] = useState(null);
+    const [applyPencilEffect, setApplyPencilEffect] = useState(false);
     const [previewUrl, setPreviewUrl] = useState('');
     const [customization, setCustomization] = useState({
         position: { x: 45, y: 10 },
@@ -377,12 +379,59 @@ export default function AdminPage() {
     });
     const [previewColorKey, setPreviewColorKey] = useState('black');
     useEffect(() => {
-        if (selectedFile) {
-            setPreviewUrl(URL.createObjectURL(selectedFile));
-        } else {
+        if (!selectedFile) {
+            setProcessedFile(null);
             setPreviewUrl(productForm.image);
+            return;
         }
-    }, [selectedFile, productForm.image]);
+
+        if (!applyPencilEffect) {
+            setProcessedFile(selectedFile);
+            setPreviewUrl(URL.createObjectURL(selectedFile));
+            return;
+        }
+
+        const img = new Image();
+        img.onload = () => {
+            const canvas = document.createElement('canvas');
+            canvas.width = img.width;
+            canvas.height = img.height;
+            const ctx = canvas.getContext('2d');
+            ctx.drawImage(img, 0, 0);
+
+            const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+            const data = imageData.data;
+            
+            for (let i = 0; i < data.length; i += 4) {
+                const r = data[i];
+                const g = data[i + 1];
+                const b = data[i + 2];
+                const alpha = data[i + 3];
+                
+                if (alpha === 0) continue;
+                
+                const brightness = (r + g + b) / 3;
+                if (brightness > 200) {
+                    data[i + 3] = 0;
+                } else {
+                    data[i] = 0;
+                    data[i + 1] = 0;
+                    data[i + 2] = 0;
+                    data[i + 3] = 255;
+                }
+            }
+            ctx.putImageData(imageData, 0, 0);
+            
+            canvas.toBlob((blob) => {
+                if (blob) {
+                    const newFile = new File([blob], selectedFile.name.replace(/\.[^/.]+$/, "") + ".png", { type: "image/png" });
+                    setProcessedFile(newFile);
+                    setPreviewUrl(URL.createObjectURL(newFile));
+                }
+            }, 'image/png');
+        };
+        img.src = URL.createObjectURL(selectedFile);
+    }, [selectedFile, applyPencilEffect, productForm.image]);
     const fetchData = useCallback(async () => {
         try {
             setLoading(true);
@@ -430,6 +479,8 @@ export default function AdminPage() {
         setIsEditing(false);
         setEditingId(null);
         setSelectedFile(null);
+        setProcessedFile(null);
+        setApplyPencilEffect(false);
     };
     const handleSelectProductToEdit = (product) => {
         setIsEditing(true);
@@ -465,9 +516,9 @@ export default function AdminPage() {
     const handleProductFormSubmit = async (e) => {
         e.preventDefault();
         let imageUrl = productForm.image;
-        if (selectedFile) {
+        if (processedFile) {
             const formData = new FormData();
-            formData.append('image', selectedFile);
+            formData.append('image', processedFile);
             setUploading(true);
             try {
                 const uploadResult = await api.uploadFile(formData, token);
@@ -662,6 +713,18 @@ export default function AdminPage() {
                                     onChange={(e) => setSelectedFile(e.target.files[0])} 
                                     className="w-full text-sm text-gray-400 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-indigo-50 file:text-indigo-700 hover:file:bg-indigo-100"
                                 />
+                                <div className="flex items-center mt-2">
+                                    <input 
+                                        id="adminApplyPencil"
+                                        type="checkbox" 
+                                        checked={applyPencilEffect} 
+                                        onChange={(e) => setApplyPencilEffect(e.target.checked)}
+                                        className="w-4 h-4 text-indigo-600 bg-gray-700 border-gray-600 rounded focus:ring-indigo-500"
+                                    />
+                                    <label htmlFor="adminApplyPencil" className="ml-2 text-sm font-medium text-gray-300">
+                                        {t('applyPencilEffect') || 'Apply Pencil Drawing Effect (Removes Background)'}
+                                    </label>
+                                </div>
                             </div>
                             <div className="text-center text-gray-400">{t('or')}</div>
                             <div>
