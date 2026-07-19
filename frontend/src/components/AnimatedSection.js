@@ -4,6 +4,7 @@ import { useIntersectionObserver } from '../hooks/useIntersectionObserver';
 const AnimatedSection = ({ children, animation = 'fade-in-up' }) => {
     const [ref, isIntersecting] = useIntersectionObserver({
         threshold: 0.1,
+        triggerOnce: true
     });
 
     const [hasAnimated, setHasAnimated] = useState(false);

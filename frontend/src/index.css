@@ -136,7 +136,16 @@ div.userway_buttons_wrapper {
     border-bottom: 1px solid rgba(212, 175, 55, 0.3) !important; /* Metallic gold border */
     box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5) !important;
     transform: translateZ(0);
-    will-change: transform, backdrop-filter;
+    will-change: transform;
+}
+
+@media (max-width: 768px) {
+    .navbar-luxury {
+        background: rgba(15, 15, 15, 0.98) !important;
+        backdrop-filter: none !important;
+        -webkit-backdrop-filter: none !important;
+        will-change: auto;
+    }
 }
 
 .nav-link-luxury {
@@ -208,7 +217,16 @@ div.userway_buttons_wrapper {
     -webkit-backdrop-filter: blur(20px);
     border: 1px solid rgba(255, 255, 255, 0.05);
     transform: translateZ(0);
-    will-change: transform, backdrop-filter;
+    will-change: transform;
+}
+
+@media (max-width: 768px) {
+    .filter-glass {
+        background: rgba(20, 25, 35, 0.95);
+        backdrop-filter: none;
+        -webkit-backdrop-filter: none;
+        will-change: auto;
+    }
 }
 
 .category-pill {
@@ -316,7 +334,22 @@ div.userway_buttons_wrapper {
     border-radius: 1rem;
     box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
     transform: translateZ(0);
-    will-change: transform, backdrop-filter;
+    will-change: transform;
+}
+
+@media (max-width: 768px) {
+    .glass-panel {
+        background: rgba(25, 30, 40, 0.95);
+        backdrop-filter: none;
+        -webkit-backdrop-filter: none;
+        will-change: auto;
+    }
+}
+
+/* Add hardware acceleration for background videos globally */
+video.background-video, video[autoPlay] {
+    transform: translateZ(0);
+    will-change: transform;
 }
 
 .metallic-text {

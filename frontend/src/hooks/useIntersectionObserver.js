@@ -14,6 +14,9 @@ export function useIntersectionObserver(options) {
         observer.current = new IntersectionObserver(([entry]) => {
             setEntry(entry);
             setIsIntersecting(entry.isIntersecting);
+            if (entry.isIntersecting && options?.triggerOnce && node) {
+                observer.current.unobserve(node);
+            }
         }, options);
 
         const { current: currentObserver } = observer;

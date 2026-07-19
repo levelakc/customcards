@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useEffect, useMemo, useRef } from 'react';
 import { useRouter } from '../contexts/RouterContext';
 import CreditCardPreview from './CreditCardPreview';
 import { useTranslation } from 'react-i18next';
@@ -17,9 +17,23 @@ const ProductCard = ({
     const { t, i18n } = useTranslation();
     const [colorIndex, setColorIndex] = useState(0);
 
+    const [isIntersecting, setIsIntersecting] = useState(true);
+    const cardRef = useRef(null);
+
     useEffect(() => {
-        // If external color is provided, we don't cycle internally
-        if (propCardColorKey || !product || !product.availableColors || product.availableColors.length <= 1) return;
+        const observer = new IntersectionObserver(([entry]) => {
+            setIsIntersecting(entry.isIntersecting);
+        }, { rootMargin: '200px' });
+
+        if (cardRef.current) {
+            observer.observe(cardRef.current);
+        }
+        return () => observer.disconnect();
+    }, []);
+
+    useEffect(() => {
+        // If external color is provided or not intersecting, we don't cycle internally
+        if (!isIntersecting || propCardColorKey || !product || !product.availableColors || product.availableColors.length <= 1) return;
 
         // Use a slightly slower interval in the carousel to keep performance high
         const intervalTime = isCarousel ? 3000 : 2500; 
@@ -29,7 +43,7 @@ const ProductCard = ({
         }, intervalTime);
 
         return () => clearInterval(colorInterval);
-    }, [product, isCarousel, propCardColorKey]);
+    }, [product, isCarousel, propCardColorKey, isIntersecting]);
     
     // Derived values
     const currentLanguage = i18n.language || 'he';
@@ -89,6 +103,7 @@ const ProductCard = ({
 
     return (
         <div 
+            ref={cardRef}
             onClick={handleClick}
             className="bg-gray-800/90 border border-white/5 rounded-xl shadow-[0_8px_32px_0_rgba(0,0,0,0.37)] group flex flex-col h-full cursor-pointer relative overflow-hidden transition-all duration-500 hover:shadow-[0_0_30px_rgba(212,175,55,0.15)] transform hover:-translate-y-2"
         >
@@ -115,6 +130,7 @@ const ProductCard = ({
                     rotation={product.customization?.rotation}
                     isDraggable={false}
                     isCarousel={isCarousel}
+                    isThumbnail={true}
                 />
             </div>
             
