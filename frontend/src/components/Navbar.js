@@ -27,6 +27,7 @@ export default function Navbar() {
         { name: t('homePage'), page: 'home' },
         { name: t('browseProducts'), page: 'browse' },
         { name: t('realLifeGalleryTitle') || 'Gallery', page: 'home', params: { scrollTo: 'gallery' } },
+        { name: t('allCategoriesTitle') || 'All Categories', page: 'all-categories' },
         ...categories.map(c => ({ 
             name: c.name, 
             page: 'category', 
