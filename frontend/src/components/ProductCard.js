@@ -90,7 +90,7 @@ const ProductCard = ({
     return (
         <div 
             onClick={handleClick}
-            className="glass-panel group flex flex-col h-full cursor-pointer relative overflow-hidden transition-all duration-500 hover:shadow-[0_0_30px_rgba(212,175,55,0.15)] transform hover:-translate-y-2"
+            className="bg-gray-800/90 border border-white/5 rounded-xl shadow-[0_8px_32px_0_rgba(0,0,0,0.37)] group flex flex-col h-full cursor-pointer relative overflow-hidden transition-all duration-500 hover:shadow-[0_0_30px_rgba(212,175,55,0.15)] transform hover:-translate-y-2"
         >
             {/* Share Button Overlay */}
             <button 

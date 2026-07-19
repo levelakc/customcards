@@ -98,7 +98,7 @@ export default function BrowsePage() {
                     
                     {/* Futuristic Sidebar Filters */}
                     <aside className={`${isSidebarOpen ? 'block' : 'hidden'} lg:block lg:w-80 flex-shrink-0`}>
-                        <div className="glass-panel p-8 sticky top-28 z-30 space-y-10">
+                        <div className="bg-gray-800/90 border border-white/5 rounded-2xl shadow-[0_8px_32px_0_rgba(0,0,0,0.37)] p-8 sticky top-28 z-30 space-y-10">
                             
                             {/* Search Section */}
                             <div>

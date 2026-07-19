@@ -365,7 +365,7 @@ const CreditCardPreview = React.memo(function CreditCardPreview({
                     <radialGradient id={uniqueIds.blackSpotlight} cx="25%" cy="25%" r="60%"><stop offset="0%" stopColor="white" stopOpacity="0.08" /><stop offset="100%" stopColor="white" stopOpacity="0" /></radialGradient>
                     <radialGradient id={uniqueIds.silverSpotlight} cx="25%" cy="25%" r="60%"><stop offset="0%" stopColor="white" stopOpacity="0.7" /><stop offset="100%" stopColor="white" stopOpacity="0" /></radialGradient>
 
-                    <filter id="white-mask-filter">
+                    <filter id={uniqueIds.whiteMaskFilter}>
                         <feColorMatrix type="matrix" values="-1 0 0 0 1
                                                               0 -1 0 0 1
                                                               0 0 -1 0 1
@@ -378,9 +378,9 @@ const CreditCardPreview = React.memo(function CreditCardPreview({
                     {finalLogoUrl && (
                         <mask id={uniqueIds.mask}>
                             {svgContent ? (
-                                <g dangerouslySetInnerHTML={{ __html: svgContent }} filter="url(#white-mask-filter)" />
+                                <g dangerouslySetInnerHTML={{ __html: svgContent }} filter={`url(#${uniqueIds.whiteMaskFilter})`} />
                             ) : (
-                                <image href={finalLogoUrl} x="0" y="0" width="100%" height="100%" preserveAspectRatio="xMidYMid meet" filter="url(#white-mask-filter)" />
+                                <image href={finalLogoUrl} x="0" y="0" width="100%" height="100%" preserveAspectRatio="xMidYMid meet" filter={`url(#${uniqueIds.whiteMaskFilter})`} />
                             )}
                         </mask>
                     )}
