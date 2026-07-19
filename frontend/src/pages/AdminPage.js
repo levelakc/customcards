@@ -726,12 +726,6 @@ export default function AdminPage() {
                                     </label>
                                 </div>
                             </div>
-                            <div className="text-center text-gray-400">{t('or')}</div>
-                            <div>
-                                <label className="block mb-1">{t('pasteLinkToFile')}</label>
-                                <input type="text" name="image" value={productForm.image} onChange={handleProductInputChange} placeholder={t('pasteLogoLink')} className="w-full bg-gray-700 rounded p-2 border border-gray-600"/>
-                            </div>
-                            
                             
                             <div><label className="block mb-1">{t('category')}</label><select name="category" value={productForm.category} onChange={handleProductInputChange} className="w-full bg-gray-700 rounded p-2 border border-gray-600">{categories.map(c => <option key={c._id} value={c._id}>{c.name}</option>)}</select></div>
                             
