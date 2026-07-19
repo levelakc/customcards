@@ -88,7 +88,7 @@ export default function PersonalDesignPage() {
         }
     };
 
-    const [applyPencilEffect, setApplyPencilEffect] = useState(true);
+
 
     const getCroppedImg = useCallback(() => {
         if (!completedCrop || !imgRef.current) return;
@@ -162,7 +162,7 @@ export default function PersonalDesignPage() {
         img.src = baseCroppedImage;
     }, [baseCroppedImage]);
     
-    const uploadedImage = applyPencilEffect ? (pencilImage || baseCroppedImage) : baseCroppedImage;
+    const uploadedImage = pencilImage || baseCroppedImage;
     
     const handleAddToCart = () => {
         if (!uploadedImage) {
@@ -270,19 +270,6 @@ export default function PersonalDesignPage() {
                             <div className="space-y-4 glass-panel p-6 border-gold-500/20">
                                 <h3 className="text-xl font-bold gold-gradient-text">{t('adjustDesignTitle')}</h3>
                                 <p className="text-sm text-gray-400 mb-3">{t('adjustDesignDescription')}</p>
-
-                                <div className="flex items-center mb-4 bg-gray-800 p-3 rounded-lg border border-gray-700">
-                                    <input
-                                        type="checkbox"
-                                        id="applyPencilEffectMain"
-                                        checked={applyPencilEffect}
-                                        onChange={(e) => setApplyPencilEffect(e.target.checked)}
-                                        className="w-4 h-4 text-indigo-600 bg-gray-700 border-gray-600 rounded focus:ring-indigo-500"
-                                    />
-                                    <label htmlFor="applyPencilEffectMain" className="ml-2 text-sm font-medium text-gray-300">
-                                        {t('applyPencilEffect') || 'Apply Pencil Drawing Effect (Removes Background)'}
-                                    </label>
-                                </div>
 
                                 {/* SCALE SLIDER */}
                                 <div>

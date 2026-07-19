@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useAuth } from '../contexts/AuthContext';
 import { useRouter } from '../contexts/RouterContext';
@@ -10,7 +10,9 @@ import AdminReviewsPage from './AdminReviewsPage';
 import AdminDashboardPage from './AdminDashboardPage';
 import AdminMailingPage from './AdminMailingPage';
 import CreditCardPreview from '../components/CreditCardPreview';
-import WalletPreview from '../components/WalletPreview'; // 1. Import WalletPreview
+import WalletPreview from '../components/WalletPreview';
+import ReactCrop, { centerCrop, makeAspectCrop } from 'react-image-crop';
+import Modal from '../components/Modal';
 import { ALL_CARD_COLORS, cardColorOptions } from '../utils/colorUtils';
 
 function SiteSettingsPage({ products }) {
@@ -370,8 +372,13 @@ export default function AdminPage() {
     const [uploading, setUploading] = useState(false);
     const [selectedFile, setSelectedFile] = useState(null);
     const [processedFile, setProcessedFile] = useState(null);
-    const [applyPencilEffect, setApplyPencilEffect] = useState(true);
     const [previewUrl, setPreviewUrl] = useState('');
+    const [originalImage, setOriginalImage] = useState(null);
+    const [originalFileName, setOriginalFileName] = useState("image.png");
+    const [isCropModalOpen, setIsCropModalOpen] = useState(false);
+    const [crop, setCrop] = useState();
+    const [completedCrop, setCompletedCrop] = useState();
+    const imgRef = useRef(null);
     const [customization, setCustomization] = useState({
         position: { x: 45, y: 10 },
         scale: 1,
@@ -382,12 +389,6 @@ export default function AdminPage() {
         if (!selectedFile) {
             setProcessedFile(null);
             setPreviewUrl(productForm.image);
-            return;
-        }
-
-        if (!applyPencilEffect) {
-            setProcessedFile(selectedFile);
-            setPreviewUrl(URL.createObjectURL(selectedFile));
             return;
         }
 
@@ -424,14 +425,81 @@ export default function AdminPage() {
             
             canvas.toBlob((blob) => {
                 if (blob) {
-                    const newFile = new File([blob], selectedFile.name.replace(/\.[^/.]+$/, "") + ".png", { type: "image/png" });
+                    const newFile = new File([blob], selectedFile.name.replace(/\.[^/.]+$/, "") + "_pencil.png", { type: "image/png" });
                     setProcessedFile(newFile);
                     setPreviewUrl(URL.createObjectURL(newFile));
                 }
             }, 'image/png');
         };
         img.src = URL.createObjectURL(selectedFile);
-    }, [selectedFile, applyPencilEffect, productForm.image]);
+    }, [selectedFile, productForm.image]);
+    
+    const handleImageUpload = (event) => {
+        const file = event.target.files[0];
+        if (file) {
+            setOriginalFileName(file.name);
+            const reader = new FileReader();
+            reader.onload = () => {
+                setOriginalImage(reader.result);
+                setIsCropModalOpen(true);
+                if (event.target) event.target.value = '';
+            };
+            reader.readAsDataURL(file);
+        }
+    };
+
+    const onImageLoad = (e) => {
+        const { width, height } = e.currentTarget;
+        const initialCrop = centerCrop(
+            makeAspectCrop({ unit: '%', width: 90 }, 1, width, height),
+            width, height
+        );
+        setCrop(initialCrop);
+    };
+
+    const handleResetCrop = () => {
+        if (imgRef.current) onImageLoad({ currentTarget: imgRef.current });
+    };
+
+    const handleFullSize = () => {
+        if (imgRef.current) {
+            const { width, height } = imgRef.current;
+            const fullCrop = { unit: 'px', x: 0, y: 0, width: width, height: height };
+            setCrop(fullCrop);
+            setCompletedCrop(fullCrop);
+        }
+    };
+
+    const getCroppedImg = () => {
+        if (!completedCrop || !imgRef.current) return;
+        const image = imgRef.current;
+        const canvas = document.createElement('canvas');
+        const scaleX = image.naturalWidth / image.width;
+        const scaleY = image.naturalHeight / image.height;
+        canvas.width = completedCrop.width;
+        canvas.height = completedCrop.height;
+        const ctx = canvas.getContext('2d');
+
+        ctx.drawImage(
+            image,
+            completedCrop.x * scaleX,
+            completedCrop.y * scaleY,
+            completedCrop.width * scaleX,
+            completedCrop.height * scaleY,
+            0,
+            0,
+            completedCrop.width,
+            completedCrop.height
+        );
+
+        canvas.toBlob((blob) => {
+            if (blob) {
+                const croppedFile = new File([blob], originalFileName, { type: "image/png" });
+                setSelectedFile(croppedFile);
+                setIsCropModalOpen(false);
+            }
+        }, 'image/png');
+    };
     const fetchData = useCallback(async () => {
         try {
             setLoading(true);
@@ -480,7 +548,6 @@ export default function AdminPage() {
         setEditingId(null);
         setSelectedFile(null);
         setProcessedFile(null);
-        setApplyPencilEffect(true);
     };
     const handleSelectProductToEdit = (product) => {
         setIsEditing(true);
@@ -709,22 +776,10 @@ export default function AdminPage() {
                                 <label className="block mb-1">{t('uploadSVG_PNG')}</label>
                                 <input 
                                     type="file" 
-                                    accept="image/svg+xml,image/png,image/jpeg"
-                                    onChange={(e) => setSelectedFile(e.target.files[0])} 
+                                    accept="image/png,image/jpeg"
+                                    onChange={handleImageUpload} 
                                     className="w-full text-sm text-gray-400 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-indigo-50 file:text-indigo-700 hover:file:bg-indigo-100"
                                 />
-                                <div className="flex items-center mt-2">
-                                    <input 
-                                        id="adminApplyPencil"
-                                        type="checkbox" 
-                                        checked={applyPencilEffect} 
-                                        onChange={(e) => setApplyPencilEffect(e.target.checked)}
-                                        className="w-4 h-4 text-indigo-600 bg-gray-700 border-gray-600 rounded focus:ring-indigo-500"
-                                    />
-                                    <label htmlFor="adminApplyPencil" className="ml-2 text-sm font-medium text-gray-300">
-                                        {t('applyPencilEffect') || 'Apply Pencil Drawing Effect (Removes Background)'}
-                                    </label>
-                                </div>
                             </div>
                             
                             <div><label className="block mb-1">{t('category')}</label><select name="category" value={productForm.category} onChange={handleProductInputChange} className="w-full bg-gray-700 rounded p-2 border border-gray-600">{categories.map(c => <option key={c._id} value={c._id}>{c.name}</option>)}</select></div>
@@ -790,6 +845,46 @@ export default function AdminPage() {
         {activeTab === 'users' && <AdminUsersPage />}
         {activeTab === 'reviews' && <AdminReviewsPage />}
         {activeTab === 'settings' && <SiteSettingsPage products={products} />}
+        
+        <Modal isOpen={isCropModalOpen} onClose={() => setIsCropModalOpen(false)} title={t('crop')}>
+            <div className="flex flex-col items-center">
+                {originalImage && (
+                    <ReactCrop
+                        crop={crop}
+                        onChange={(c) => setCrop(c)}
+                        onComplete={(c) => setCompletedCrop(c)}
+                    >
+                        <img 
+                            ref={imgRef}
+                            src={originalImage} 
+                            alt="Original" 
+                            onLoad={onImageLoad}
+                            className="max-w-full max-h-[60vh]"
+                        />
+                    </ReactCrop>
+                )}
+                <div className="mt-6 flex flex-wrap gap-3 justify-center">
+                    <button 
+                        onClick={handleResetCrop}
+                        className="bg-gray-700 hover:bg-gray-600 text-white font-bold py-2 px-6 rounded-lg transition-colors"
+                    >
+                        {t('resetCrop')}
+                    </button>
+                    <button 
+                        onClick={handleFullSize}
+                        className="bg-gray-700 hover:bg-gray-600 text-white font-bold py-2 px-6 rounded-lg transition-colors"
+                    >
+                        {t('fullSize')}
+                    </button>
+                    <button 
+                        onClick={getCroppedImg}
+                        className="bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2 px-8 rounded-lg transition-colors"
+                    >
+                        {t('done')}
+                    </button>
+                </div>
+            </div>
+        </Modal>
       </div>
     );
 }
