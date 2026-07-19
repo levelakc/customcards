@@ -65,7 +65,7 @@ body {
 }
 
 /* --- Particles --- */
-.particles-container { position: absolute; top: 0; left: 0; width: 100%; height: 100%; overflow: hidden; z-index: 1; }
+.particles-container { position: absolute; top: 0; left: 0; width: 100%; height: 100%; overflow: hidden; z-index: 1; pointer-events: none; transform: translateZ(0); }
 .particle { position: absolute; width: 3px; height: 3px; background-color: rgba(255, 255, 255, 0.3); border-radius: 50%; animation: float 25s infinite ease-in-out; }
 @keyframes float { 0% { transform: translateY(0) translateX(0); opacity: 0; } 25% { opacity: 1; } 50% { transform: translateY(-100vh) translateX(20vw); opacity: 1; } 75% { opacity: 1; } 100% { transform: translateY(0) translateX(0); opacity: 0; } }
 .particle:nth-child(1) { top: 20%; left: 25%; animation-duration: 18s; animation-delay: -5s; }
@@ -88,6 +88,8 @@ body {
   height: 100%;
   overflow: hidden;
   z-index: 2;
+  pointer-events: none;
+  transform: translateZ(0);
 }
 .weld-spark {
   position: absolute;
@@ -129,6 +131,8 @@ div.userway_buttons_wrapper {
     -webkit-backdrop-filter: blur(12px) !important;
     border-bottom: 1px solid rgba(212, 175, 55, 0.3) !important; /* Metallic gold border */
     box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5) !important;
+    transform: translateZ(0);
+    will-change: transform, backdrop-filter;
 }
 
 .nav-link-luxury {
@@ -199,6 +203,8 @@ div.userway_buttons_wrapper {
     backdrop-filter: blur(20px);
     -webkit-backdrop-filter: blur(20px);
     border: 1px solid rgba(255, 255, 255, 0.05);
+    transform: translateZ(0);
+    will-change: transform, backdrop-filter;
 }
 
 .category-pill {
@@ -305,6 +311,8 @@ div.userway_buttons_wrapper {
     border: 1px solid rgba(255, 255, 255, 0.05);
     border-radius: 1rem;
     box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+    transform: translateZ(0);
+    will-change: transform, backdrop-filter;
 }
 
 .metallic-text {
