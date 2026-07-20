@@ -83,7 +83,7 @@ export default function Navbar() {
                                             <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7"></path></svg>
                                         </button>
                                         {isMoreMenuOpen && (
-                                            <div className="absolute start-0 mt-2 w-48 bg-gray-900 border border-gray-700 rounded-md shadow-2xl py-2 z-20">
+                                            <div className="absolute start-0 mt-2 w-48 bg-gray-900 border border-gray-700 rounded-md shadow-2xl py-2 z-20 max-h-[70vh] overflow-y-auto custom-scrollbar">
                                                 {moreLinks.map(link => (
                                                     <button key={link.params?.id || link.name} onClick={() => {navigate(link.page, link.params); setIsMoreMenuOpen(false);}} className="block w-full text-right px-4 py-3 text-sm text-gray-300 hover:bg-gray-800 hover:text-gold transition-colors">{link.name}</button>
                                                 ))}
@@ -158,7 +158,7 @@ export default function Navbar() {
             </div>
             
             {isMenuOpen && (
-                <div className="md:hidden bg-gray-900 border-t border-gray-800 shadow-2xl">
+                <div className="md:hidden bg-gray-900 border-t border-gray-800 shadow-2xl overflow-y-auto max-h-[calc(100vh-6rem)] custom-scrollbar">
                     <div className="px-4 pt-4 pb-6 space-y-2">
                         {allNavLinks.map(link => (
                             <button key={link.name} onClick={() => { navigate(link.page, link.params); setIsMenuOpen(false); }} className="text-gray-300 hover:bg-gray-800 hover:text-gold-500 block w-full text-right px-4 py-3 rounded-lg text-base font-medium transition-all">{link.name}</button>
