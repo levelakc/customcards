@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import * as api from '../api/api';
 import { useTranslation } from 'react-i18next';
+import ProductCard from '../components/ProductCard';
 
 export default function SearchPage() {
     const { i18n } = useTranslation();
@@ -38,6 +39,11 @@ export default function SearchPage() {
     };
 
     const currentLanguage = i18n.language || 'he';
+
+    useEffect(() => {
+        handleSearch({ preventDefault: () => {} });
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, []);
 
     return (
         <div className="min-h-screen bg-gray-900 text-white py-12 px-4 sm:px-6 lg:px-8">
@@ -118,26 +124,9 @@ export default function SearchPage() {
 
                 {!loading && !error && results.length > 0 && (
                     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-                        {results.map((product) => {
-                            const productName = (product.name?.[currentLanguage] || product.name || '').toString();
-                            const productDescription = (product.description?.[currentLanguage] || product.description || '').toString();
-                            return (
-                                <div key={product._id} className="bg-gray-800 rounded-lg shadow-lg overflow-hidden">
-                                    <img src={product.image} alt={productName} className="w-full h-48 object-cover" />
-                                    <div className="p-4">
-                                        <h3 className="text-xl font-semibold text-white mb-2">{productName}</h3>
-                                        <p className="text-gray-300 text-sm mb-2">{productDescription.substring(0, 100)}...</p>
-                                        <p className="text-lg font-bold text-white mb-4">₪{product.price}</p>
-                                        <button
-                                            onClick={() => { /* navigate to product page */ }}
-                                            className="w-full py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
-                                        >
-                                            צפה במוצר
-                                        </button>
-                                    </div>
-                                </div>
-                            );
-                        })}
+                        {results.map((product) => (
+                            <ProductCard key={product._id} product={product} />
+                        ))}
                     </div>
                 )}
 

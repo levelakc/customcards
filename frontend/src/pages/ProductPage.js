@@ -35,6 +35,7 @@ export default function ProductPage() {
     const [showSuccessMessage, setShowSuccessMessage] = useState(false);
 
     useEffect(() => {
+        window.scrollTo(0, 0);
         if (product) {
             if (product.availableColors?.length > 0) {
                 const sortedColors = getSortedColors(product.availableColors);

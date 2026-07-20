@@ -339,7 +339,7 @@ const CreditCardPreview = React.memo(function CreditCardPreview({
                 xmlns="http://www.w3.org/2000/svg"
                 viewBox={`0 0 ${SVG_WIDTH} ${SVG_HEIGHT}`}
                 className={`w-full object-cover md:transform-style-3d md:rotate-x-5 md:-rotate-y-10 ${isDraggable ? (isDragging ? 'cursor-grabbing' : 'cursor-grab') : ''}`}
-                style={{ filter: (isCarousel || isThumbnail) ? 'none' : 'drop-shadow(0 10px 10px rgba(0,0,0,0.4))' }}
+                style={{ filter: (isCarousel || isThumbnail) ? undefined : 'drop-shadow(0 10px 10px rgba(0,0,0,0.4))' }}
                 onMouseDown={isDraggable ? handleDragStart : undefined}
                 onTouchStart={isDraggable ? handleDragStart : undefined}
             >
@@ -389,7 +389,7 @@ const CreditCardPreview = React.memo(function CreditCardPreview({
                         </mask>
                     )}
                 </defs>
-                <g filter={(isCarousel || isThumbnail) ? 'none' : `url(#${uniqueIds.shimmerFilter})`}>
+                <g filter={(isCarousel || isThumbnail) ? undefined : `url(#${uniqueIds.shimmerFilter})`}>
                     <rect width={SVG_WIDTH} height={SVG_HEIGHT} rx="20" fill={cardFill} />
                     {finalLogoUrl && (
                         <g>
