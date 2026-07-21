@@ -323,7 +323,7 @@ export default function PersonalDesignPage() {
                         {uploadedImage && (
                             <div className="mt-8 p-4 bg-gray-900 rounded-xl border border-gray-700">
                                 <label className="block text-lg font-bold text-white mb-4 text-center">בחר סגנון חריטה</label>
-                                <div className="grid grid-cols-2 gap-3">
+                                <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
                                     <button 
                                         onClick={() => setPencilMode('light')}
                                         className={`p-3 rounded-xl font-bold transition-all ${pencilMode === 'light' ? 'bg-indigo-600 text-white shadow-[0_0_15px_rgba(79,70,229,0.5)] scale-105 border-2 border-indigo-400' : 'bg-gray-800 text-gray-400 hover:bg-gray-700 border-2 border-transparent'}`}

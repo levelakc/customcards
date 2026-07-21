@@ -748,7 +748,7 @@ export default function AdminPage() {
                             {previewUrl && previewUrl.startsWith('blob:') && (
                                 <div className="mt-6 p-4 bg-gray-800 rounded-xl border border-gray-600">
                                     <label className="block text-lg font-bold text-white mb-4 text-center">אפקט חריטה (Pencil Effect Mode)</label>
-                                    <div className="grid grid-cols-2 gap-3">
+                                    <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
                                         <button 
                                             type="button"
                                             onClick={() => setPencilMode('light')}
