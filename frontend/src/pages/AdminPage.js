@@ -385,7 +385,7 @@ export default function AdminPage() {
         rotation: 0,
     });
     const [previewColorKey, setPreviewColorKey] = useState('black');
-    const [pencilMode, setPencilMode] = useState('medium');
+    const [pencilIntensity, setPencilIntensity] = useState(50);
     
     useEffect(() => {
         if (!selectedFile) {
@@ -411,10 +411,8 @@ export default function AdminPage() {
             canvasB.height = img.height;
             const ctxB = canvasB.getContext('2d');
             
-            // Blur radius determines line thickness. 
-            let blurRadius = 4;
-            if (pencilMode === 'light') blurRadius = 2; // thinner lines
-            if (pencilMode === 'dark') blurRadius = 8;  // thicker, bolder lines
+            // Blur radius determines line thickness. Intensity 1 -> 1px, 100 -> 8px.
+            let blurRadius = 1 + (pencilIntensity / 100) * 7;
             
             ctxB.filter = `grayscale(100%) invert(100%) blur(${blurRadius}px)`;
             ctxB.drawImage(img, 0, 0);
@@ -427,24 +425,22 @@ export default function AdminPage() {
             const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
             const data = imageData.data;
             
+            // Higher intensity = picks up more faint lines
+            let threshold = 200 + (pencilIntensity / 100) * 45; 
+            const isBlackEngraving = previewColorKey !== 'black';
+            
             for (let i = 0; i < data.length; i += 4) {
                 const r = data[i]; // r = g = b (grayscale)
                 
-                if (pencilMode === 'detailed') {
-                    // Keep smooth shading, but make background transparent
-                    data[i] = 0; data[i+1] = 0; data[i+2] = 0;
-                    data[i+3] = 255 - r; 
+                if (r > threshold) {
+                    data[i+3] = 0; // transparent background
                 } else {
-                    let threshold = 230; // Anything darker than 230 becomes a line
-                    if (pencilMode === 'light') threshold = 240; // Picks up faint lines
-                    if (pencilMode === 'dark') threshold = 200;  // Only very dark lines
-                    
-                    if (r > threshold) {
-                        data[i+3] = 0; // transparent background
-                    } else {
+                    if (isBlackEngraving) {
                         data[i] = 0; data[i+1] = 0; data[i+2] = 0;
-                        data[i+3] = 255; // solid black line
+                    } else {
+                        data[i] = 255; data[i+1] = 255; data[i+2] = 255;
                     }
+                    data[i+3] = 255; // solid line
                 }
             }
             
@@ -460,7 +456,7 @@ export default function AdminPage() {
             }, 'image/png');
         };
         img.src = URL.createObjectURL(selectedFile);
-    }, [selectedFile, pencilMode, productForm.image]);
+    }, [selectedFile, pencilIntensity, previewColorKey, productForm.image]);
     
     const handleImageUpload = (event) => {
         const file = event.target.files[0];
@@ -761,28 +757,20 @@ export default function AdminPage() {
                             
                             {previewUrl && previewUrl.startsWith('blob:') && (
                                 <div className="mt-6 p-4 bg-gray-800 rounded-xl border border-gray-600">
-                                    <label className="block text-lg font-bold text-white mb-4 text-center">אפקט חריטה (Pencil Effect Mode)</label>
-                                    <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-                                        <button 
-                                            type="button"
-                                            onClick={() => setPencilMode('light')}
-                                            className={`p-3 rounded-xl font-bold transition-all ${pencilMode === 'light' ? 'bg-indigo-600 text-white shadow-[0_0_15px_rgba(79,70,229,0.5)] scale-105 border-2 border-indigo-400' : 'bg-gray-700 text-gray-300 hover:bg-gray-600 border-2 border-transparent'}`}
-                                        >בהיר</button>
-                                        <button 
-                                            type="button"
-                                            onClick={() => setPencilMode('medium')}
-                                            className={`p-3 rounded-xl font-bold transition-all ${pencilMode === 'medium' ? 'bg-indigo-600 text-white shadow-[0_0_15px_rgba(79,70,229,0.5)] scale-105 border-2 border-indigo-400' : 'bg-gray-700 text-gray-300 hover:bg-gray-600 border-2 border-transparent'}`}
-                                        >רגיל</button>
-                                        <button 
-                                            type="button"
-                                            onClick={() => setPencilMode('dark')}
-                                            className={`p-3 rounded-xl font-bold transition-all ${pencilMode === 'dark' ? 'bg-indigo-600 text-white shadow-[0_0_15px_rgba(79,70,229,0.5)] scale-105 border-2 border-indigo-400' : 'bg-gray-700 text-gray-300 hover:bg-gray-600 border-2 border-transparent'}`}
-                                        >כהה</button>
-                                        <button 
-                                            type="button"
-                                            onClick={() => setPencilMode('detailed')}
-                                            className={`p-3 rounded-xl font-bold transition-all ${pencilMode === 'detailed' ? 'bg-indigo-600 text-white shadow-[0_0_15px_rgba(79,70,229,0.5)] scale-105 border-2 border-indigo-400' : 'bg-gray-700 text-gray-300 hover:bg-gray-600 border-2 border-transparent'}`}
-                                        >מפורט (הצללות)</button>
+                                    <label className="block text-lg font-bold text-white mb-2 text-center">עוצמת סקיצה (Pencil Intensity)</label>
+                                    <div className="px-4 py-2">
+                                        <input
+                                            type="range"
+                                            min="1"
+                                            max="100"
+                                            value={pencilIntensity}
+                                            onChange={(e) => setPencilIntensity(parseInt(e.target.value))}
+                                            className="w-full h-2 bg-gray-700 rounded-lg appearance-none cursor-pointer range-lg"
+                                        />
+                                        <div className="flex justify-between text-xs text-gray-400 mt-2">
+                                            <span>חלש (מעט קווים)</span>
+                                            <span>חזק (מלא קווים)</span>
+                                        </div>
                                     </div>
                                 </div>
                             )}
