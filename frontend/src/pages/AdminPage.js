@@ -746,28 +746,28 @@ export default function AdminPage() {
                             )}
                             
                             {previewUrl && previewUrl.startsWith('blob:') && (
-                                <div className="mt-4">
-                                    <label className="block text-sm font-medium text-gray-300 mb-2">אפקט חריטה (Pencil Effect Mode)</label>
-                                    <div className="flex gap-2">
+                                <div className="mt-6 p-4 bg-gray-800 rounded-xl border border-gray-600">
+                                    <label className="block text-lg font-bold text-white mb-4 text-center">אפקט חריטה (Pencil Effect Mode)</label>
+                                    <div className="grid grid-cols-2 gap-3">
                                         <button 
                                             type="button"
                                             onClick={() => setPencilMode('light')}
-                                            className={`px-3 py-1 rounded-lg text-sm border-2 ${pencilMode === 'light' ? 'border-blue-500 bg-gray-700 text-white' : 'border-transparent bg-gray-800 text-gray-400 hover:text-white'}`}
+                                            className={`p-3 rounded-xl font-bold transition-all ${pencilMode === 'light' ? 'bg-indigo-600 text-white shadow-[0_0_15px_rgba(79,70,229,0.5)] scale-105 border-2 border-indigo-400' : 'bg-gray-700 text-gray-300 hover:bg-gray-600 border-2 border-transparent'}`}
                                         >בהיר</button>
                                         <button 
                                             type="button"
                                             onClick={() => setPencilMode('medium')}
-                                            className={`px-3 py-1 rounded-lg text-sm border-2 ${pencilMode === 'medium' ? 'border-blue-500 bg-gray-700 text-white' : 'border-transparent bg-gray-800 text-gray-400 hover:text-white'}`}
+                                            className={`p-3 rounded-xl font-bold transition-all ${pencilMode === 'medium' ? 'bg-indigo-600 text-white shadow-[0_0_15px_rgba(79,70,229,0.5)] scale-105 border-2 border-indigo-400' : 'bg-gray-700 text-gray-300 hover:bg-gray-600 border-2 border-transparent'}`}
                                         >רגיל</button>
                                         <button 
                                             type="button"
                                             onClick={() => setPencilMode('dark')}
-                                            className={`px-3 py-1 rounded-lg text-sm border-2 ${pencilMode === 'dark' ? 'border-blue-500 bg-gray-700 text-white' : 'border-transparent bg-gray-800 text-gray-400 hover:text-white'}`}
+                                            className={`p-3 rounded-xl font-bold transition-all ${pencilMode === 'dark' ? 'bg-indigo-600 text-white shadow-[0_0_15px_rgba(79,70,229,0.5)] scale-105 border-2 border-indigo-400' : 'bg-gray-700 text-gray-300 hover:bg-gray-600 border-2 border-transparent'}`}
                                         >כהה</button>
                                         <button 
                                             type="button"
                                             onClick={() => setPencilMode('detailed')}
-                                            className={`px-3 py-1 rounded-lg text-sm border-2 ${pencilMode === 'detailed' ? 'border-blue-500 bg-gray-700 text-white' : 'border-transparent bg-gray-800 text-gray-400 hover:text-white'}`}
+                                            className={`p-3 rounded-xl font-bold transition-all ${pencilMode === 'detailed' ? 'bg-indigo-600 text-white shadow-[0_0_15px_rgba(79,70,229,0.5)] scale-105 border-2 border-indigo-400' : 'bg-gray-700 text-gray-300 hover:bg-gray-600 border-2 border-transparent'}`}
                                         >מפורט (הצללות)</button>
                                     </div>
                                 </div>
