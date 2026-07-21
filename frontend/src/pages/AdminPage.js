@@ -896,25 +896,25 @@ export default function AdminPage() {
             onClose={() => setIsCropModalOpen(false)} 
             title={t('crop')}
             footer={
-                <div className="flex flex-wrap gap-3 justify-center">
+                <div className="flex flex-col sm:flex-row gap-3 justify-center">
                     <button 
                         type="button"
                         onClick={handleResetCrop}
-                        className="bg-gray-700 hover:bg-gray-600 text-white font-bold py-2 px-6 rounded-lg transition-colors"
+                        className="flex-grow py-3 px-4 bg-gray-700 hover:bg-gray-600 rounded-lg transition-colors font-medium text-white"
                     >
                         {t('resetCrop')}
                     </button>
                     <button 
                         type="button"
                         onClick={handleFullSize}
-                        className="bg-gray-700 hover:bg-gray-600 text-white font-bold py-2 px-6 rounded-lg transition-colors"
+                        className="flex-grow py-3 px-4 bg-gray-700 hover:bg-gray-600 rounded-lg transition-colors font-medium text-white"
                     >
                         {t('fullSize')}
                     </button>
                     <button 
                         type="button"
                         onClick={getCroppedImg}
-                        className="bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2 px-8 rounded-lg transition-colors"
+                        className="flex-grow py-3 px-4 bg-indigo-600 hover:bg-indigo-500 rounded-lg transition-colors font-medium text-white shadow-lg"
                     >
                         {t('done')}
                     </button>

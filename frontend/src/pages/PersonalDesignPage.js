@@ -366,22 +366,22 @@ export default function PersonalDesignPage() {
                 onClose={() => setIsCropModalOpen(false)} 
                 title={t('crop')}
                 footer={
-                    <div className="flex flex-wrap gap-3 justify-center">
+                    <div className="flex flex-col sm:flex-row gap-3 justify-center">
                         <button 
                             onClick={handleResetCrop}
-                            className="bg-gray-700 hover:bg-gray-600 text-white font-bold py-2 px-6 rounded-lg transition-colors"
+                            className="flex-grow py-3 px-4 bg-gray-700 hover:bg-gray-600 rounded-lg transition-colors font-medium text-white"
                         >
                             {t('resetCrop')}
                         </button>
                         <button 
                             onClick={handleFullSize}
-                            className="bg-gray-700 hover:bg-gray-600 text-white font-bold py-2 px-6 rounded-lg transition-colors"
+                            className="flex-grow py-3 px-4 bg-gray-700 hover:bg-gray-600 rounded-lg transition-colors font-medium text-white"
                         >
                             {t('fullSize')}
                         </button>
                         <button 
                             onClick={getCroppedImg}
-                            className="bg-gold-500 hover:bg-gold-600 text-black font-bold py-2 px-6 rounded-lg transition-colors"
+                            className="flex-grow py-3 px-4 bg-indigo-600 hover:bg-indigo-500 rounded-lg transition-colors font-medium text-white shadow-lg"
                         >
                             {t('cropAndContinue')}
                         </button>

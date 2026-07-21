@@ -14,7 +14,7 @@ export default function Modal({ isOpen, onClose, title, children, footer }) {
         >
             {/* The actual modal content box */}
             <div 
-                className="bg-gray-800 text-white rounded-lg shadow-xl w-full max-w-2xl max-h-[85dvh] flex flex-col m-4"
+                className="bg-gray-800 text-white rounded-lg shadow-xl w-full max-w-2xl max-h-[75dvh] flex flex-col m-4"
                 onClick={e => e.stopPropagation()} // Prevent clicks inside the modal from closing it
             >
                 {/* Modal Header */}
@@ -32,7 +32,7 @@ export default function Modal({ isOpen, onClose, title, children, footer }) {
 
                 {/* Modal Footer */}
                 {footer && (
-                    <div className="p-4 border-t border-gray-700 bg-gray-800 rounded-b-lg shrink-0">
+                    <div className="p-4 pb-8 border-t border-gray-700 bg-gray-800 rounded-b-lg shrink-0">
                         {footer}
                     </div>
                 )}
