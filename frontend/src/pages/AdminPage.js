@@ -405,36 +405,54 @@ export default function AdminPage() {
             const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
             const data = imageData.data;
             
-            for (let i = 0; i < data.length; i += 4) {
-                const r = data[i];
-                const g = data[i + 1];
-                const b = data[i + 2];
-                const alpha = data[i + 3];
-                
-                if (alpha === 0) continue;
-                
-                const brightness = (r + g + b) / 3;
-                
-                if (pencilMode === 'detailed') {
-                    data[i] = 0;
-                    data[i + 1] = 0;
-                    data[i + 2] = 0;
-                    data[i + 3] = 255 - brightness;
-                } else {
-                    let threshold = 200;
-                    if (pencilMode === 'light') threshold = 220;
-                    if (pencilMode === 'dark') threshold = 150;
+            const width = canvas.width;
+            const height = canvas.height;
+            const grayscale = new Uint8Array(width * height);
+            
+            // First pass: convert to grayscale and clear alpha
+            for (let i = 0; i < width * height; i++) {
+                const r = data[i * 4];
+                const g = data[i * 4 + 1];
+                const b = data[i * 4 + 2];
+                const alpha = data[i * 4 + 3];
+                grayscale[i] = alpha === 0 ? 255 : (r + g + b) / 3;
+                data[i * 4 + 3] = 0; // default to transparent
+            }
+
+            // Second pass: Edge detection and shading
+            for (let y = 0; y < height - 1; y++) {
+                for (let x = 0; x < width - 1; x++) {
+                    const idx = y * width + x;
+                    const dataIdx = idx * 4;
+                    const current = grayscale[idx];
                     
-                    if (brightness > threshold) {
-                        data[i + 3] = 0;
+                    if (pencilMode === 'detailed') {
+                        data[dataIdx] = 0; data[dataIdx + 1] = 0; data[dataIdx + 2] = 0;
+                        data[dataIdx + 3] = 255 - current;
                     } else {
-                        data[i] = 0;
-                        data[i + 1] = 0;
-                        data[i + 2] = 0;
-                        data[i + 3] = 255;
+                        const right = grayscale[idx + 1];
+                        const bottom = grayscale[idx + width];
+                        const edge = Math.abs(current - right) + Math.abs(current - bottom);
+                        
+                        let edgeThresh = 20;
+                        let solidThresh = 100;
+                        
+                        if (pencilMode === 'light') {
+                            edgeThresh = 30;
+                            solidThresh = 50;
+                        } else if (pencilMode === 'dark') {
+                            edgeThresh = 10;
+                            solidThresh = 150;
+                        }
+                        
+                        if (edge > edgeThresh || current < solidThresh) {
+                            data[dataIdx] = 0; data[dataIdx + 1] = 0; data[dataIdx + 2] = 0;
+                            data[dataIdx + 3] = 255;
+                        }
                     }
                 }
             }
+            
             ctx.putImageData(imageData, 0, 0);
             
             canvas.toBlob((blob) => {

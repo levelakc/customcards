@@ -138,37 +138,54 @@ export default function PersonalDesignPage() {
 
             const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
             const data = imageData.data;
+            const width = canvas.width;
+            const height = canvas.height;
+            const grayscale = new Uint8Array(width * height);
             
-            for (let i = 0; i < data.length; i += 4) {
-                const r = data[i];
-                const g = data[i + 1];
-                const b = data[i + 2];
-                const alpha = data[i + 3];
-                
-                if (alpha === 0) continue;
-                
-                const brightness = (r + g + b) / 3;
-                
-                if (pencilMode === 'detailed') {
-                    data[i] = 0;
-                    data[i + 1] = 0;
-                    data[i + 2] = 0;
-                    data[i + 3] = 255 - brightness;
-                } else {
-                    let threshold = 200;
-                    if (pencilMode === 'light') threshold = 220;
-                    if (pencilMode === 'dark') threshold = 150;
+            // First pass: convert to grayscale and clear alpha
+            for (let i = 0; i < width * height; i++) {
+                const r = data[i * 4];
+                const g = data[i * 4 + 1];
+                const b = data[i * 4 + 2];
+                const alpha = data[i * 4 + 3];
+                grayscale[i] = alpha === 0 ? 255 : (r + g + b) / 3;
+                data[i * 4 + 3] = 0; // default to transparent
+            }
+
+            // Second pass: Edge detection and shading
+            for (let y = 0; y < height - 1; y++) {
+                for (let x = 0; x < width - 1; x++) {
+                    const idx = y * width + x;
+                    const dataIdx = idx * 4;
+                    const current = grayscale[idx];
                     
-                    if (brightness > threshold) {
-                        data[i + 3] = 0;
+                    if (pencilMode === 'detailed') {
+                        data[dataIdx] = 0; data[dataIdx + 1] = 0; data[dataIdx + 2] = 0;
+                        data[dataIdx + 3] = 255 - current;
                     } else {
-                        data[i] = 0;
-                        data[i + 1] = 0;
-                        data[i + 2] = 0;
-                        data[i + 3] = 255;
+                        const right = grayscale[idx + 1];
+                        const bottom = grayscale[idx + width];
+                        const edge = Math.abs(current - right) + Math.abs(current - bottom);
+                        
+                        let edgeThresh = 20;
+                        let solidThresh = 100;
+                        
+                        if (pencilMode === 'light') {
+                            edgeThresh = 30;
+                            solidThresh = 50;
+                        } else if (pencilMode === 'dark') {
+                            edgeThresh = 10;
+                            solidThresh = 150;
+                        }
+                        
+                        if (edge > edgeThresh || current < solidThresh) {
+                            data[dataIdx] = 0; data[dataIdx + 1] = 0; data[dataIdx + 2] = 0;
+                            data[dataIdx + 3] = 255;
+                        }
                     }
                 }
             }
+            
             ctx.putImageData(imageData, 0, 0);
             setPencilImage(canvas.toDataURL('image/png'));
         };
@@ -280,6 +297,30 @@ export default function PersonalDesignPage() {
                         </div>
                         
                         {uploadedImage && (
+                            <div className="mt-8 p-4 bg-gray-900 rounded-xl border border-gray-700">
+                                <label className="block text-lg font-bold text-white mb-4 text-center">בחר סגנון חריטה</label>
+                                <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+                                    <button 
+                                        onClick={() => setPencilMode('light')}
+                                        className={`p-3 rounded-xl font-bold transition-all ${pencilMode === 'light' ? 'bg-indigo-600 text-white shadow-[0_0_15px_rgba(79,70,229,0.5)] scale-105 border-2 border-indigo-400' : 'bg-gray-800 text-gray-400 hover:bg-gray-700 border-2 border-transparent'}`}
+                                    >בהיר</button>
+                                    <button 
+                                        onClick={() => setPencilMode('medium')}
+                                        className={`p-3 rounded-xl font-bold transition-all ${pencilMode === 'medium' ? 'bg-indigo-600 text-white shadow-[0_0_15px_rgba(79,70,229,0.5)] scale-105 border-2 border-indigo-400' : 'bg-gray-800 text-gray-400 hover:bg-gray-700 border-2 border-transparent'}`}
+                                    >רגיל</button>
+                                    <button 
+                                        onClick={() => setPencilMode('dark')}
+                                        className={`p-3 rounded-xl font-bold transition-all ${pencilMode === 'dark' ? 'bg-indigo-600 text-white shadow-[0_0_15px_rgba(79,70,229,0.5)] scale-105 border-2 border-indigo-400' : 'bg-gray-800 text-gray-400 hover:bg-gray-700 border-2 border-transparent'}`}
+                                    >כהה</button>
+                                    <button 
+                                        onClick={() => setPencilMode('detailed')}
+                                        className={`p-3 rounded-xl font-bold transition-all ${pencilMode === 'detailed' ? 'bg-indigo-600 text-white shadow-[0_0_15px_rgba(79,70,229,0.5)] scale-105 border-2 border-indigo-400' : 'bg-gray-800 text-gray-400 hover:bg-gray-700 border-2 border-transparent'}`}
+                                    >מפורט (הצללות)</button>
+                                </div>
+                            </div>
+                        )}
+
+                        {uploadedImage && (
                             <div className="space-y-4 glass-panel p-6 border-gold-500/20">
                                 <h3 className="text-xl font-bold gold-gradient-text">{t('adjustDesignTitle')}</h3>
                                 <p className="text-sm text-gray-400 mb-3">{t('adjustDesignDescription')}</p>
@@ -320,29 +361,7 @@ export default function PersonalDesignPage() {
                             </div>
                         )}
 
-                        {uploadedImage && (
-                            <div className="mt-8 p-4 bg-gray-900 rounded-xl border border-gray-700">
-                                <label className="block text-lg font-bold text-white mb-4 text-center">בחר סגנון חריטה</label>
-                                <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-                                    <button 
-                                        onClick={() => setPencilMode('light')}
-                                        className={`p-3 rounded-xl font-bold transition-all ${pencilMode === 'light' ? 'bg-indigo-600 text-white shadow-[0_0_15px_rgba(79,70,229,0.5)] scale-105 border-2 border-indigo-400' : 'bg-gray-800 text-gray-400 hover:bg-gray-700 border-2 border-transparent'}`}
-                                    >בהיר</button>
-                                    <button 
-                                        onClick={() => setPencilMode('medium')}
-                                        className={`p-3 rounded-xl font-bold transition-all ${pencilMode === 'medium' ? 'bg-indigo-600 text-white shadow-[0_0_15px_rgba(79,70,229,0.5)] scale-105 border-2 border-indigo-400' : 'bg-gray-800 text-gray-400 hover:bg-gray-700 border-2 border-transparent'}`}
-                                    >רגיל</button>
-                                    <button 
-                                        onClick={() => setPencilMode('dark')}
-                                        className={`p-3 rounded-xl font-bold transition-all ${pencilMode === 'dark' ? 'bg-indigo-600 text-white shadow-[0_0_15px_rgba(79,70,229,0.5)] scale-105 border-2 border-indigo-400' : 'bg-gray-800 text-gray-400 hover:bg-gray-700 border-2 border-transparent'}`}
-                                    >כהה</button>
-                                    <button 
-                                        onClick={() => setPencilMode('detailed')}
-                                        className={`p-3 rounded-xl font-bold transition-all ${pencilMode === 'detailed' ? 'bg-indigo-600 text-white shadow-[0_0_15px_rgba(79,70,229,0.5)] scale-105 border-2 border-indigo-400' : 'bg-gray-800 text-gray-400 hover:bg-gray-700 border-2 border-transparent'}`}
-                                    >מפורט (הצללות)</button>
-                                </div>
-                            </div>
-                        )}
+
                         
                         <button onClick={handleAddToCart} className="btn-premium btn-gold text-xl w-full py-4 mt-4">
                             {t('addToCartButton')}
