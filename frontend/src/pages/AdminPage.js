@@ -385,6 +385,8 @@ export default function AdminPage() {
         rotation: 0,
     });
     const [previewColorKey, setPreviewColorKey] = useState('black');
+    const [pencilMode, setPencilMode] = useState('medium');
+    
     useEffect(() => {
         if (!selectedFile) {
             setProcessedFile(null);
@@ -412,13 +414,25 @@ export default function AdminPage() {
                 if (alpha === 0) continue;
                 
                 const brightness = (r + g + b) / 3;
-                if (brightness > 200) {
-                    data[i + 3] = 0;
-                } else {
+                
+                if (pencilMode === 'detailed') {
                     data[i] = 0;
                     data[i + 1] = 0;
                     data[i + 2] = 0;
-                    data[i + 3] = 255;
+                    data[i + 3] = 255 - brightness;
+                } else {
+                    let threshold = 200;
+                    if (pencilMode === 'light') threshold = 220;
+                    if (pencilMode === 'dark') threshold = 150;
+                    
+                    if (brightness > threshold) {
+                        data[i + 3] = 0;
+                    } else {
+                        data[i] = 0;
+                        data[i + 1] = 0;
+                        data[i + 2] = 0;
+                        data[i + 3] = 255;
+                    }
                 }
             }
             ctx.putImageData(imageData, 0, 0);
@@ -432,7 +446,7 @@ export default function AdminPage() {
             }, 'image/png');
         };
         img.src = URL.createObjectURL(selectedFile);
-    }, [selectedFile, productForm.image]);
+    }, [selectedFile, pencilMode, productForm.image]);
     
     const handleImageUpload = (event) => {
         const file = event.target.files[0];
@@ -730,6 +744,35 @@ export default function AdminPage() {
                                     showTransformHandles={true}
                                 />
                             )}
+                            
+                            {previewUrl && previewUrl.startsWith('blob:') && (
+                                <div className="mt-4">
+                                    <label className="block text-sm font-medium text-gray-300 mb-2">אפקט חריטה (Pencil Effect Mode)</label>
+                                    <div className="flex gap-2">
+                                        <button 
+                                            type="button"
+                                            onClick={() => setPencilMode('light')}
+                                            className={`px-3 py-1 rounded-lg text-sm border-2 ${pencilMode === 'light' ? 'border-blue-500 bg-gray-700 text-white' : 'border-transparent bg-gray-800 text-gray-400 hover:text-white'}`}
+                                        >בהיר</button>
+                                        <button 
+                                            type="button"
+                                            onClick={() => setPencilMode('medium')}
+                                            className={`px-3 py-1 rounded-lg text-sm border-2 ${pencilMode === 'medium' ? 'border-blue-500 bg-gray-700 text-white' : 'border-transparent bg-gray-800 text-gray-400 hover:text-white'}`}
+                                        >רגיל</button>
+                                        <button 
+                                            type="button"
+                                            onClick={() => setPencilMode('dark')}
+                                            className={`px-3 py-1 rounded-lg text-sm border-2 ${pencilMode === 'dark' ? 'border-blue-500 bg-gray-700 text-white' : 'border-transparent bg-gray-800 text-gray-400 hover:text-white'}`}
+                                        >כהה</button>
+                                        <button 
+                                            type="button"
+                                            onClick={() => setPencilMode('detailed')}
+                                            className={`px-3 py-1 rounded-lg text-sm border-2 ${pencilMode === 'detailed' ? 'border-blue-500 bg-gray-700 text-white' : 'border-transparent bg-gray-800 text-gray-400 hover:text-white'}`}
+                                        >מפורט (הצללות)</button>
+                                    </div>
+                                </div>
+                            )}
+
                             <div className="space-y-4 pt-4">
                                 <h3 className="text-lg font-semibold">{t('customizeDesign')}</h3>
                                 <p className="text-sm text-gray-400">{t('customizeDesignDescription')}</p>
@@ -846,7 +889,36 @@ export default function AdminPage() {
         {activeTab === 'reviews' && <AdminReviewsPage />}
         {activeTab === 'settings' && <SiteSettingsPage products={products} />}
         
-        <Modal isOpen={isCropModalOpen} onClose={() => setIsCropModalOpen(false)} title={t('crop')}>
+        <Modal 
+            isOpen={isCropModalOpen} 
+            onClose={() => setIsCropModalOpen(false)} 
+            title={t('crop')}
+            footer={
+                <div className="flex flex-wrap gap-3 justify-center">
+                    <button 
+                        type="button"
+                        onClick={handleResetCrop}
+                        className="bg-gray-700 hover:bg-gray-600 text-white font-bold py-2 px-6 rounded-lg transition-colors"
+                    >
+                        {t('resetCrop')}
+                    </button>
+                    <button 
+                        type="button"
+                        onClick={handleFullSize}
+                        className="bg-gray-700 hover:bg-gray-600 text-white font-bold py-2 px-6 rounded-lg transition-colors"
+                    >
+                        {t('fullSize')}
+                    </button>
+                    <button 
+                        type="button"
+                        onClick={getCroppedImg}
+                        className="bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2 px-8 rounded-lg transition-colors"
+                    >
+                        {t('done')}
+                    </button>
+                </div>
+            }
+        >
             <div className="flex flex-col items-center">
                 {originalImage && (
                     <ReactCrop
@@ -863,26 +935,6 @@ export default function AdminPage() {
                         />
                     </ReactCrop>
                 )}
-                <div className="mt-6 flex flex-wrap gap-3 justify-center">
-                    <button 
-                        onClick={handleResetCrop}
-                        className="bg-gray-700 hover:bg-gray-600 text-white font-bold py-2 px-6 rounded-lg transition-colors"
-                    >
-                        {t('resetCrop')}
-                    </button>
-                    <button 
-                        onClick={handleFullSize}
-                        className="bg-gray-700 hover:bg-gray-600 text-white font-bold py-2 px-6 rounded-lg transition-colors"
-                    >
-                        {t('fullSize')}
-                    </button>
-                    <button 
-                        onClick={getCroppedImg}
-                        className="bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2 px-8 rounded-lg transition-colors"
-                    >
-                        {t('done')}
-                    </button>
-                </div>
             </div>
         </Modal>
       </div>

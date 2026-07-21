@@ -1,7 +1,7 @@
 import React from 'react';
 import { XIcon } from './Icons';
 
-export default function Modal({ isOpen, onClose, title, children }) {
+export default function Modal({ isOpen, onClose, title, children, footer }) {
     if (!isOpen) {
         return null;
     }
@@ -29,6 +29,13 @@ export default function Modal({ isOpen, onClose, title, children }) {
                 <div className="p-6 overflow-y-auto">
                     {children}
                 </div>
+
+                {/* Modal Footer */}
+                {footer && (
+                    <div className="p-4 border-t border-gray-700 bg-gray-800 rounded-b-lg">
+                        {footer}
+                    </div>
+                )}
             </div>
         </div>
     );
