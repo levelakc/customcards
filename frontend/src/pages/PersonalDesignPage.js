@@ -134,59 +134,57 @@ export default function PersonalDesignPage() {
             canvas.width = img.width;
             canvas.height = img.height;
             const ctx = canvas.getContext('2d');
+            
+            // 1. Draw original grayscale
+            ctx.filter = 'grayscale(100%)';
             ctx.drawImage(img, 0, 0);
 
+            // 2. Create inverted + blurred version on a second canvas
+            const canvasB = document.createElement('canvas');
+            canvasB.width = img.width;
+            canvasB.height = img.height;
+            const ctxB = canvasB.getContext('2d');
+            
+            // Blur radius determines line thickness. 
+            let blurRadius = 4;
+            if (pencilMode === 'light') blurRadius = 2; // thinner lines
+            if (pencilMode === 'dark') blurRadius = 8;  // thicker, bolder lines
+            
+            ctxB.filter = `grayscale(100%) invert(100%) blur(${blurRadius}px)`;
+            ctxB.drawImage(img, 0, 0);
+
+            // 3. Blend them using Color Dodge (creates the sketch effect)
+            ctx.globalCompositeOperation = 'color-dodge';
+            ctx.drawImage(canvasB, 0, 0);
+
+            // 4. Thresholding to remove white background and color the lines
             const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
             const data = imageData.data;
-            const width = canvas.width;
-            const height = canvas.height;
-            const grayscale = new Uint8Array(width * height);
             
-            // First pass: convert to grayscale and clear alpha
-            for (let i = 0; i < width * height; i++) {
-                const r = data[i * 4];
-                const g = data[i * 4 + 1];
-                const b = data[i * 4 + 2];
-                const alpha = data[i * 4 + 3];
-                grayscale[i] = alpha === 0 ? 255 : (r + g + b) / 3;
-                data[i * 4 + 3] = 0; // default to transparent
-            }
-
-            // Second pass: Edge detection and shading
-            for (let y = 0; y < height - 1; y++) {
-                for (let x = 0; x < width - 1; x++) {
-                    const idx = y * width + x;
-                    const dataIdx = idx * 4;
-                    const current = grayscale[idx];
+            for (let i = 0; i < data.length; i += 4) {
+                const r = data[i]; // r = g = b (grayscale)
+                
+                if (pencilMode === 'detailed') {
+                    // Keep smooth shading, but make background transparent
+                    data[i] = 0; data[i+1] = 0; data[i+2] = 0;
+                    data[i+3] = 255 - r; 
+                } else {
+                    let threshold = 230; // Anything darker than 230 becomes a line
+                    if (pencilMode === 'light') threshold = 240; // Picks up faint lines
+                    if (pencilMode === 'dark') threshold = 200;  // Only very dark lines
                     
-                    if (pencilMode === 'detailed') {
-                        data[dataIdx] = 0; data[dataIdx + 1] = 0; data[dataIdx + 2] = 0;
-                        data[dataIdx + 3] = 255 - current;
+                    if (r > threshold) {
+                        data[i+3] = 0; // transparent background
                     } else {
-                        const right = grayscale[idx + 1];
-                        const bottom = grayscale[idx + width];
-                        const edge = Math.abs(current - right) + Math.abs(current - bottom);
-                        
-                        let edgeThresh = 20;
-                        let solidThresh = 100;
-                        
-                        if (pencilMode === 'light') {
-                            edgeThresh = 30;
-                            solidThresh = 50;
-                        } else if (pencilMode === 'dark') {
-                            edgeThresh = 10;
-                            solidThresh = 150;
-                        }
-                        
-                        if (edge > edgeThresh || current < solidThresh) {
-                            data[dataIdx] = 0; data[dataIdx + 1] = 0; data[dataIdx + 2] = 0;
-                            data[dataIdx + 3] = 255;
-                        }
+                        data[i] = 0; data[i+1] = 0; data[i+2] = 0;
+                        data[i+3] = 255; // solid black line
                     }
                 }
             }
             
+            ctx.globalCompositeOperation = 'source-over'; // reset
             ctx.putImageData(imageData, 0, 0);
+            
             setPencilImage(canvas.toDataURL('image/png'));
         };
         img.src = baseCroppedImage;
