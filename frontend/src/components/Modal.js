@@ -26,7 +26,7 @@ export default function Modal({ isOpen, onClose, title, children, footer }) {
                 </div>
 
                 {/* Modal Body (Scrollable) */}
-                <div className="p-6 overflow-y-auto">
+                <div className="p-6 overflow-y-auto flex-1 min-h-0">
                     {children}
                 </div>
 
