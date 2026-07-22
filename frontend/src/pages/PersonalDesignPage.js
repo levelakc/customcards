@@ -400,7 +400,7 @@ export default function PersonalDesignPage() {
                                 src={originalImage} 
                                 alt="Original" 
                                 onLoad={onImageLoad}
-                                className="max-w-full max-h-[45vh] md:max-h-[60vh]"
+                                className="max-w-full h-auto"
                             />
                         </ReactCrop>
                     )}
