@@ -65,10 +65,10 @@ export const CartProvider = ({ children }) => {
                 guestInfo, // Include guestInfo
             };
 
-            await api.addOrder(orderData, token);
+            const createdOrder = await api.addOrder(orderData, token);
             
             clearCart();
-            return { success: true };
+            return { success: true, orderId: createdOrder._id };
         } catch (error) {
             console.error("Failed to create order:", error);
             return { success: false, error: error.message };

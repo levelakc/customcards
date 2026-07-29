@@ -339,10 +339,13 @@ export const updateSiteSettings = async (settingsData, token) => {
 };
 
 // --- NEW PAYMENT FUNCTIONS ---
-export const processMakePayment = async (paymentData, token) => {
-    const response = await fetch(`${BASE_URL}/api/payment/make`, {
+export const initiatePayPlusPayment = async (paymentData, token) => {
+    const response = await fetch(`${BASE_URL}/api/payment/initiate`, {
         method: 'POST',
-        headers: { ...getAuthHeaders(token), ...getLanguageHeaders() },
+        headers: {
+            ...getAuthHeaders(token),
+            ...getLanguageHeaders()
+        },
         body: JSON.stringify(paymentData),
     });
     const data = await response.json();

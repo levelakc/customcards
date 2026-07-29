@@ -34,25 +34,20 @@ const CheckoutForm = ({ guestInfo }) => {
                 throw new Error(orderResult.error || 'Failed to save order.');
             }
 
-            // 2. Process payment with Make.com
-            // We send the order details (or just the latest order) and payment method
+            // 2. Process payment with PayPlus
+            // We send the order ID and amount to the backend to generate a PayPlus payment page URL
             const paymentData = {
-                paymentMethod,
-                orderDetails: {
-                    items: cartItems,
-                    guestInfo,
-                    messageToDesigner,
-                    totalAmount: cartItems.reduce((sum, item) => sum + item.price * item.quantity, 0) + DELIVERY_FEE_ILS
-                }
+                orderId: orderResult.orderId, // Ensure your createOrder function returns the newly created order ID
+                amount: cartItems.reduce((sum, item) => sum + item.price * item.quantity, 0) + DELIVERY_FEE_ILS
             };
 
-            const result = await api.processMakePayment(paymentData, token);
+            const result = await api.initiatePayPlusPayment(paymentData, token);
 
-            if (result.url) {
-                // Redirect user to the Make.com webhook / payment page
-                window.location.href = result.url;
+            if (result.payment_page_link) {
+                // Redirect user to the PayPlus payment page
+                window.location.href = result.payment_page_link;
             } else {
-                // If no URL returned, assume success or manual handle (unlikely given requirement)
+                // Fallback if no URL returned (e.g., if total was 0, though unlikely here)
                 navigate('order-success');
             }
         } catch (error) {
