@@ -228,6 +228,25 @@ export default function PersonalDesignPage() {
                             isDraggable={true}
                             showTransformHandles={true}
                         />
+                        {uploadedImage && (
+                            <div className="mt-8 p-4 bg-gray-900 rounded-xl border border-gray-700">
+                                <label className="block text-lg font-bold text-white mb-2 text-center">{t('pencilIntensity')}</label>
+                                <div className="px-4 py-2">
+                                    <input
+                                        type="range"
+                                        min="1"
+                                        max="100"
+                                        value={pencilIntensity}
+                                        onChange={(e) => setPencilIntensity(parseInt(e.target.value))}
+                                        className="w-full h-2 bg-gray-700 rounded-lg appearance-none cursor-pointer range-lg"
+                                    />
+                                    <div className="flex justify-between text-xs text-gray-400 mt-2">
+                                        <span>חלש (מעט קווים)</span>
+                                        <span>חזק (מלא קווים)</span>
+                                    </div>
+                                </div>
+                            </div>
+                        )}
                     </div>
                     <div className="flex flex-col space-y-6">
                         <h1 className="text-4xl font-extrabold text-center font-dancing">{t('designYourCardTitle')}</h1>
@@ -289,26 +308,6 @@ export default function PersonalDesignPage() {
                                 )}
                             </div>
                         </div>
-                        
-                        {uploadedImage && (
-                            <div className="mt-8 p-4 bg-gray-900 rounded-xl border border-gray-700">
-                                <label className="block text-lg font-bold text-white mb-2 text-center">{t('pencilIntensity')}</label>
-                                <div className="px-4 py-2">
-                                    <input
-                                        type="range"
-                                        min="1"
-                                        max="100"
-                                        value={pencilIntensity}
-                                        onChange={(e) => setPencilIntensity(parseInt(e.target.value))}
-                                        className="w-full h-2 bg-gray-700 rounded-lg appearance-none cursor-pointer range-lg"
-                                    />
-                                    <div className="flex justify-between text-xs text-gray-400 mt-2">
-                                        <span>חלש (מעט קווים)</span>
-                                        <span>חזק (מלא קווים)</span>
-                                    </div>
-                                </div>
-                            </div>
-                        )}
 
                         {uploadedImage && (
                             <div className="space-y-4 glass-panel p-6 border-gold-500/20">

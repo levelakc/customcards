@@ -717,21 +717,6 @@ export default function AdminPage() {
                         <div className="mb-6 p-4 bg-gray-900 rounded-lg">
                             <h3 className="text-lg font-semibold mb-2 text-center">{t('preview')}</h3>
                             
-                            {!productForm.isUpsellProduct && (
-                                <div className="flex justify-center items-center gap-2 mb-4 flex-wrap">
-                                    <span className="text-sm font-medium">{t('previewColor')}:</span>
-                                    {Object.keys(cardColorOptions).map(colorKey => (
-                                        <button
-                                            key={colorKey}
-                                            type="button"
-                                            onClick={() => setPreviewColorKey(colorKey)}
-                                            className={`px-2 py-1 text-xs rounded ${previewColorKey === colorKey ? 'bg-indigo-600 text-white' : 'bg-gray-700 text-gray-300'}`}
-                                        >
-                                            {t(cardColorOptions[colorKey].nameKey)}
-                                        </button>
-                                    ))}
-                                </div>
-                            )}
                             {productForm.isUpsellProduct ? (
                                 <WalletPreview
                                     customSvgUrl={previewUrl}
@@ -771,6 +756,24 @@ export default function AdminPage() {
                                             <span>חלש (מעט קווים)</span>
                                             <span>חזק (מלא קווים)</span>
                                         </div>
+                                    </div>
+                                </div>
+                            )}
+
+                            {!productForm.isUpsellProduct && (
+                                <div className="mt-6 mb-4">
+                                    <label className="block text-sm font-medium text-gray-300 mb-2">{t('previewColor')}</label>
+                                    <div className="flex flex-wrap gap-2">
+                                        {Object.keys(cardColorOptions).map(colorKey => (
+                                            <button
+                                                key={colorKey}
+                                                type="button"
+                                                onClick={() => setPreviewColorKey(colorKey)}
+                                                className={`px-3 py-1 text-sm rounded-md border transition-colors ${previewColorKey === colorKey ? 'border-indigo-500 bg-indigo-500/20 text-white' : 'border-gray-600 text-gray-400 hover:border-gray-400'}`}
+                                            >
+                                                {t(cardColorOptions[colorKey].nameKey)}
+                                            </button>
+                                        ))}
                                     </div>
                                 </div>
                             )}
