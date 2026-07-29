@@ -112,9 +112,16 @@ export default function PrizeWheelModal({ onClose }) {
 
         // Text positioning
         const midAngle = startAngle + segmentAngle / 2;
-        const textRadius = 35;
+        const textRadius = 28; // Closer to center so text fits
         const textX = 50 + textRadius * Math.cos(Math.PI * midAngle / 180);
         const textY = 50 + textRadius * Math.sin(Math.PI * midAngle / 180);
+
+        // Calculate rotation so text reads outwards/inwards clearly
+        let textRotation = midAngle;
+        // If on the left side of the wheel, flip it 180 so it's not upside down
+        if (midAngle > 90 && midAngle < 270) {
+            textRotation += 180;
+        }
 
         return (
             <g key={index}>
@@ -123,11 +130,11 @@ export default function PrizeWheelModal({ onClose }) {
                     x={textX} 
                     y={textY} 
                     fill={textColor} 
-                    fontSize="4" 
+                    fontSize="3.5" 
                     fontWeight="bold" 
                     textAnchor="middle" 
                     alignmentBaseline="middle"
-                    transform={`rotate(${midAngle + 90}, ${textX}, ${textY})`}
+                    transform={`rotate(${textRotation}, ${textX}, ${textY})`}
                 >
                     {prizes[index].label}
                 </text>
