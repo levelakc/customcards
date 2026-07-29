@@ -292,7 +292,7 @@ export default function PersonalDesignPage() {
                         
                         {uploadedImage && (
                             <div className="mt-8 p-4 bg-gray-900 rounded-xl border border-gray-700">
-                                <label className="block text-lg font-bold text-white mb-2 text-center">עוצמת סקיצה (Pencil Intensity)</label>
+                                <label className="block text-lg font-bold text-white mb-2 text-center">{t('pencilIntensity')}</label>
                                 <div className="px-4 py-2">
                                     <input
                                         type="range"

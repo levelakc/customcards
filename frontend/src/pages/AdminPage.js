@@ -757,7 +757,7 @@ export default function AdminPage() {
                             
                             {previewUrl && previewUrl.startsWith('blob:') && (
                                 <div className="mt-6 p-4 bg-gray-800 rounded-xl border border-gray-600">
-                                    <label className="block text-lg font-bold text-white mb-2 text-center">עוצמת סקיצה (Pencil Intensity)</label>
+                                    <label className="block text-lg font-bold text-white mb-2 text-center">{t('pencilIntensity')}</label>
                                     <div className="px-4 py-2">
                                         <input
                                             type="range"
