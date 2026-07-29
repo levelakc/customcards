@@ -15,6 +15,7 @@ const siteSettingsSchema = mongoose.Schema({
         discount: { type: Number, required: true },
         probability: { type: Number, required: true }
     }],
+    isPrizeWheelEnabled: { type: Boolean, default: false },
 }, { timestamps: true });
 
 const SiteSettings = mongoose.model('SiteSettings', siteSettingsSchema);

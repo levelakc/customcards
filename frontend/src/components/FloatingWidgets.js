@@ -1,11 +1,13 @@
 import React, { useState } from 'react';
 import { useRouter } from '../contexts/RouterContext';
 import { useTranslation } from 'react-i18next';
+import { useSiteSettings } from '../contexts/SiteSettingsContext';
 import PrizeWheelModal from './PrizeWheelModal'; // We will create this next
 
 export default function FloatingWidgets() {
     const { navigate } = useRouter();
     const { t } = useTranslation();
+    const { settings } = useSiteSettings();
     const [isWheelOpen, setIsWheelOpen] = useState(false);
 
     const phoneNumber = "972512345678"; // Use international format without '+' or '0'
@@ -17,20 +19,22 @@ export default function FloatingWidgets() {
             <div className="fixed bottom-5 left-5 z-40 flex flex-col gap-4 items-center">
                 
                 {/* Prize Wheel Button */}
-                <button 
-                    onClick={() => setIsWheelOpen(true)}
-                    className="relative bg-gradient-to-r from-yellow-400 via-yellow-500 to-yellow-600 hover:from-yellow-500 hover:to-yellow-700 text-white rounded-full p-3 shadow-[0_0_15px_rgba(234,179,8,0.5)] transition-transform transform hover:scale-110 border border-yellow-200"
-                    title={t('spinToWin') || 'Spin to Win!'}
-                >
-                    <div className="absolute -top-1 -right-1 flex h-4 w-4">
-                        <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span>
-                        <span className="relative inline-flex rounded-full h-4 w-4 bg-red-500"></span>
-                    </div>
-                    {/* Wheel Icon */}
-                    <svg className="w-8 h-8 text-black opacity-80" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-                    </svg>
-                </button>
+                {settings?.isPrizeWheelEnabled && (
+                    <button 
+                        onClick={() => setIsWheelOpen(true)}
+                        className="relative bg-gradient-to-r from-yellow-400 via-yellow-500 to-yellow-600 hover:from-yellow-500 hover:to-yellow-700 text-white rounded-full p-3 shadow-[0_0_15px_rgba(234,179,8,0.5)] transition-transform transform hover:scale-110 border border-yellow-200"
+                        title={t('spinToWin') || 'Spin to Win!'}
+                    >
+                        <div className="absolute -top-1 -right-1 flex h-4 w-4">
+                            <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span>
+                            <span className="relative inline-flex rounded-full h-4 w-4 bg-red-500"></span>
+                        </div>
+                        {/* Wheel Icon */}
+                        <svg className="w-8 h-8 text-black opacity-80" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                        </svg>
+                    </button>
+                )}
 
                 {/* Accessibility Button */}
                 <button 

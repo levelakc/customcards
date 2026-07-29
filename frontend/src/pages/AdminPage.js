@@ -141,6 +141,18 @@ function SiteSettingsPage({ products }) {
                 </div>
                 <div className="space-y-4">
                     <h3 className="text-lg font-semibold text-white border-b border-gray-700 pb-2">{t('prizeWheelSettings') || 'Prize Wheel Settings'}</h3>
+                    <div className="flex items-center space-x-3 space-x-reverse py-2">
+                        <input
+                            type="checkbox"
+                            id="isPrizeWheelEnabled"
+                            checked={localSettings.isPrizeWheelEnabled || false}
+                            onChange={(e) => setLocalSettings({ ...localSettings, isPrizeWheelEnabled: e.target.checked })}
+                            className="w-5 h-5 text-indigo-600 bg-gray-700 border-gray-600 rounded focus:ring-indigo-500"
+                        />
+                        <label htmlFor="isPrizeWheelEnabled" className="text-white font-medium">
+                            {t('enablePrizeWheel') || 'Enable Prize Wheel'}
+                        </label>
+                    </div>
                     {localSettings.wheelPrizes?.map((prize, index) => (
                         <div key={index} className="flex flex-col md:flex-row gap-2 items-center bg-gray-900 p-2 rounded">
                             <input 
@@ -170,7 +182,7 @@ function SiteSettingsPage({ products }) {
                             </div>
                         </div>
                     ))}
-                    <button type="button" onClick={() => handleSettingsUpdate({ wheelPrizes: localSettings.wheelPrizes })} className="bg-indigo-600 hover:bg-indigo-700 px-4 py-2 rounded font-bold w-full">{t('savePrizes') || 'Save Prizes'}</button>
+                    <button type="button" onClick={() => handleSettingsUpdate({ wheelPrizes: localSettings.wheelPrizes, isPrizeWheelEnabled: localSettings.isPrizeWheelEnabled })} className="bg-indigo-600 hover:bg-indigo-700 px-4 py-2 rounded font-bold w-full">{t('savePrizes') || 'Save Prizes'}</button>
                 </div>
 
                 {/* --- HERO SETTINGS --- */}
