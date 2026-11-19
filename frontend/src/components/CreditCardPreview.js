@@ -30,6 +30,54 @@ const CARD_HEIGHT_MM = 53.98;
 const X_RATIO = SVG_WIDTH / CARD_WIDTH_MM;
 const Y_RATIO = SVG_HEIGHT / CARD_HEIGHT_MM;
 
+// Precomputed concentric rounded-rectangle layers for the colorful card:
+// creates a smooth, rectangular outward rainbow transition from a purple rectangular core
+// to magenta -> crimson-rose -> metallic gold -> emerald green -> cobalt blue along all 4 edges.
+const RECT_RAINBOW_STOPS = [
+    { t: 0.00, rgb: [36, 99, 200] },   // #2463c8 cobalt blue (outermost edge)
+    { t: 0.16, rgb: [31, 157, 104] },  // #1f9d68 emerald green
+    { t: 0.33, rgb: [212, 162, 42] },  // #d4a22a metallic gold
+    { t: 0.50, rgb: [201, 51, 104] },  // #c93368 crimson-rose
+    { t: 0.66, rgb: [180, 41, 156] },  // #b4299c magenta
+    { t: 0.82, rgb: [126, 34, 206] },  // #7e22ce metallic purple
+    { t: 1.00, rgb: [91, 33, 182] },   // #5b21b6 deep purple center
+];
+
+const interpolateRainbowColor = (t) => {
+    for (let i = 0; i < RECT_RAINBOW_STOPS.length - 1; i++) {
+        const a = RECT_RAINBOW_STOPS[i];
+        const b = RECT_RAINBOW_STOPS[i + 1];
+        if (t >= a.t && t <= b.t) {
+            const localT = (t - a.t) / (b.t - a.t);
+            const r = Math.round(a.rgb[0] + (b.rgb[0] - a.rgb[0]) * localT);
+            const g = Math.round(a.rgb[1] + (b.rgb[1] - a.rgb[1]) * localT);
+            const bl = Math.round(a.rgb[2] + (b.rgb[2] - a.rgb[2]) * localT);
+            return `rgb(${r},${g},${bl})`;
+        }
+    }
+    return 'rgb(91,33,182)';
+};
+
+const RECT_RAINBOW_LAYERS = (() => {
+    const steps = 36;
+    const maxInset = 64;
+    const layers = [];
+    for (let i = 0; i <= steps; i++) {
+        const t = i / steps;
+        const inset = t * maxInset;
+        const rx = Math.max(6, 20 - inset * 0.2);
+        layers.push({
+            x: inset,
+            y: inset,
+            width: SVG_WIDTH - inset * 2,
+            height: SVG_HEIGHT - inset * 2,
+            rx,
+            fill: interpolateRainbowColor(t),
+        });
+    }
+    return layers;
+})();
+
 // Simple in-memory cache for SVG content
 const svgCache = new Map();
 
@@ -424,7 +472,23 @@ const CreditCardPreview = React.memo(function CreditCardPreview({
                 <g>
                     {/* Guaranteed 100% solid opaque base so cards never appear translucent */}
                     <rect width={SVG_WIDTH} height={SVG_HEIGHT} rx="20" fill="#050505" fillOpacity="1" />
-                    <rect width={SVG_WIDTH} height={SVG_HEIGHT} rx="20" fill={cardFill} fillOpacity="1" />
+                    {cardColorKey === 'colorful' ? (
+                        <g pointerEvents="none">
+                            {RECT_RAINBOW_LAYERS.map((layer, idx) => (
+                                <rect
+                                    key={idx}
+                                    x={layer.x}
+                                    y={layer.y}
+                                    width={layer.width}
+                                    height={layer.height}
+                                    rx={layer.rx}
+                                    fill={layer.fill}
+                                />
+                            ))}
+                        </g>
+                    ) : (
+                        <rect width={SVG_WIDTH} height={SVG_HEIGHT} rx="20" fill={cardFill} fillOpacity="1" />
+                    )}
                     {cardColorKey === 'black' && (
                         <rect width={SVG_WIDTH} height={SVG_HEIGHT} rx="20" fill={`url(#${uniqueIds.blackSheen})`} pointerEvents="none" />
                     )}
