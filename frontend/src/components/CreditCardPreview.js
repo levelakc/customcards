@@ -376,9 +376,9 @@ const CreditCardPreview = React.memo(function CreditCardPreview({
                         <stop offset="100%" stopColor="#000000" stopOpacity="0" />
                     </linearGradient>
                     <linearGradient id={uniqueIds.roseGoldGradient} x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stopColor="#fda4af" /><stop offset="50%" stopColor="#fecdd3" /><stop offset="100%" stopColor="#be123c" /></linearGradient>
-                    {/* Photo-Accurate PVD Iridescent Metal Card:
-                        Deep royal violet-purple to rich magenta face, electric blue upper-right,
-                        warm amber-gold bottom-right & lower-left side glow, and thin cyan/emerald/gold top edge */}
+                    {/* Photo-Accurate PVD Iridescent Metal Card (100% linear/sideways sweeps, no circles):
+                        Deep royal violet-purple to rich magenta face, electric blue/teal top & left edge,
+                        and sleek sideways warm amber-gold sweep along the opposite right side */}
                     <linearGradient id={uniqueIds.colorfulGradient} x1="15%" y1="0%" x2="85%" y2="100%">
                         <stop offset="0%" stopColor="#3c2eb8" />
                         <stop offset="28%" stopColor="#5c28b5" />
@@ -386,25 +386,28 @@ const CreditCardPreview = React.memo(function CreditCardPreview({
                         <stop offset="86%" stopColor="#89227b" />
                         <stop offset="100%" stopColor="#9c2d64" />
                     </linearGradient>
-                    {/* Upper-right royal blue metallic sweep */}
-                    <radialGradient id={uniqueIds.colorfulTopRight} cx="90%" cy="16%" r="48%">
-                        <stop offset="0%" stopColor="#266de8" stopOpacity="0.9" />
-                        <stop offset="45%" stopColor="#433fd1" stopOpacity="0.55" />
+                    {/* Upper-right straight diagonal royal blue metallic sweep */}
+                    <linearGradient id={uniqueIds.colorfulTopRight} x1="100%" y1="0%" x2="48%" y2="52%">
+                        <stop offset="0%" stopColor="#22b878" stopOpacity="0.88" />
+                        <stop offset="10%" stopColor="#1494c8" stopOpacity="0.84" />
+                        <stop offset="28%" stopColor="#266de8" stopOpacity="0.78" />
+                        <stop offset="58%" stopColor="#433fd1" stopOpacity="0.38" />
                         <stop offset="100%" stopColor="#5c28b5" stopOpacity="0" />
-                    </radialGradient>
-                    {/* Bottom-right warm rose -> amber -> gold iridescent glow */}
-                    <radialGradient id={uniqueIds.colorfulBottomRight} cx="98%" cy="80%" r="44%">
-                        <stop offset="0%" stopColor="#ebc026" stopOpacity="0.96" />
-                        <stop offset="30%" stopColor="#dc8029" stopOpacity="0.86" />
-                        <stop offset="60%" stopColor="#b83a6d" stopOpacity="0.48" />
+                    </linearGradient>
+                    {/* Right-side sideways linear warm gold -> amber -> rose sweep (opposite side of blue/green, no circle) */}
+                    <linearGradient id={uniqueIds.colorfulBottomRight} x1="100%" y1="78%" x2="58%" y2="48%">
+                        <stop offset="0%" stopColor="#ebc026" stopOpacity="0.95" />
+                        <stop offset="18%" stopColor="#dc8029" stopOpacity="0.85" />
+                        <stop offset="44%" stopColor="#b83a6d" stopOpacity="0.5" />
+                        <stop offset="75%" stopColor="#89227b" stopOpacity="0.16" />
                         <stop offset="100%" stopColor="#89227b" stopOpacity="0" />
-                    </radialGradient>
-                    {/* Subtle lower-left warm amber/magenta side glint */}
-                    <radialGradient id={uniqueIds.colorfulBottomLeft} cx="1%" cy="74%" r="26%">
+                    </linearGradient>
+                    {/* Left-side subtle linear warm magenta-amber sheen near bottom-left edge */}
+                    <linearGradient id={uniqueIds.colorfulBottomLeft} x1="0%" y1="88%" x2="26%" y2="62%">
                         <stop offset="0%" stopColor="#d98a32" stopOpacity="0.72" />
-                        <stop offset="38%" stopColor="#b03373" stopOpacity="0.45" />
+                        <stop offset="32%" stopColor="#b03373" stopOpacity="0.45" />
                         <stop offset="100%" stopColor="#742395" stopOpacity="0" />
-                    </radialGradient>
+                    </linearGradient>
                     {/* Razor-thin PVD iridescent top rim (gold -> emerald -> cyan -> indigo) */}
                     <linearGradient id={uniqueIds.colorfulTopRim} x1="0%" y1="0%" x2="0%" y2="100%">
                         <stop offset="0%" stopColor="#dfc24a" stopOpacity="0.94" />
@@ -413,17 +416,19 @@ const CreditCardPreview = React.memo(function CreditCardPreview({
                         <stop offset="11%" stopColor="#3842c8" stopOpacity="0.25" />
                         <stop offset="18%" stopColor="#5c28b5" stopOpacity="0" />
                     </linearGradient>
-                    {/* Thin teal-cyan sheen along upper-left & upper-right side corners */}
-                    <radialGradient id={uniqueIds.colorfulCornerLeft} cx="0%" cy="6%" r="22%">
-                        <stop offset="0%" stopColor="#28bf7e" stopOpacity="0.92" />
-                        <stop offset="38%" stopColor="#1688c2" stopOpacity="0.62" />
+                    {/* Thin straight teal-cyan-blue sweep along left edge */}
+                    <linearGradient id={uniqueIds.colorfulCornerLeft} x1="0%" y1="18%" x2="22%" y2="28%">
+                        <stop offset="0%" stopColor="#22b878" stopOpacity="0.9" />
+                        <stop offset="16%" stopColor="#1494c8" stopOpacity="0.72" />
+                        <stop offset="45%" stopColor="#2a56d4" stopOpacity="0.35" />
                         <stop offset="100%" stopColor="#3c2eb8" stopOpacity="0" />
-                    </radialGradient>
-                    <radialGradient id={uniqueIds.colorfulCornerRight} cx="100%" cy="6%" r="22%">
-                        <stop offset="0%" stopColor="#28bf7e" stopOpacity="0.92" />
-                        <stop offset="38%" stopColor="#1688c2" stopOpacity="0.62" />
-                        <stop offset="100%" stopColor="#266de8" stopOpacity="0" />
-                    </radialGradient>
+                    </linearGradient>
+                    {/* Subtle thin teal-gold sheen along very bottom edge */}
+                    <linearGradient id={uniqueIds.colorfulCornerRight} x1="0%" y1="100%" x2="0%" y2="88%">
+                        <stop offset="0%" stopColor="#1292c7" stopOpacity="0.5" />
+                        <stop offset="35%" stopColor="#5c28b5" stopOpacity="0.18" />
+                        <stop offset="100%" stopColor="#742395" stopOpacity="0" />
+                    </linearGradient>
                     {/* Subtle brushed metallic luster */}
                     <linearGradient id={uniqueIds.colorfulSheen} x1="0%" y1="0%" x2="100%" y2="100%">
                         <stop offset="0%" stopColor="#ffffff" stopOpacity="0.14" />
