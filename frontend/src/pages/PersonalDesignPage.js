@@ -211,26 +211,28 @@ export default function PersonalDesignPage() {
     };
 
     return (
-        <div className="bg-gray-900 py-20 text-white">
+        <div className="luxury-spotlight-bg py-20 text-white">
             <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-12 items-start">
                     <div>
-                        <CreditCardPreview 
-                            cardColorKey={cardColor}
-                            engravingColorKey={engravingColor}
-                            logoUrl={uploadedImage}
-                            scale={scale}
-                            rotation={rotation}
-                            position={position}
-                            onPositionChange={setPosition}
-                            onScaleChange={setScale}
-                            onRotationChange={setRotation}
-                            isDraggable={true}
-                            showTransformHandles={true}
-                        />
+                        <div className="rounded-2xl p-6 sm:p-8 border border-gold-500/35 shadow-[0_14px_40px_rgba(0,0,0,0.5)]" style={{ background: 'radial-gradient(ellipse at center, rgba(212, 175, 55, 0.16) 0%, #2c2923 55%, #1d1b17 100%)' }}>
+                            <CreditCardPreview 
+                                cardColorKey={cardColor}
+                                engravingColorKey={engravingColor}
+                                logoUrl={uploadedImage}
+                                scale={scale}
+                                rotation={rotation}
+                                position={position}
+                                onPositionChange={setPosition}
+                                onScaleChange={setScale}
+                                onRotationChange={setRotation}
+                                isDraggable={true}
+                                showTransformHandles={true}
+                            />
+                        </div>
                         {uploadedImage && (
-                            <div className="mt-8 p-4 bg-gray-900 rounded-xl border border-gray-700">
-                                <label className="block text-lg font-bold text-white mb-2 text-center">{t('pencilIntensity')}</label>
+                            <div className="mt-6 p-5 glass-panel">
+                                <label className="block text-lg font-bold text-gold-300 mb-2 text-center">{t('pencilIntensity')}</label>
                                 <div className="px-4 py-2">
                                     <input
                                         type="range"
@@ -238,9 +240,9 @@ export default function PersonalDesignPage() {
                                         max="100"
                                         value={pencilIntensity}
                                         onChange={(e) => setPencilIntensity(parseInt(e.target.value))}
-                                        className="w-full h-2 bg-gray-700 rounded-lg appearance-none cursor-pointer range-lg"
+                                        className="w-full h-2 bg-gray-700 accent-gold-400 rounded-lg appearance-none cursor-pointer range-lg"
                                     />
-                                    <div className="flex justify-between text-xs text-gray-400 mt-2">
+                                    <div className="flex justify-between text-xs text-gray-300 mt-2">
                                         <span>חלש (מעט קווים)</span>
                                         <span>חזק (מלא קווים)</span>
                                     </div>
@@ -249,16 +251,16 @@ export default function PersonalDesignPage() {
                         )}
                     </div>
                     <div className="flex flex-col space-y-6">
-                        <h1 className="text-4xl font-extrabold text-center font-dancing">{t('designYourCardTitle')}</h1>
+                        <h1 className="text-4xl md:text-5xl font-extrabold text-center gold-gradient-text font-luxury">{t('designYourCardTitle')}</h1>
                         
                         <div>
-                            <h3 className="text-lg font-semibold mb-3">{t('chooseCardColorTitle')}</h3>
+                            <h3 className="text-lg font-semibold text-gold-300 mb-3">{t('chooseCardColorTitle')}</h3>
                             <div className="flex flex-wrap gap-3">
                                 {Object.keys(cardColorOptions).map(colorKey => (
                                     <button 
                                         key={colorKey} 
                                         onClick={() => handleCardColorChange(colorKey)} 
-                                        className={`px-4 py-2 rounded-md text-sm font-medium border-2 transition-all ${cardColor === colorKey ? 'border-indigo-500 bg-indigo-500 bg-opacity-20' : 'border-gray-600 hover:border-gray-400'}`}
+                                        className={`px-4 py-2 rounded-lg text-sm font-semibold border-2 transition-all ${cardColor === colorKey ? 'border-gold-400 bg-gold-500/20 text-gold-200 shadow-[0_0_16px_rgba(212,175,55,0.25)]' : 'border-gray-600 bg-gray-800/80 text-gray-200 hover:border-gold-500/50'}`}
                                     >
                                         {t(cardColorOptions[colorKey].nameKey)}
                                     </button>
@@ -267,13 +269,13 @@ export default function PersonalDesignPage() {
                         </div>
 
                         <div>
-                            <h3 className="text-lg font-semibold mb-3">{t('chooseEngravingColorTitle')}</h3>
+                            <h3 className="text-lg font-semibold text-gold-300 mb-3">{t('chooseEngravingColorTitle')}</h3>
                             <div className="flex flex-wrap gap-3">
                                 {cardColorOptions[cardColor].engraving.map(engraveColorKey => (
                                     <button 
                                         key={engraveColorKey} 
                                         onClick={() => setEngravingColor(engraveColorKey)} 
-                                        className={`px-4 py-2 rounded-md text-sm font-medium border-2 transition-all ${engravingColor === engraveColorKey ? 'border-indigo-500 bg-indigo-500 bg-opacity-20' : 'border-gray-600 hover:border-gray-400'}`}
+                                        className={`px-4 py-2 rounded-lg text-sm font-semibold border-2 transition-all ${engravingColor === engraveColorKey ? 'border-gold-400 bg-gold-500/20 text-gold-200 shadow-[0_0_16px_rgba(212,175,55,0.25)]' : 'border-gray-600 bg-gray-800/80 text-gray-200 hover:border-gold-500/50'}`}
                                     >
                                         {t(engravingColorNameKeys[engraveColorKey])}
                                     </button>
@@ -380,7 +382,7 @@ export default function PersonalDesignPage() {
                         </button>
                         <button 
                             onClick={getCroppedImg}
-                            className="flex-grow py-3 px-4 bg-indigo-600 hover:bg-indigo-500 rounded-lg transition-colors font-medium text-white shadow-lg"
+                            className="flex-grow py-3 px-4 btn-premium btn-gold rounded-lg"
                         >
                             {t('cropAndContinue')}
                         </button>

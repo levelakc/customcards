@@ -81,19 +81,21 @@ export default function ProductPage() {
                 <div className="lg:grid lg:grid-cols-2 lg:gap-x-8 lg:items-start">
                     <div className="flex flex-col-reverse">
                         <div className="mt-6 w-full max-w-2xl mx-auto sm:px-6 lg:max-w-none lg:px-0">
-                            <CreditCardPreview 
-                                cardColorKey={selectedCardColorKey} 
-                                engravingColorKey={selectedEngravingColor} 
-                                logoUrl={product.image} 
-                            />
+                            <div className="rounded-2xl p-6 sm:p-8 border border-gold-500/35 shadow-[0_14px_40px_rgba(0,0,0,0.5)]" style={{ background: 'radial-gradient(ellipse at center, rgba(212, 175, 55, 0.16) 0%, #2c2923 55%, #1d1b17 100%)' }}>
+                                <CreditCardPreview 
+                                    cardColorKey={selectedCardColorKey} 
+                                    engravingColorKey={selectedEngravingColor} 
+                                    logoUrl={product.image} 
+                                />
+                            </div>
                         </div>
                     </div>
 
                     <div className="mt-10 px-4 sm:px-0 sm:mt-16 lg:mt-0">
-                        <h1 className="text-3xl font-extrabold tracking-tight text-white font-dancing">{product.name[i18n.language]}</h1>
+                        <h1 className="text-4xl font-extrabold tracking-tight gold-gradient-text font-luxury">{product.name[i18n.language]}</h1>
                         <div className="mt-3">
                             <h2 className="sr-only">Product information</h2>
-                            <p className="text-3xl text-white">{product.price} ₪</p>
+                            <p className="text-3xl font-bold text-gold-300">{product.price} ₪</p>
                         </div>
 
                         <div className="mt-6">
@@ -105,15 +107,15 @@ export default function ProductPage() {
                         </div>
 
                         <div className="mt-6">
-                            <h3 className="text-lg font-medium text-white">צבע כרטיס</h3>
-                            <div className="mt-2 flex items-center space-x-3">
+                            <h3 className="text-lg font-medium text-gold-300">צבע כרטיס</h3>
+                            <div className="mt-2 flex items-center gap-3">
                                 {sortedColorNames.map((colorName) => {
                                     const colorKey = nameToKeyMap[colorName];
                                     const colorClass = cardColorBgClasses[colorKey] || 'bg-gray-700';
                                     return (
                                         <button
                                             key={colorKey}
-                                            className={`w-8 h-8 rounded-full border-2 ${selectedCardColorKey === colorKey ? 'border-blue-500' : 'border-transparent'} ${colorClass}`}
+                                            className={`w-9 h-9 rounded-full border-2 transition-transform hover:scale-110 ${selectedCardColorKey === colorKey ? 'border-gold-400 ring-2 ring-gold-400/50 scale-110' : 'border-white/20'} ${colorClass}`}
                                             onClick={() => {
                                                 console.log("Card color button clicked:", colorName);
                                                 handleCardColorChange(colorName);
@@ -126,15 +128,15 @@ export default function ProductPage() {
                         </div>
 
                         <div className="mt-6">
-                            <h3 className="text-lg font-medium text-white">צבע חריטה</h3>
-                            <div className="mt-2 flex items-center space-x-3">
+                            <h3 className="text-lg font-medium text-gold-300">צבע חריטה</h3>
+                            <div className="mt-2 flex items-center gap-3">
                                 {currentEngravingOptions.map((engravingKey) => {
                                     const engravingName = t(engravingColorNames[engravingKey]);
-                                    const engravingClass = engravingColorClasses[engravingKey] || 'text-gray-400';
+                                    const engravingClass = engravingColorClasses[engravingKey] || 'text-gray-300';
                                     return (
                                         <button
                                             key={engravingKey}
-                                            className={`px-3 py-1 rounded-md border-2 ${selectedEngravingColor === engravingKey ? 'border-blue-500' : 'border-transparent'} ${engravingClass}`}
+                                            className={`px-4 py-1.5 rounded-lg border-2 transition-all ${selectedEngravingColor === engravingKey ? 'border-gold-400 bg-gold-500/20 shadow-[0_0_12px_rgba(212,175,55,0.25)]' : 'border-gray-600 bg-gray-800/80 hover:border-gold-500/50'} ${engravingClass}`}
                                             onClick={() => {
                                                 console.log("Engraving color button clicked:", engravingKey);
                                                 setSelectedEngravingColor(engravingKey);

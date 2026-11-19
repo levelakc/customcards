@@ -105,12 +105,12 @@ const ProductCard = ({
         <div 
             ref={cardRef}
             onClick={handleClick}
-            className="bg-gray-800/90 border border-white/5 rounded-xl shadow-[0_8px_32px_0_rgba(0,0,0,0.37)] group flex flex-col h-full cursor-pointer relative overflow-hidden transition-all duration-500 hover:shadow-[0_0_30px_rgba(212,175,55,0.15)] transform hover:-translate-y-2"
+            className="luxury-card-surface rounded-2xl group flex flex-col h-full cursor-pointer relative overflow-hidden transition-all duration-500 transform hover:-translate-y-2"
         >
             {/* Share Button Overlay */}
             <button 
                 onClick={handleShare}
-                className="absolute top-4 right-4 z-20 p-2.5 bg-black/40 backdrop-blur-md border border-white/10 rounded-xl text-white opacity-0 group-hover:opacity-100 transition-all duration-300 hover:bg-gold-500 hover:text-black hover:border-gold-500 shadow-xl"
+                className="absolute top-4 right-4 z-20 p-2.5 bg-black/50 backdrop-blur-md border border-gold-500/30 rounded-xl text-white opacity-0 group-hover:opacity-100 transition-all duration-300 hover:bg-gold-500 hover:text-black hover:border-gold-400 shadow-xl"
                 title={t('share')}
             >
                 <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -118,7 +118,7 @@ const ProductCard = ({
                 </svg>
             </button>
             <div 
-                className="transition-transform duration-300 md:group-hover:-translate-y-1 relative z-0 p-4"
+                className="transition-transform duration-300 md:group-hover:-translate-y-1 relative z-0 p-4 bg-gradient-to-b from-gold-400/[0.09] via-transparent to-transparent"
                 style={{ transform: 'translateZ(0)' }}
             >
                 <CreditCardPreview 
@@ -139,13 +139,13 @@ const ProductCard = ({
                     <h3 className="text-lg font-bold text-white line-clamp-2 leading-snug">{productName.replace(/<br\s*\/?>/gi, ' ')}</h3>
                 </div>
                 <div className="h-10 flex items-start justify-center overflow-hidden mb-2">
-                    <p className="text-gray-400 text-xs line-clamp-2 leading-relaxed">{productDescription}</p>
+                    <p className="text-gray-300 text-xs line-clamp-2 leading-relaxed">{productDescription}</p>
                 </div>
                 <div className="flex-grow"></div>
-                <p className="text-white font-black text-lg mb-3">₪{product.price}</p>
+                <p className="text-gold-300 font-black text-xl mb-3 tracking-wide">₪{product.price}</p>
                 <button 
                     onClick={handleButtonClick}
-                    className="btn-premium btn-gold py-2 w-full text-sm"
+                    className="btn-premium btn-gold py-2.5 w-full text-sm"
                 >
                     {t('viewDetailsButton')}
                 </button>

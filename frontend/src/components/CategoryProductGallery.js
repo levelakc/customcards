@@ -35,20 +35,21 @@ export default function CategoryProductGallery() {
     }
 
     return (
-        <div className="bg-gray-800 py-20">
-            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="bg-[#1b1a17] py-20 border-b border-gold-500/20">
+            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
                 <h2 
-                    className="text-3xl font-extrabold text-white text-center mb-16 cursor-pointer"
+                    className="text-4xl md:text-5xl font-extrabold gold-gradient-text text-center mb-16 cursor-pointer"
                     onClick={() => navigate('all-categories')} 
                 >
-                                                {t('allCategoriesTitle')}                </h2>
+                    {t('allCategoriesTitle')}
+                </h2>
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
                     {categoriesWithRandomProduct.map(({ category, product }) => {
                         const categoryName = category.name?.[currentLanguage] || category.name?.he || category.name?.en || category.name || '';
                         return (
-                            <div key={category._id} className="overflow-hidden flex flex-col cursor-pointer transition-all duration-500 hover:shadow-[0_0_30px_rgba(212,175,55,0.1)] rounded-xl" onClick={() => navigate('category', { id: category._id })}>
-                                <div className="p-4 flex flex-col items-center justify-center">
-                                    <h3 className="text-2xl font-bold text-white text-center mb-4 font-dancing">{categoryName}</h3>
+                            <div key={category._id} className="glass-panel overflow-hidden flex flex-col cursor-pointer transition-all duration-500 hover:border-gold-400/60 hover:shadow-[0_0_32px_rgba(212,175,55,0.2)] rounded-2xl" onClick={() => navigate('category', { id: category._id })}>
+                                <div className="pt-6 px-4 pb-2 flex flex-col items-center justify-center">
+                                    <h3 className="text-2xl font-bold text-gold-300 text-center mb-2 font-luxury">{categoryName}</h3>
                                 </div>
                                 {product && (
                                     <div className="p-4">
@@ -60,10 +61,10 @@ export default function CategoryProductGallery() {
                                         )}
                                     </div>
                                 )}
-                                <div className="p-6 flex flex-col items-center justify-center flex-grow">
+                                <div className="p-5 pt-2 flex flex-col items-center justify-center flex-grow">
                                     <button
                                         onClick={(e) => { e.stopPropagation(); navigate('category', { id: category._id }); }} // Added e.stopPropagation()
-                                        className="btn-premium btn-gold w-full text-sm"
+                                        className="btn-premium btn-obsidian w-full text-sm"
                                     >
                                         {t('viewCategory')}
                                     </button>

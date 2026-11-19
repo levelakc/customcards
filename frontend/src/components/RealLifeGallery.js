@@ -77,25 +77,25 @@ export default function RealLifeGallery() {
     }
 
     return (
-        <div className="bg-gray-800 py-20">
-            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                <h2 className="text-3xl font-extrabold text-white text-center mb-16">
+        <div className="bg-[#1b1a17] py-20 border-t border-b border-gold-500/20">
+            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+                <h2 className="text-4xl md:text-5xl font-extrabold gold-gradient-text text-center mb-16">
                     {t('ourRealLifeWork')}
                 </h2>
                 {loading ? (
-                     <div className="text-center text-gray-400">{t('loadingGallery')}</div>
+                     <div className="text-center text-gray-300">{t('loadingGallery')}</div>
                 ) : (
-                    <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+                    <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-5">
                         {images.map((url, index) => (
                             <div 
                                 key={index} 
-                                className="group cursor-pointer overflow-hidden rounded-lg shadow-lg"
+                                className="group cursor-pointer overflow-hidden rounded-xl border border-gold-500/25 hover:border-gold-400/70 shadow-lg hover:shadow-[0_0_24px_rgba(212,175,55,0.25)] transition-all duration-300"
                                 onClick={() => setSelectedImage(url)}
                             >
                                 <img 
                                     src={url} 
                                     alt={`Real life example ${index + 1}`}
-                                    className="w-full h-64 object-cover transform group-hover:scale-110 transition-transform duration-300"
+                                    className="w-full h-64 object-cover transform group-hover:scale-110 transition-transform duration-500"
                                     loading="lazy"
                                 />
                             </div>

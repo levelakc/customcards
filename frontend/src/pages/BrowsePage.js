@@ -98,7 +98,7 @@ export default function BrowsePage() {
                     
                     {/* Futuristic Sidebar Filters */}
                     <aside className={`${isSidebarOpen ? 'block' : 'hidden'} lg:block lg:w-80 flex-shrink-0`}>
-                        <div className="bg-gray-800/90 border border-white/5 rounded-2xl shadow-[0_8px_32px_0_rgba(0,0,0,0.37)] p-8 sticky top-28 z-30 space-y-10">
+                        <div className="glass-panel rounded-2xl p-8 sticky top-28 z-30 space-y-10">
                             
                             {/* Search Section */}
                             <div>
@@ -163,7 +163,7 @@ export default function BrowsePage() {
                                                         color === 'roseGold' ? '#b76e79' : 
                                                         '#333',
                                                     background: 
-                                                        color === 'colorful' ? 'linear-gradient(45deg, #f06, #4a90e2, #2ecc71)' : 
+                                                        color === 'colorful' ? 'linear-gradient(45deg, #2c283e 0%, #57466b 25%, #bda476 55%, #4c767d 80%, #3f5475 100%)' : 
                                                         color === 'roseGold' ? 'linear-gradient(135deg, #b76e79 0%, #ffc0cb 100%)' :
                                                         undefined
                                                 }}

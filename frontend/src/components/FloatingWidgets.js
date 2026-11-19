@@ -3,6 +3,7 @@ import { useRouter } from '../contexts/RouterContext';
 import { useTranslation } from 'react-i18next';
 import { useSiteSettings } from '../contexts/SiteSettingsContext';
 import PrizeWheelModal from './PrizeWheelModal'; // We will create this next
+import { getWhatsAppUrl } from '../config/contactConfig';
 
 export default function FloatingWidgets() {
     const { navigate } = useRouter();
@@ -10,9 +11,7 @@ export default function FloatingWidgets() {
     const { settings } = useSiteSettings();
     const [isWheelOpen, setIsWheelOpen] = useState(false);
 
-    const phoneNumber = "972512345678"; // Use international format without '+' or '0'
-    const message = "שלום, הגעתי דרך אתר VIPCard.";
-    const whatsappUrl = `https://wa.me/${phoneNumber}?text=${encodeURIComponent(message)}`;
+    const whatsappUrl = getWhatsAppUrl();
 
     return (
         <>

@@ -27,6 +27,7 @@ export default function Navbar() {
         { name: t('homePage'), page: 'home' },
         { name: t('browseProducts'), page: 'browse' },
         { name: t('realLifeGalleryTitle') || 'Gallery', page: 'home', params: { scrollTo: 'gallery' } },
+        { name: t('contactUsTitle') || 'Contact Us', page: 'home', params: { scrollTo: 'contact' } },
         { name: t('allCategoriesTitle') || 'All Categories', page: 'all-categories' },
         ...categories.map(c => ({ 
             name: c.name, 
@@ -35,8 +36,8 @@ export default function Navbar() {
         }))
     ];
 
-    const mainLinks = allNavLinks.slice(0, 4);
-    const moreLinks = allNavLinks.slice(4);
+    const mainLinks = allNavLinks.slice(0, 5);
+    const moreLinks = allNavLinks.slice(5);
     
     const cartItemCount = cartItems.reduce((sum, item) => sum + item.quantity, 0);
 
@@ -120,7 +121,7 @@ export default function Navbar() {
                                                 <p className="text-sm font-bold gold-gradient-text truncate">{user.name}</p>
                                             </div>
                                             <button onClick={() => { navigate('profile'); setIsAuthOpen(false); }} className="w-full text-right px-6 py-3 text-sm text-gray-300 hover:bg-gray-800 hover:text-gold transition-colors">{t('myProfile')}</button>
-                                            {isAdmin && <button onClick={() => { navigate('admin'); setIsAuthOpen(false); }} className="w-full text-right px-6 py-3 text-sm text-indigo-400 hover:bg-indigo-900/30 transition-colors">{t('adminPanel')}</button>}
+                                            {isAdmin && <button onClick={() => { navigate('admin'); setIsAuthOpen(false); }} className="w-full text-right px-6 py-3 text-sm text-gold-400 hover:bg-gold-500/15 transition-colors font-semibold">{t('adminPanel')}</button>}
                                             <div className="border-t border-gray-800 mt-2 pt-2">
                                                 <button onClick={() => { handleLogout(); setIsAuthOpen(false); }} className="w-full text-right px-6 py-3 text-sm text-red-400 hover:bg-gray-800 transition-colors">{t('logout')}</button>
                                             </div>
@@ -164,7 +165,7 @@ export default function Navbar() {
                             <button key={link.name} onClick={() => { navigate(link.page, link.params); setIsMenuOpen(false); }} className="text-gray-300 hover:bg-gray-800 hover:text-gold-500 block w-full text-right px-4 py-3 rounded-lg text-base font-medium transition-all">{link.name}</button>
                         ))}
                         {isAdmin && (
-                            <button onClick={() => { navigate('admin'); setIsMenuOpen(false); }} className="text-indigo-300 bg-indigo-900 bg-opacity-20 border border-indigo-800 block w-full text-right px-4 py-3 rounded-lg text-base font-bold transition-all uppercase tracking-widest mt-4">{t('adminPanel')}</button>
+                            <button onClick={() => { navigate('admin'); setIsMenuOpen(false); }} className="text-gold-300 bg-gold-500/15 border border-gold-500/40 block w-full text-right px-4 py-3 rounded-lg text-base font-bold transition-all uppercase tracking-widest mt-4">{t('adminPanel')}</button>
                         )}
                         <div className="pt-4 flex justify-between items-center px-4">
                             <LanguageSwitcher />

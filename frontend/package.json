@@ -28,6 +28,7 @@
   "scripts": {
     "start": "GENERATE_SOURCEMAP=false react-scripts start",
     "build": "GENERATE_SOURCEMAP=false react-scripts build",
+    "postbuild": "node -e \"const fs=require('fs');const path=require('path');const src=path.join('build','index.html');if(fs.existsSync(src)){fs.copyFileSync(src,path.join('build','404.html'));const homeDir=path.join('build','home');fs.mkdirSync(homeDir,{recursive:true});fs.copyFileSync(src,path.join(homeDir,'index.html'));}\"",
     "test": "react-scripts test",
     "eject": "react-scripts eject"
   },

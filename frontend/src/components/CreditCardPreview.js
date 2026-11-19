@@ -67,9 +67,10 @@ const CreditCardPreview = React.memo(function CreditCardPreview({
             blackGradient: `black-gradient-${randomString}`,
             roseGoldGradient: `roseGold-gradient-${randomString}`,
             colorfulGradient: `colorful-gradient-${randomString}`,
-            shimmerFilter: `metallic-shimmer-filter-${randomString}`,
+            colorfulSheen: `colorful-sheen-${randomString}`,
+            blackSheen: `black-sheen-${randomString}`,
+            metallicSheen: `metallic-sheen-${randomString}`,
             spotlight: `spotlight-reflection-gradient-${randomString}`,
-            blackSpotlight: `black-card-spotlight-gradient-${randomString}`,
             silverSpotlight: `silver-card-spotlight-gradient-${randomString}`,
             simStripes: `sim-stripes-gradient-${randomString}`,
         };
@@ -352,22 +353,52 @@ const CreditCardPreview = React.memo(function CreditCardPreview({
                         <stop offset="75%" stopColor="#ffbf00" />
                         <stop offset="100%" stopColor="#b8860b" />
                     </linearGradient>
-                    <linearGradient id={uniqueIds.blackGradient} x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stopColor="#1f2937" /><stop offset="50%" stopColor="#0f172a" /><stop offset="100%" stopColor="#000000" /></linearGradient>
+                    {/* Solid Deep Jet-Black Brushed Metal Finish */}
+                    <linearGradient id={uniqueIds.blackGradient} x1="0%" y1="0%" x2="100%" y2="100%">
+                        <stop offset="0%" stopColor="#1e1e20" />
+                        <stop offset="28%" stopColor="#0c0c0e" />
+                        <stop offset="56%" stopColor="#040404" />
+                        <stop offset="82%" stopColor="#141416" />
+                        <stop offset="100%" stopColor="#020202" />
+                    </linearGradient>
+                    {/* Crisp Metallic Satin Highlight for Solid Black Card (no milky washout) */}
+                    <linearGradient id={uniqueIds.blackSheen} x1="0%" y1="0%" x2="100%" y2="100%">
+                        <stop offset="0%" stopColor="#ffffff" stopOpacity="0.08" />
+                        <stop offset="32%" stopColor="#ffffff" stopOpacity="0" />
+                        <stop offset="48%" stopColor="#fff8e1" stopOpacity="0.11" />
+                        <stop offset="58%" stopColor="#ffffff" stopOpacity="0" />
+                        <stop offset="100%" stopColor="#000000" stopOpacity="0" />
+                    </linearGradient>
                     <linearGradient id={uniqueIds.roseGoldGradient} x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stopColor="#fda4af" /><stop offset="50%" stopColor="#fecdd3" /><stop offset="100%" stopColor="#be123c" /></linearGradient>
-                    <linearGradient id={uniqueIds.colorfulGradient} x1="0%" y1="100%" x2="100%" y2="0%"><stop offset="0%" stopColor="#6b21a8" /><stop offset="20%" stopColor="#c026d3" /><stop offset="40%" stopColor="#db2777" /><stop offset="60%" stopColor="#ca8a04" /><stop offset="80%" stopColor="#16a34a" /><stop offset="100%" stopColor="#2563eb" /></linearGradient>
-                    
-                    {!(isCarousel || isThumbnail) && (
-                        <filter id={uniqueIds.shimmerFilter} x="-20%" y="-20%" width="140%" height="140%">
-                            <feSpecularLighting in="SourceAlpha" surfaceScale="2" specularConstant="0.4" specularExponent="40" lightingColor="#ffffff" result="specular">
-                                <feDistantLight azimuth="225" elevation="45" />
-                            </feSpecularLighting>
-                            <feComposite in="SourceGraphic" in2="specular" operator="arithmetic" k1="0" k2="1" k3="0.2" k4="0" />
-                        </filter>
-                    )}
+                    {/* Luxury PVD Anodized Iridescent Titanium / Oil-Slick Metallic Finish */}
+                    <linearGradient id={uniqueIds.colorfulGradient} x1="0%" y1="100%" x2="100%" y2="0%">
+                        <stop offset="0%" stopColor="#2c283e" />
+                        <stop offset="18%" stopColor="#57466b" />
+                        <stop offset="36%" stopColor="#856b60" />
+                        <stop offset="54%" stopColor="#bda476" />
+                        <stop offset="72%" stopColor="#4c767d" />
+                        <stop offset="88%" stopColor="#3f5475" />
+                        <stop offset="100%" stopColor="#26293d" />
+                    </linearGradient>
+                    {/* Brushed PVD Specular Refraction Overlay for Colorful Card */}
+                    <linearGradient id={uniqueIds.colorfulSheen} x1="0%" y1="0%" x2="100%" y2="100%">
+                        <stop offset="0%" stopColor="#ffffff" stopOpacity="0.18" />
+                        <stop offset="28%" stopColor="#f5e6c4" stopOpacity="0.06" />
+                        <stop offset="48%" stopColor="#ffffff" stopOpacity="0.28" />
+                        <stop offset="65%" stopColor="#0d0e14" stopOpacity="0.22" />
+                        <stop offset="84%" stopColor="#d8e6f2" stopOpacity="0.14" />
+                        <stop offset="100%" stopColor="#000000" stopOpacity="0.28" />
+                    </linearGradient>
+                    {/* Lightweight Brushed Metallic Sheen (keeps non-black cards bright and realistic) */}
+                    <linearGradient id={uniqueIds.metallicSheen} x1="0%" y1="0%" x2="100%" y2="100%">
+                        <stop offset="0%" stopColor="#ffffff" stopOpacity="0.2" />
+                        <stop offset="35%" stopColor="#ffffff" stopOpacity="0.04" />
+                        <stop offset="55%" stopColor="#fff8e1" stopOpacity="0.14" />
+                        <stop offset="100%" stopColor="#000000" stopOpacity="0.1" />
+                    </linearGradient>
                     
                     <radialGradient id={uniqueIds.spotlight} cx="25%" cy="25%" r="60%"><stop offset="0%" stopColor="white" stopOpacity="0.2" /><stop offset="100%" stopColor="white" stopOpacity="0" /></radialGradient>
-                    <radialGradient id={uniqueIds.blackSpotlight} cx="25%" cy="25%" r="60%"><stop offset="0%" stopColor="white" stopOpacity="0.08" /><stop offset="100%" stopColor="white" stopOpacity="0" /></radialGradient>
-                    <radialGradient id={uniqueIds.silverSpotlight} cx="25%" cy="25%" r="60%"><stop offset="0%" stopColor="white" stopOpacity="0.7" /><stop offset="100%" stopColor="white" stopOpacity="0" /></radialGradient>
+                    <radialGradient id={uniqueIds.silverSpotlight} cx="25%" cy="25%" r="60%"><stop offset="0%" stopColor="white" stopOpacity="0.55" /><stop offset="100%" stopColor="white" stopOpacity="0" /></radialGradient>
 
                     <filter id={uniqueIds.whiteMaskFilter}>
                         <feColorMatrix type="matrix" values="0 0 0 0 1
@@ -389,8 +420,30 @@ const CreditCardPreview = React.memo(function CreditCardPreview({
                         </mask>
                     )}
                 </defs>
-                <g filter={(isCarousel || isThumbnail) ? undefined : `url(#${uniqueIds.shimmerFilter})`}>
-                    <rect width={SVG_WIDTH} height={SVG_HEIGHT} rx="20" fill={cardFill} />
+                <g>
+                    {/* Guaranteed 100% solid opaque base so cards never appear translucent */}
+                    <rect width={SVG_WIDTH} height={SVG_HEIGHT} rx="20" fill="#050505" fillOpacity="1" />
+                    <rect width={SVG_WIDTH} height={SVG_HEIGHT} rx="20" fill={cardFill} fillOpacity="1" />
+                    {cardColorKey === 'black' && (
+                        <rect width={SVG_WIDTH} height={SVG_HEIGHT} rx="20" fill={`url(#${uniqueIds.blackSheen})`} pointerEvents="none" />
+                    )}
+                    {cardColorKey === 'colorful' && (
+                        <rect width={SVG_WIDTH} height={SVG_HEIGHT} rx="20" fill={`url(#${uniqueIds.colorfulSheen})`} pointerEvents="none" />
+                    )}
+                    {cardColorKey !== 'colorful' && cardColorKey !== 'black' && (
+                        <rect width={SVG_WIDTH} height={SVG_HEIGHT} rx="20" fill={`url(#${uniqueIds.metallicSheen})`} pointerEvents="none" />
+                    )}
+                    <rect
+                        x="0.75"
+                        y="0.75"
+                        width={SVG_WIDTH - 1.5}
+                        height={SVG_HEIGHT - 1.5}
+                        rx="19.5"
+                        fill="none"
+                        stroke={cardColorKey === 'black' ? 'rgba(212,175,55,0.42)' : 'rgba(255,248,220,0.28)'}
+                        strokeWidth="1.25"
+                        pointerEvents="none"
+                    />
                     {finalLogoUrl && (
                         <g>
                             <g transform={`translate(${logoX}, ${logoY}) scale(${scale}) rotate(${rotation}, ${unscaledLogoSvgWidth / 2}, ${unscaledLogoSvgHeight / 2})`} style={{ willChange: 'transform' }}>
@@ -401,9 +454,8 @@ const CreditCardPreview = React.memo(function CreditCardPreview({
                             ))}
                         </g>
                     )}
-                    {!(isCarousel || isThumbnail) && cardColorKey === 'black' && ( <rect width={SVG_WIDTH} height={SVG_HEIGHT} rx="20" fill={`url(#${uniqueIds.blackSpotlight})`} /> )}
-                    {!(isCarousel || isThumbnail) && cardColorKey === 'silver' && ( <rect width={SVG_WIDTH} height={SVG_HEIGHT} rx="20" fill={`url(#${uniqueIds.silverSpotlight})`} /> )}
-                    {!(isCarousel || isThumbnail) && cardColorKey !== 'black' && cardColorKey !== 'silver' && ( <rect width={SVG_WIDTH} height={SVG_HEIGHT} rx="20" fill={`url(#${uniqueIds.spotlight})`} /> )}
+                    {!(isCarousel || isThumbnail) && cardColorKey === 'silver' && ( <rect width={SVG_WIDTH} height={SVG_HEIGHT} rx="20" fill={`url(#${uniqueIds.silverSpotlight})`} pointerEvents="none" /> )}
+                    {!(isCarousel || isThumbnail) && cardColorKey !== 'black' && cardColorKey !== 'silver' && ( <rect width={SVG_WIDTH} height={SVG_HEIGHT} rx="20" fill={`url(#${uniqueIds.spotlight})`} pointerEvents="none" /> )}
                 </g>
                 <path d="M40,85 h30 a5,5 0 0 1 5,5 v20 a5,5 0 0 1 -5,5 h-30 a5,5 0 0 1 -5,-5 v-20 a5,5 0 0 1 5,-5 z" fill={`url(#${uniqueIds.simStripes})`} opacity="0.9" stroke="black" strokeWidth="0.5" />
             </svg>
