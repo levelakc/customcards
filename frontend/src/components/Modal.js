@@ -1,4 +1,5 @@
 import React from 'react';
+import { createPortal } from 'react-dom';
 import { XIcon } from './Icons';
 
 export default function Modal({ isOpen, onClose, title, children, footer }) {
@@ -6,10 +7,10 @@ export default function Modal({ isOpen, onClose, title, children, footer }) {
         return null;
     }
 
-    return (
+    return createPortal(
         // The semi-transparent background overlay
         <div 
-            className="fixed inset-0 bg-black bg-opacity-75 flex justify-center items-center z-50"
+            className="fixed inset-0 bg-black bg-opacity-75 flex justify-center items-center z-[999]"
             onClick={onClose} // Close modal when clicking the background
         >
             {/* The actual modal content box */}
@@ -37,6 +38,7 @@ export default function Modal({ isOpen, onClose, title, children, footer }) {
                     </div>
                 )}
             </div>
-        </div>
+        </div>,
+        document.body
     );
 }

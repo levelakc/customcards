@@ -1,46 +1,56 @@
 import React, { useState, useEffect } from 'react';
+import { createPortal } from 'react-dom';
 import * as api from '../api/api';
 import { useTranslation } from 'react-i18next'; // Import useTranslation
 
 /**
  * A modal component for viewing an image in a larger overlay.
- * @param {object} props
- * @param {string|null} props.imageUrl - The URL of the image to display.
- * @param {function} props.onClose - Function to call when the modal should be closed.
+ * Uses a portal to document.body so parent CSS transforms (e.g. AnimatedSection)
+ * never trap `position: fixed`.
  */
 const ImageModal = ({ imageUrl, onClose }) => {
-    // FIX: The useEffect hook is now at the top level of the component, before any returns.
     useEffect(() => {
+        if (!imageUrl) return;
+        const prevOverflow = document.body.style.overflow;
+        document.body.style.overflow = 'hidden';
+
         const handleKeyDown = (e) => {
             if (e.key === 'Escape') {
                 onClose();
             }
         };
         window.addEventListener('keydown', handleKeyDown);
-        return () => window.removeEventListener('keydown', handleKeyDown);
-    }, [onClose]);
+        return () => {
+            document.body.style.overflow = prevOverflow;
+            window.removeEventListener('keydown', handleKeyDown);
+        };
+    }, [imageUrl, onClose]);
 
-    // The early return is now after the hook, which is correct.
     if (!imageUrl) return null;
 
-    return (
+    return createPortal(
         <div 
-            className="fixed inset-0 bg-black bg-opacity-80 flex items-center justify-center z-50 transition-opacity duration-300"
+            className="fixed inset-0 bg-black/85 backdrop-blur-sm flex items-center justify-center z-[999] p-4 transition-opacity duration-300"
             onClick={onClose}
-            role="button"
-            tabIndex="0"
+            role="dialog"
+            aria-modal="true"
         >
-            <div className="relative p-4" onClick={(e) => e.stopPropagation()}>
-                <img src={imageUrl} alt="Enlarged view" className="max-w-screen-lg max-h-[90vh] object-contain rounded-lg shadow-2xl" />
+            <div className="relative flex items-center justify-center max-w-[92vw] max-h-[88vh]" onClick={(e) => e.stopPropagation()}>
+                <img
+                    src={imageUrl}
+                    alt="Enlarged view"
+                    className="max-w-[92vw] max-h-[86vh] object-contain rounded-xl shadow-2xl border border-gold-500/30"
+                />
                 <button 
                     onClick={onClose}
-                    className="absolute top-4 right-4 text-white bg-gray-800 hover:bg-gray-900 rounded-full w-10 h-10 text-2xl flex items-center justify-center transition-colors cursor-pointer z-[60] touch-action-manipulation"
+                    className="absolute -top-3 -right-3 text-white bg-black/90 hover:bg-gold-500 hover:text-black border border-gold-500/50 rounded-full w-10 h-10 text-2xl flex items-center justify-center transition-colors cursor-pointer z-[1000] shadow-lg"
                     aria-label="Close"
                 >
                     &times;
                 </button>
             </div>
-        </div>
+        </div>,
+        document.body
     );
 };
 

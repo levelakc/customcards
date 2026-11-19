@@ -30,54 +30,6 @@ const CARD_HEIGHT_MM = 53.98;
 const X_RATIO = SVG_WIDTH / CARD_WIDTH_MM;
 const Y_RATIO = SVG_HEIGHT / CARD_HEIGHT_MM;
 
-// Precomputed concentric rounded-rectangle layers for the colorful card:
-// creates a smooth, rectangular outward rainbow transition from a purple rectangular core
-// to magenta -> crimson-rose -> metallic gold -> emerald green -> cobalt blue along all 4 edges.
-const RECT_RAINBOW_STOPS = [
-    { t: 0.00, rgb: [36, 99, 200] },   // #2463c8 cobalt blue (outermost edge)
-    { t: 0.16, rgb: [31, 157, 104] },  // #1f9d68 emerald green
-    { t: 0.33, rgb: [212, 162, 42] },  // #d4a22a metallic gold
-    { t: 0.50, rgb: [201, 51, 104] },  // #c93368 crimson-rose
-    { t: 0.66, rgb: [180, 41, 156] },  // #b4299c magenta
-    { t: 0.82, rgb: [126, 34, 206] },  // #7e22ce metallic purple
-    { t: 1.00, rgb: [91, 33, 182] },   // #5b21b6 deep purple center
-];
-
-const interpolateRainbowColor = (t) => {
-    for (let i = 0; i < RECT_RAINBOW_STOPS.length - 1; i++) {
-        const a = RECT_RAINBOW_STOPS[i];
-        const b = RECT_RAINBOW_STOPS[i + 1];
-        if (t >= a.t && t <= b.t) {
-            const localT = (t - a.t) / (b.t - a.t);
-            const r = Math.round(a.rgb[0] + (b.rgb[0] - a.rgb[0]) * localT);
-            const g = Math.round(a.rgb[1] + (b.rgb[1] - a.rgb[1]) * localT);
-            const bl = Math.round(a.rgb[2] + (b.rgb[2] - a.rgb[2]) * localT);
-            return `rgb(${r},${g},${bl})`;
-        }
-    }
-    return 'rgb(91,33,182)';
-};
-
-const RECT_RAINBOW_LAYERS = (() => {
-    const steps = 36;
-    const maxInset = 64;
-    const layers = [];
-    for (let i = 0; i <= steps; i++) {
-        const t = i / steps;
-        const inset = t * maxInset;
-        const rx = Math.max(6, 20 - inset * 0.2);
-        layers.push({
-            x: inset,
-            y: inset,
-            width: SVG_WIDTH - inset * 2,
-            height: SVG_HEIGHT - inset * 2,
-            rx,
-            fill: interpolateRainbowColor(t),
-        });
-    }
-    return layers;
-})();
-
 // Simple in-memory cache for SVG content
 const svgCache = new Map();
 
@@ -115,6 +67,12 @@ const CreditCardPreview = React.memo(function CreditCardPreview({
             blackGradient: `black-gradient-${randomString}`,
             roseGoldGradient: `roseGold-gradient-${randomString}`,
             colorfulGradient: `colorful-gradient-${randomString}`,
+            colorfulTopRight: `colorful-top-right-${randomString}`,
+            colorfulBottomRight: `colorful-bottom-right-${randomString}`,
+            colorfulBottomLeft: `colorful-bottom-left-${randomString}`,
+            colorfulTopRim: `colorful-top-rim-${randomString}`,
+            colorfulCornerLeft: `colorful-corner-left-${randomString}`,
+            colorfulCornerRight: `colorful-corner-right-${randomString}`,
             colorfulSheen: `colorful-sheen-${randomString}`,
             blackSheen: `black-sheen-${randomString}`,
             metallicSheen: `metallic-sheen-${randomString}`,
@@ -418,25 +376,61 @@ const CreditCardPreview = React.memo(function CreditCardPreview({
                         <stop offset="100%" stopColor="#000000" stopOpacity="0" />
                     </linearGradient>
                     <linearGradient id={uniqueIds.roseGoldGradient} x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stopColor="#fda4af" /><stop offset="50%" stopColor="#fecdd3" /><stop offset="100%" stopColor="#be123c" /></linearGradient>
-                    {/* Realistic Metallic PVD Rainbow Finish (balanced purple center radiating into rainbow halo) */}
-                    <radialGradient id={uniqueIds.colorfulGradient} cx="50%" cy="50%" r="74%" fx="48%" fy="48%">
-                        <stop offset="0%" stopColor="#5b21b6" />
-                        <stop offset="26%" stopColor="#6d28d9" />
-                        <stop offset="42%" stopColor="#7e22ce" />
-                        <stop offset="56%" stopColor="#b4299c" />
-                        <stop offset="68%" stopColor="#c93368" />
-                        <stop offset="80%" stopColor="#d4a22a" />
-                        <stop offset="91%" stopColor="#1f9d68" />
-                        <stop offset="100%" stopColor="#2463c8" />
+                    {/* Photo-Accurate PVD Iridescent Metal Card:
+                        Deep royal violet-purple to rich magenta face, electric blue upper-right,
+                        warm amber-gold bottom-right & lower-left side glow, and thin cyan/emerald/gold top edge */}
+                    <linearGradient id={uniqueIds.colorfulGradient} x1="15%" y1="0%" x2="85%" y2="100%">
+                        <stop offset="0%" stopColor="#3c2eb8" />
+                        <stop offset="28%" stopColor="#5c28b5" />
+                        <stop offset="58%" stopColor="#742395" />
+                        <stop offset="86%" stopColor="#89227b" />
+                        <stop offset="100%" stopColor="#9c2d64" />
+                    </linearGradient>
+                    {/* Upper-right royal blue metallic sweep */}
+                    <radialGradient id={uniqueIds.colorfulTopRight} cx="90%" cy="16%" r="48%">
+                        <stop offset="0%" stopColor="#266de8" stopOpacity="0.9" />
+                        <stop offset="45%" stopColor="#433fd1" stopOpacity="0.55" />
+                        <stop offset="100%" stopColor="#5c28b5" stopOpacity="0" />
                     </radialGradient>
-                    {/* Brushed PVD Specular Refraction Overlay for Colorful Card */}
+                    {/* Bottom-right warm rose -> amber -> gold iridescent glow */}
+                    <radialGradient id={uniqueIds.colorfulBottomRight} cx="98%" cy="80%" r="44%">
+                        <stop offset="0%" stopColor="#ebc026" stopOpacity="0.96" />
+                        <stop offset="30%" stopColor="#dc8029" stopOpacity="0.86" />
+                        <stop offset="60%" stopColor="#b83a6d" stopOpacity="0.48" />
+                        <stop offset="100%" stopColor="#89227b" stopOpacity="0" />
+                    </radialGradient>
+                    {/* Subtle lower-left warm amber/magenta side glint */}
+                    <radialGradient id={uniqueIds.colorfulBottomLeft} cx="1%" cy="74%" r="26%">
+                        <stop offset="0%" stopColor="#d98a32" stopOpacity="0.72" />
+                        <stop offset="38%" stopColor="#b03373" stopOpacity="0.45" />
+                        <stop offset="100%" stopColor="#742395" stopOpacity="0" />
+                    </radialGradient>
+                    {/* Razor-thin PVD iridescent top rim (gold -> emerald -> cyan -> indigo) */}
+                    <linearGradient id={uniqueIds.colorfulTopRim} x1="0%" y1="0%" x2="0%" y2="100%">
+                        <stop offset="0%" stopColor="#dfc24a" stopOpacity="0.94" />
+                        <stop offset="2.8%" stopColor="#22b878" stopOpacity="0.9" />
+                        <stop offset="6%" stopColor="#1292c7" stopOpacity="0.78" />
+                        <stop offset="11%" stopColor="#3842c8" stopOpacity="0.25" />
+                        <stop offset="18%" stopColor="#5c28b5" stopOpacity="0" />
+                    </linearGradient>
+                    {/* Thin teal-cyan sheen along upper-left & upper-right side corners */}
+                    <radialGradient id={uniqueIds.colorfulCornerLeft} cx="0%" cy="6%" r="22%">
+                        <stop offset="0%" stopColor="#28bf7e" stopOpacity="0.92" />
+                        <stop offset="38%" stopColor="#1688c2" stopOpacity="0.62" />
+                        <stop offset="100%" stopColor="#3c2eb8" stopOpacity="0" />
+                    </radialGradient>
+                    <radialGradient id={uniqueIds.colorfulCornerRight} cx="100%" cy="6%" r="22%">
+                        <stop offset="0%" stopColor="#28bf7e" stopOpacity="0.92" />
+                        <stop offset="38%" stopColor="#1688c2" stopOpacity="0.62" />
+                        <stop offset="100%" stopColor="#266de8" stopOpacity="0" />
+                    </radialGradient>
+                    {/* Subtle brushed metallic luster */}
                     <linearGradient id={uniqueIds.colorfulSheen} x1="0%" y1="0%" x2="100%" y2="100%">
-                        <stop offset="0%" stopColor="#ffffff" stopOpacity="0.22" />
-                        <stop offset="28%" stopColor="#ffffff" stopOpacity="0.04" />
-                        <stop offset="48%" stopColor="#ffffff" stopOpacity="0.32" />
-                        <stop offset="65%" stopColor="#0a0a12" stopOpacity="0.22" />
-                        <stop offset="84%" stopColor="#e6f0ff" stopOpacity="0.16" />
-                        <stop offset="100%" stopColor="#000000" stopOpacity="0.26" />
+                        <stop offset="0%" stopColor="#ffffff" stopOpacity="0.14" />
+                        <stop offset="32%" stopColor="#ffffff" stopOpacity="0.02" />
+                        <stop offset="52%" stopColor="#ffffff" stopOpacity="0.14" />
+                        <stop offset="72%" stopColor="#080614" stopOpacity="0.14" />
+                        <stop offset="100%" stopColor="#000000" stopOpacity="0.18" />
                     </linearGradient>
                     {/* Lightweight Brushed Metallic Sheen (keeps non-black cards bright and realistic) */}
                     <linearGradient id={uniqueIds.metallicSheen} x1="0%" y1="0%" x2="100%" y2="100%">
@@ -472,28 +466,20 @@ const CreditCardPreview = React.memo(function CreditCardPreview({
                 <g>
                     {/* Guaranteed 100% solid opaque base so cards never appear translucent */}
                     <rect width={SVG_WIDTH} height={SVG_HEIGHT} rx="20" fill="#050505" fillOpacity="1" />
-                    {cardColorKey === 'colorful' ? (
+                    <rect width={SVG_WIDTH} height={SVG_HEIGHT} rx="20" fill={cardFill} fillOpacity="1" />
+                    {cardColorKey === 'colorful' && (
                         <g pointerEvents="none">
-                            {RECT_RAINBOW_LAYERS.map((layer, idx) => (
-                                <rect
-                                    key={idx}
-                                    x={layer.x}
-                                    y={layer.y}
-                                    width={layer.width}
-                                    height={layer.height}
-                                    rx={layer.rx}
-                                    fill={layer.fill}
-                                />
-                            ))}
+                            <rect width={SVG_WIDTH} height={SVG_HEIGHT} rx="20" fill={`url(#${uniqueIds.colorfulTopRight})`} />
+                            <rect width={SVG_WIDTH} height={SVG_HEIGHT} rx="20" fill={`url(#${uniqueIds.colorfulBottomRight})`} />
+                            <rect width={SVG_WIDTH} height={SVG_HEIGHT} rx="20" fill={`url(#${uniqueIds.colorfulBottomLeft})`} />
+                            <rect width={SVG_WIDTH} height={SVG_HEIGHT} rx="20" fill={`url(#${uniqueIds.colorfulTopRim})`} />
+                            <rect width={SVG_WIDTH} height={SVG_HEIGHT} rx="20" fill={`url(#${uniqueIds.colorfulCornerLeft})`} />
+                            <rect width={SVG_WIDTH} height={SVG_HEIGHT} rx="20" fill={`url(#${uniqueIds.colorfulCornerRight})`} />
+                            <rect width={SVG_WIDTH} height={SVG_HEIGHT} rx="20" fill={`url(#${uniqueIds.colorfulSheen})`} />
                         </g>
-                    ) : (
-                        <rect width={SVG_WIDTH} height={SVG_HEIGHT} rx="20" fill={cardFill} fillOpacity="1" />
                     )}
                     {cardColorKey === 'black' && (
                         <rect width={SVG_WIDTH} height={SVG_HEIGHT} rx="20" fill={`url(#${uniqueIds.blackSheen})`} pointerEvents="none" />
-                    )}
-                    {cardColorKey === 'colorful' && (
-                        <rect width={SVG_WIDTH} height={SVG_HEIGHT} rx="20" fill={`url(#${uniqueIds.colorfulSheen})`} pointerEvents="none" />
                     )}
                     {cardColorKey !== 'colorful' && cardColorKey !== 'black' && (
                         <rect width={SVG_WIDTH} height={SVG_HEIGHT} rx="20" fill={`url(#${uniqueIds.metallicSheen})`} pointerEvents="none" />
