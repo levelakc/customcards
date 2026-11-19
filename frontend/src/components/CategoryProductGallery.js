@@ -35,10 +35,10 @@ export default function CategoryProductGallery() {
     }
 
     return (
-        <div className="bg-[#1b1a17] py-20 border-b border-gold-500/20">
+        <div className="bg-[#181818] py-20 border-b border-gold-500/20">
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
                 <h2 
-                    className="text-4xl md:text-5xl font-extrabold gold-gradient-text text-center mb-16 cursor-pointer"
+                    className="text-4xl md:text-5xl text-white text-center mb-16 cursor-pointer"
                     onClick={() => navigate('all-categories')} 
                 >
                     {t('allCategoriesTitle')}
@@ -47,9 +47,9 @@ export default function CategoryProductGallery() {
                     {categoriesWithRandomProduct.map(({ category, product }) => {
                         const categoryName = category.name?.[currentLanguage] || category.name?.he || category.name?.en || category.name || '';
                         return (
-                            <div key={category._id} className="glass-panel overflow-hidden flex flex-col cursor-pointer transition-all duration-500 hover:border-gold-400/60 hover:shadow-[0_0_32px_rgba(212,175,55,0.2)] rounded-2xl" onClick={() => navigate('category', { id: category._id })}>
+                            <div key={category._id} className="glass-panel overflow-hidden flex flex-col cursor-pointer transition-all duration-300 hover:border-gold-500/60 rounded-2xl" onClick={() => navigate('category', { id: category._id })}>
                                 <div className="pt-6 px-4 pb-2 flex flex-col items-center justify-center">
-                                    <h3 className="text-2xl font-bold text-gold-300 text-center mb-2 font-luxury">{categoryName}</h3>
+                                    <h3 className="text-2xl text-gold-400 text-center mb-2 font-luxury">{categoryName}</h3>
                                 </div>
                                 {product && (
                                     <div className="p-4">

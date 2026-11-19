@@ -211,11 +211,11 @@ export default function PersonalDesignPage() {
     };
 
     return (
-        <div className="luxury-spotlight-bg py-20 text-white">
+        <div className="bg-[#121212] py-20 text-white">
             <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-12 items-start">
                     <div>
-                        <div className="rounded-2xl p-6 sm:p-8 border border-gold-500/35 shadow-[0_14px_40px_rgba(0,0,0,0.5)]" style={{ background: 'radial-gradient(ellipse at center, rgba(212, 175, 55, 0.16) 0%, #2c2923 55%, #1d1b17 100%)' }}>
+                        <div className="rounded-2xl p-6 sm:p-8 bg-[#262626] border border-gold-500/30 shadow-2xl">
                             <CreditCardPreview 
                                 cardColorKey={cardColor}
                                 engravingColorKey={engravingColor}
@@ -251,7 +251,7 @@ export default function PersonalDesignPage() {
                         )}
                     </div>
                     <div className="flex flex-col space-y-6">
-                        <h1 className="text-4xl md:text-5xl font-extrabold text-center gold-gradient-text font-luxury">{t('designYourCardTitle')}</h1>
+                        <h1 className="text-4xl md:text-5xl text-center text-white font-luxury">{t('designYourCardTitle')}</h1>
                         
                         <div>
                             <h3 className="text-lg font-semibold text-gold-300 mb-3">{t('chooseCardColorTitle')}</h3>

@@ -40,10 +40,10 @@ export default function Reviews() {
     };
 
     return (
-        <div className="bg-[#151412] py-20 text-white">
+        <div className="bg-[#121212] py-20 text-white">
             <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
                 <div className="text-center">
-                    <h2 className="text-4xl md:text-5xl font-extrabold gold-gradient-text text-center mb-12">{t('whatOurCustomersSay')}</h2>
+                    <h2 className="text-4xl md:text-5xl text-white text-center mb-12">{t('whatOurCustomersSay')}</h2>
                 </div>
                 <div className="space-y-6">
                     {reviews.map(review => (

@@ -58,13 +58,13 @@ export default function ContactSocialSection() {
     ];
 
     return (
-        <section className="luxury-spotlight-bg border-t border-gold-500/25 py-20 text-white relative overflow-hidden">
+        <section className="bg-[#181818] border-t border-gold-500/20 py-20 text-white relative overflow-hidden">
             <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
                 <div className="text-center mb-14">
                     <span className="inline-block text-xs font-bold uppercase tracking-[0.25em] text-gold-400 mb-3">
                         VIPCard
                     </span>
-                    <h2 className="text-4xl md:text-5xl font-extrabold gold-gradient-text mb-4">
+                    <h2 className="text-4xl md:text-5xl text-white mb-4">
                         {t('contactAndSocialTitle') || 'צרו איתנו קשר ועקבו אחרינו'}
                     </h2>
                     <p className="text-gray-300 text-lg max-w-2xl mx-auto">
@@ -103,7 +103,7 @@ export default function ContactSocialSection() {
                         href={contactConfig.phoneHref}
                         className="luxury-card-surface rounded-2xl p-6 sm:p-8 flex items-center gap-5 transition-all duration-300 hover:-translate-y-1 group"
                     >
-                        <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-gold-400 via-gold-300 to-gold-600 text-black flex items-center justify-center flex-shrink-0 shadow-[0_0_24px_rgba(212,175,55,0.35)] group-hover:scale-105 transition-transform">
+                        <div className="w-16 h-16 rounded-2xl bg-black border border-gold-500/50 text-gold-400 flex items-center justify-center flex-shrink-0 group-hover:bg-gold-500 group-hover:text-black transition-all duration-300">
                             <PhoneIcon className="w-8 h-8" />
                         </div>
                         <div className="flex-grow">

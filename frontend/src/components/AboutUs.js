@@ -4,26 +4,26 @@ import { useTranslation } from 'react-i18next'; // Import useTranslation
 export default function AboutUs() {
     const { t } = useTranslation(); // Initialize useTranslation
     return (
-        <div className="bg-[#151412] py-20 text-white border-t border-gold-500/15">
+        <div className="bg-[#121212] py-20 text-white border-t border-gold-500/15">
             <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-                <h2 className="text-4xl md:text-5xl font-extrabold gold-gradient-text mb-12">{t('howItWorksTitle')}</h2>
+                <h2 className="text-4xl md:text-5xl text-white mb-12">{t('howItWorksTitle')}</h2>
                 <div className="grid md:grid-cols-3 gap-8 text-lg">
                     <div className="luxury-card-surface rounded-2xl p-8 flex flex-col items-center">
-                        <div className="btn-premium btn-gold w-16 h-16 rounded-full text-2xl font-bold mb-6 cursor-default">
+                        <div className="btn-premium btn-obsidian w-16 h-16 rounded-full text-2xl font-bold mb-6 cursor-default">
                             <span>1</span>
                         </div>
                         <h3 className="font-bold text-xl mb-3 text-white">{t('placeAnOrderTitle')}</h3>
                         <p className="text-gray-300 leading-relaxed">{t('placeAnOrderDescription')}</p>
                     </div>
                     <div className="luxury-card-surface rounded-2xl p-8 flex flex-col items-center">
-                        <div className="btn-premium btn-gold w-16 h-16 rounded-full text-2xl font-bold mb-6 cursor-default">
+                        <div className="btn-premium btn-obsidian w-16 h-16 rounded-full text-2xl font-bold mb-6 cursor-default">
                             <span>2</span>
                         </div>
                         <h3 className="font-bold text-xl mb-3 text-white">{t('weContactYouTitle')}</h3>
                         <p className="text-gray-300 leading-relaxed">{t('weContactYouDescription')}</p>
                     </div>
                     <div className="luxury-card-surface rounded-2xl p-8 flex flex-col items-center">
-                        <div className="btn-premium btn-gold w-16 h-16 rounded-full text-2xl font-bold mb-6 cursor-default">
+                        <div className="btn-premium btn-obsidian w-16 h-16 rounded-full text-2xl font-bold mb-6 cursor-default">
                             <span>3</span>
                         </div>
                         <h3 className="font-bold text-xl mb-3 text-white">{t('homeDeliveryTitle')}</h3>

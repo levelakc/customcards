@@ -81,7 +81,7 @@ export default function ProductPage() {
                 <div className="lg:grid lg:grid-cols-2 lg:gap-x-8 lg:items-start">
                     <div className="flex flex-col-reverse">
                         <div className="mt-6 w-full max-w-2xl mx-auto sm:px-6 lg:max-w-none lg:px-0">
-                            <div className="rounded-2xl p-6 sm:p-8 border border-gold-500/35 shadow-[0_14px_40px_rgba(0,0,0,0.5)]" style={{ background: 'radial-gradient(ellipse at center, rgba(212, 175, 55, 0.16) 0%, #2c2923 55%, #1d1b17 100%)' }}>
+                            <div className="rounded-2xl p-6 sm:p-8 bg-[#262626] border border-gold-500/30 shadow-2xl">
                                 <CreditCardPreview 
                                     cardColorKey={selectedCardColorKey} 
                                     engravingColorKey={selectedEngravingColor} 

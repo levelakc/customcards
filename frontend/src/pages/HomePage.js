@@ -130,13 +130,7 @@ export default function HomePage() {
                         })()}
                     ></video>
                 )}
-                <div className="absolute inset-0 bg-gradient-to-b from-black/45 via-black/40 to-[#121210]"></div>
-                <div
-                    className="pointer-events-none absolute inset-0"
-                    style={{
-                        background: 'radial-gradient(ellipse 65% 50% at 50% 45%, rgba(212, 175, 55, 0.14) 0%, transparent 70%)',
-                    }}
-                ></div>
+                <div className="absolute inset-0 bg-gradient-to-b from-black/45 via-black/40 to-[#0c0c0c]"></div>
                 
                 <div className="particles-container">
                     {Array.from({ length: 10 }).map((_, i) => <div key={i} className="particle"></div>)}
@@ -181,7 +175,7 @@ export default function HomePage() {
             {/* Promoted Section */}
             {settings?.promotedProducts && settings.promotedProducts.length > 0 && (
                 <AnimatedSection animation="fade-in-up">
-                    <div className="py-20 bg-[#181714] border-t border-b border-gold-500/20">
+                    <div className="py-20 bg-[#141414] border-t border-b border-gold-500/20">
                         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                             <h2 className="text-4xl md:text-5xl font-extrabold gold-gradient-text text-center mb-16 font-luxury block">
                                 {settings.promotedTitle || t('ourTopPicks')}
@@ -199,9 +193,9 @@ export default function HomePage() {
             )}
 
             <AnimatedSection animation="fade-in-left">
-                <div ref={designsSectionRef} className="py-20 luxury-spotlight-bg border-t border-b border-gold-500/20">
+                <div ref={designsSectionRef} className="py-20 bg-[#1a1a1a] border-t border-b border-gold-500/20">
                     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-                        <h2 className="text-4xl md:text-5xl font-extrabold gold-gradient-text text-center mb-16">{t('ourDesignsTitle')}</h2>
+                        <h2 className="text-4xl md:text-5xl text-white text-center mb-16">{t('ourDesignsTitle')}</h2>
                         {featured.length > 0 ? <Carousel3D items={featured} /> : <div className="text-center text-gray-300 py-10">{t('loadingDesigns')}</div>}
                     </div>
                 </div>

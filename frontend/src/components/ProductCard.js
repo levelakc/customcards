@@ -118,7 +118,7 @@ const ProductCard = ({
                 </svg>
             </button>
             <div 
-                className="transition-transform duration-300 md:group-hover:-translate-y-1 relative z-0 p-4 bg-gradient-to-b from-gold-400/[0.09] via-transparent to-transparent"
+                className="transition-transform duration-300 md:group-hover:-translate-y-1 relative z-0 p-4 bg-[#262626]"
                 style={{ transform: 'translateZ(0)' }}
             >
                 <CreditCardPreview 

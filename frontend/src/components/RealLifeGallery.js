@@ -77,9 +77,9 @@ export default function RealLifeGallery() {
     }
 
     return (
-        <div className="bg-[#1b1a17] py-20 border-t border-b border-gold-500/20">
+        <div className="bg-[#181818] py-20 border-t border-b border-gold-500/20">
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-                <h2 className="text-4xl md:text-5xl font-extrabold gold-gradient-text text-center mb-16">
+                <h2 className="text-4xl md:text-5xl text-white text-center mb-16">
                     {t('ourRealLifeWork')}
                 </h2>
                 {loading ? (

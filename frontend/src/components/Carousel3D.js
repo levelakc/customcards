@@ -156,22 +156,14 @@ export default function Carousel3D({ items }) {
 
     return (
         <div className="w-full flex relative min-h-[500px] md:min-h-[650px] items-center justify-center overflow-x-hidden px-2 sm:px-12 md:px-24">
-            {/* Warm Golden Studio Ambient Glow Behind Carousel */}
-            <div
-                className="pointer-events-none absolute inset-0 mx-auto my-auto w-[85%] max-w-4xl h-[75%] rounded-full blur-3xl opacity-70"
-                style={{
-                    background: 'radial-gradient(ellipse at center, rgba(229, 188, 72, 0.22) 0%, rgba(212, 175, 55, 0.08) 45%, transparent 75%)',
-                }}
-            />
-
             {/* Left Arrow */}
             <button 
                 onClick={handlePrev}
                 disabled={isAnimating}
-                className={`absolute left-2 sm:left-4 md:left-8 z-50 glass-panel p-3 sm:p-5 rounded-full border-gold-400/50 hover:border-gold-300 hover:bg-gold-500/20 transition-all group active:scale-90 ${isAnimating ? 'opacity-30 cursor-not-allowed' : 'shadow-[0_0_22px_rgba(212,175,55,0.22)] hover:shadow-[0_0_28px_rgba(212,175,55,0.45)]'}`}
+                className={`absolute left-2 sm:left-4 md:left-8 z-50 bg-[#222222] p-3 sm:p-5 rounded-full border border-gold-500/50 hover:border-gold-400 hover:bg-gold-500/15 transition-all group active:scale-90 ${isAnimating ? 'opacity-30 cursor-not-allowed' : 'shadow-lg'}`}
                 aria-label="Previous"
             >
-                <svg className="w-6 h-6 sm:w-8 sm:h-8 text-gold-300 group-hover:text-gold-200 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg className="w-6 h-6 sm:w-8 sm:h-8 text-white group-hover:text-gold-400 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M15 19l-7-7 7-7" />
                 </svg>
             </button>
@@ -219,10 +211,10 @@ export default function Carousel3D({ items }) {
             <button 
                 onClick={handleNext}
                 disabled={isAnimating}
-                className={`absolute right-2 sm:right-4 md:right-8 z-50 glass-panel p-3 sm:p-5 rounded-full border-gold-400/50 hover:border-gold-300 hover:bg-gold-500/20 transition-all group active:scale-90 ${isAnimating ? 'opacity-30 cursor-not-allowed' : 'shadow-[0_0_22px_rgba(212,175,55,0.22)] hover:shadow-[0_0_28px_rgba(212,175,55,0.45)]'}`}
+                className={`absolute right-2 sm:right-4 md:right-8 z-50 bg-[#222222] p-3 sm:p-5 rounded-full border border-gold-500/50 hover:border-gold-400 hover:bg-gold-500/15 transition-all group active:scale-90 ${isAnimating ? 'opacity-30 cursor-not-allowed' : 'shadow-lg'}`}
                 aria-label="Next"
             >
-                <svg className="w-6 h-6 sm:w-8 sm:h-8 text-gold-300 group-hover:text-gold-200 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg className="w-6 h-6 sm:w-8 sm:h-8 text-white group-hover:text-gold-400 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M9 5l7 7-7 7" />
                 </svg>
             </button>
