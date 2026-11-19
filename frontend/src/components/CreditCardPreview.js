@@ -370,16 +370,16 @@ const CreditCardPreview = React.memo(function CreditCardPreview({
                         <stop offset="100%" stopColor="#000000" stopOpacity="0" />
                     </linearGradient>
                     <linearGradient id={uniqueIds.roseGoldGradient} x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stopColor="#fda4af" /><stop offset="50%" stopColor="#fecdd3" /><stop offset="100%" stopColor="#be123c" /></linearGradient>
-                    {/* Realistic Metallic PVD Rainbow Finish (full colorful spectrum + metallic sheen) */}
-                    <linearGradient id={uniqueIds.colorfulGradient} x1="0%" y1="100%" x2="100%" y2="0%">
+                    {/* Realistic Metallic PVD Rainbow Finish (radial from purple center outwards) */}
+                    <radialGradient id={uniqueIds.colorfulGradient} cx="50%" cy="50%" r="72%" fx="48%" fy="48%">
                         <stop offset="0%" stopColor="#5b21b6" />
-                        <stop offset="18%" stopColor="#a8289e" />
-                        <stop offset="36%" stopColor="#c93368" />
-                        <stop offset="54%" stopColor="#d4a22a" />
-                        <stop offset="74%" stopColor="#1f9d68" />
-                        <stop offset="90%" stopColor="#2463c8" />
-                        <stop offset="100%" stopColor="#3b389e" />
-                    </linearGradient>
+                        <stop offset="24%" stopColor="#7e22ce" />
+                        <stop offset="42%" stopColor="#b4299c" />
+                        <stop offset="58%" stopColor="#c93368" />
+                        <stop offset="74%" stopColor="#d4a22a" />
+                        <stop offset="88%" stopColor="#1f9d68" />
+                        <stop offset="100%" stopColor="#2463c8" />
+                    </radialGradient>
                     {/* Brushed PVD Specular Refraction Overlay for Colorful Card */}
                     <linearGradient id={uniqueIds.colorfulSheen} x1="0%" y1="0%" x2="100%" y2="100%">
                         <stop offset="0%" stopColor="#ffffff" stopOpacity="0.22" />
