@@ -370,14 +370,15 @@ const CreditCardPreview = React.memo(function CreditCardPreview({
                         <stop offset="100%" stopColor="#000000" stopOpacity="0" />
                     </linearGradient>
                     <linearGradient id={uniqueIds.roseGoldGradient} x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stopColor="#fda4af" /><stop offset="50%" stopColor="#fecdd3" /><stop offset="100%" stopColor="#be123c" /></linearGradient>
-                    {/* Realistic Metallic PVD Rainbow Finish (radial from purple center outwards) */}
-                    <radialGradient id={uniqueIds.colorfulGradient} cx="50%" cy="50%" r="72%" fx="48%" fy="48%">
+                    {/* Realistic Metallic PVD Rainbow Finish (~70% purple center, ~30% outer rainbow halo) */}
+                    <radialGradient id={uniqueIds.colorfulGradient} cx="50%" cy="50%" r="76%" fx="48%" fy="48%">
                         <stop offset="0%" stopColor="#5b21b6" />
-                        <stop offset="24%" stopColor="#7e22ce" />
-                        <stop offset="42%" stopColor="#b4299c" />
-                        <stop offset="58%" stopColor="#c93368" />
-                        <stop offset="74%" stopColor="#d4a22a" />
-                        <stop offset="88%" stopColor="#1f9d68" />
+                        <stop offset="42%" stopColor="#6d28d9" />
+                        <stop offset="60%" stopColor="#7e22ce" />
+                        <stop offset="70%" stopColor="#b4299c" />
+                        <stop offset="78%" stopColor="#c93368" />
+                        <stop offset="86%" stopColor="#d4a22a" />
+                        <stop offset="93%" stopColor="#1f9d68" />
                         <stop offset="100%" stopColor="#2463c8" />
                     </radialGradient>
                     {/* Brushed PVD Specular Refraction Overlay for Colorful Card */}

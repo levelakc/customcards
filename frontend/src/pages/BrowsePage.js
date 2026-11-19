@@ -163,7 +163,7 @@ export default function BrowsePage() {
                                                         color === 'roseGold' ? '#b76e79' : 
                                                         '#333',
                                                     background: 
-                                                        color === 'colorful' ? 'radial-gradient(circle at center, #5b21b6 0%, #7e22ce 24%, #b4299c 42%, #c93368 58%, #d4a22a 74%, #1f9d68 88%, #2463c8 100%)' : 
+                                                        color === 'colorful' ? 'radial-gradient(circle at center, #5b21b6 0%, #6d28d9 42%, #7e22ce 60%, #b4299c 70%, #c93368 78%, #d4a22a 86%, #1f9d68 93%, #2463c8 100%)' : 
                                                         color === 'roseGold' ? 'linear-gradient(135deg, #b76e79 0%, #ffc0cb 100%)' :
                                                         undefined
                                                 }}
