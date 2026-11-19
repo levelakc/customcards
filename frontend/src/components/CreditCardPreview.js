@@ -370,24 +370,24 @@ const CreditCardPreview = React.memo(function CreditCardPreview({
                         <stop offset="100%" stopColor="#000000" stopOpacity="0" />
                     </linearGradient>
                     <linearGradient id={uniqueIds.roseGoldGradient} x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stopColor="#fda4af" /><stop offset="50%" stopColor="#fecdd3" /><stop offset="100%" stopColor="#be123c" /></linearGradient>
-                    {/* Luxury PVD Anodized Iridescent Titanium / Oil-Slick Metallic Finish */}
+                    {/* Realistic Metallic PVD Rainbow Finish (full colorful spectrum + metallic sheen) */}
                     <linearGradient id={uniqueIds.colorfulGradient} x1="0%" y1="100%" x2="100%" y2="0%">
-                        <stop offset="0%" stopColor="#2c283e" />
-                        <stop offset="18%" stopColor="#57466b" />
-                        <stop offset="36%" stopColor="#856b60" />
-                        <stop offset="54%" stopColor="#bda476" />
-                        <stop offset="72%" stopColor="#4c767d" />
-                        <stop offset="88%" stopColor="#3f5475" />
-                        <stop offset="100%" stopColor="#26293d" />
+                        <stop offset="0%" stopColor="#5b21b6" />
+                        <stop offset="18%" stopColor="#a8289e" />
+                        <stop offset="36%" stopColor="#c93368" />
+                        <stop offset="54%" stopColor="#d4a22a" />
+                        <stop offset="74%" stopColor="#1f9d68" />
+                        <stop offset="90%" stopColor="#2463c8" />
+                        <stop offset="100%" stopColor="#3b389e" />
                     </linearGradient>
                     {/* Brushed PVD Specular Refraction Overlay for Colorful Card */}
                     <linearGradient id={uniqueIds.colorfulSheen} x1="0%" y1="0%" x2="100%" y2="100%">
-                        <stop offset="0%" stopColor="#ffffff" stopOpacity="0.18" />
-                        <stop offset="28%" stopColor="#f5e6c4" stopOpacity="0.06" />
-                        <stop offset="48%" stopColor="#ffffff" stopOpacity="0.28" />
-                        <stop offset="65%" stopColor="#0d0e14" stopOpacity="0.22" />
-                        <stop offset="84%" stopColor="#d8e6f2" stopOpacity="0.14" />
-                        <stop offset="100%" stopColor="#000000" stopOpacity="0.28" />
+                        <stop offset="0%" stopColor="#ffffff" stopOpacity="0.22" />
+                        <stop offset="28%" stopColor="#ffffff" stopOpacity="0.04" />
+                        <stop offset="48%" stopColor="#ffffff" stopOpacity="0.32" />
+                        <stop offset="65%" stopColor="#0a0a12" stopOpacity="0.22" />
+                        <stop offset="84%" stopColor="#e6f0ff" stopOpacity="0.16" />
+                        <stop offset="100%" stopColor="#000000" stopOpacity="0.26" />
                     </linearGradient>
                     {/* Lightweight Brushed Metallic Sheen (keeps non-black cards bright and realistic) */}
                     <linearGradient id={uniqueIds.metallicSheen} x1="0%" y1="0%" x2="100%" y2="100%">
