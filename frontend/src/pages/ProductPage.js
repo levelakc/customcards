@@ -62,16 +62,22 @@ export default function ProductPage() {
         if (product) {
             const cardColorName = Object.keys(nameToKeyMap).find(key => nameToKeyMap[key] === selectedCardColorKey);
             const engravingColorName = t(engravingColorNames[selectedEngravingColor]);
-            const fullDescription = `${t(cardColorName)} עם חריטת ${engravingColorName}`;
+            const fullDescription = t('personalDesignDescription', {
+                cardColor: t(cardColorName),
+                engravingColor: engravingColorName,
+            });
             addToCart(product, 1, fullDescription);
             setShowSuccessMessage(true);
             setTimeout(() => setShowSuccessMessage(false), 2000);
         }
     };
 
-    if (isGlobalLoading) return <div className="text-center p-10 text-white bg-gray-900 min-h-screen">טוען מוצר...</div>;
-    if (!product) return <div className="text-center p-10 text-white bg-gray-900 min-h-screen">מוצר לא נמצא.</div>;
+    if (isGlobalLoading) return <div className="text-center p-10 text-white bg-gray-900 min-h-screen">{t('loadingProduct')}</div>;
+    if (!product) return <div className="text-center p-10 text-white bg-gray-900 min-h-screen">{t('productNotFound')}</div>;
 
+    const currentLanguage = i18n.language?.startsWith('en') ? 'en' : 'he';
+    const productName = typeof product.name === 'object' ? (product.name[currentLanguage] || product.name.he || product.name.en || '') : (product.name || '');
+    const productDescription = typeof product.description === 'object' ? (product.description[currentLanguage] || product.description.he || product.description.en || '') : (product.description || '');
     const currentEngravingOptions = product.customization?.engraveColors || [];
     const sortedColorNames = getSortedColors(product.availableColors);
 
@@ -92,7 +98,7 @@ export default function ProductPage() {
                     </div>
 
                     <div className="mt-10 px-4 sm:px-0 sm:mt-16 lg:mt-0">
-                        <h1 className="text-4xl font-extrabold tracking-tight gold-gradient-text font-luxury">{product.name[i18n.language]}</h1>
+                        <h1 className="text-4xl font-extrabold tracking-tight gold-gradient-text font-luxury">{productName}</h1>
                         <div className="mt-3">
                             <h2 className="sr-only">Product information</h2>
                             <p className="text-3xl font-bold text-gold-300">{product.price} ₪</p>
@@ -102,12 +108,12 @@ export default function ProductPage() {
                             <h3 className="sr-only">Description</h3>
                             <div
                                 className="text-base text-gray-300 space-y-6"
-                                dangerouslySetInnerHTML={{ __html: product.description[i18n.language] }}
+                                dangerouslySetInnerHTML={{ __html: productDescription }}
                             />
                         </div>
 
                         <div className="mt-6">
-                            <h3 className="text-lg font-medium text-gold-300">צבע כרטיס</h3>
+                            <h3 className="text-lg font-medium text-gold-300">{t('cardColor')}</h3>
                             <div className="mt-2 flex items-center gap-3">
                                 {sortedColorNames.map((colorName) => {
                                     const colorKey = nameToKeyMap[colorName];
@@ -120,7 +126,7 @@ export default function ProductPage() {
                                                 console.log("Card color button clicked:", colorName);
                                                 handleCardColorChange(colorName);
                                             }}
-                                            aria-label={`בחר צבע ${colorName}`}
+                                            aria-label={`${t('cardColor')} ${t(colorKey)}`}
                                         ></button>
                                     );
                                 })}
@@ -128,7 +134,7 @@ export default function ProductPage() {
                         </div>
 
                         <div className="mt-6">
-                            <h3 className="text-lg font-medium text-gold-300">צבע חריטה</h3>
+                            <h3 className="text-lg font-medium text-gold-300">{t('engravingColor')}</h3>
                             <div className="mt-2 flex items-center gap-3">
                                 {currentEngravingOptions.map((engravingKey) => {
                                     const engravingName = t(engravingColorNames[engravingKey]);
@@ -166,23 +172,23 @@ export default function ProductPage() {
                         )}
 
                         <div className="mt-10 border-t border-gray-700 pt-10">
-                            <h3 className="text-lg font-medium text-white mb-4">מידע נוסף</h3>
+                            <h3 className="text-lg font-medium text-white mb-4">{t('additionalInfo')}</h3>
                             <ul className="space-y-4 text-gray-300">
-                                <li className="flex items-start">
-                                    <svg className="flex-shrink-0 h-6 w-6 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
-                                    <span className="ml-3">זמן אספקה: עד 5 ימי עסקים.</span>
+                                <li className="flex items-start gap-3">
+                                    <svg className="flex-shrink-0 h-6 w-6 text-gold-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                                    <span>{t('deliveryTimeInfo')}</span>
                                 </li>
-                                <li className="flex items-start">
-                                    <svg className="flex-shrink-0 h-6 w-6 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
-                                    <span className="ml-3">קנייה מאובטחת באמצעות צד שלישי.</span>
+                                <li className="flex items-start gap-3">
+                                    <svg className="flex-shrink-0 h-6 w-6 text-gold-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                                    <span>{t('securePurchaseInfo')}</span>
                                 </li>
-                                <li className="flex items-start">
-                                    <svg className="flex-shrink-0 h-6 w-6 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
-                                    <span className="ml-3">חומרים איכותיים ועמידים לאורך זמן.</span>
+                                <li className="flex items-start gap-3">
+                                    <svg className="flex-shrink-0 h-6 w-6 text-gold-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                                    <span>{t('highQualityMaterialsInfo')}</span>
                                 </li>
-                                <li className="flex items-start">
-                                    <svg className="flex-shrink-0 h-6 w-6 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
-                                    <span className="ml-3">עיצוב אישי וייחודי לכל לקוח.</span>
+                                <li className="flex items-start gap-3">
+                                    <svg className="flex-shrink-0 h-6 w-6 text-gold-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                                    <span>{t('customDesignInfo')}</span>
                                 </li>
                             </ul>
                         </div>
@@ -200,7 +206,7 @@ export default function ProductPage() {
 
                 {relatedProducts.length > 0 && (
                     <div className="mt-20">
-                        <h2 className="text-3xl font-extrabold text-white text-center mb-10">מוצרים דומים שאולי תאהב</h2>
+                        <h2 className="text-3xl font-extrabold text-white text-center mb-10">{t('similarProductsTitle')}</h2>
                         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-8">
                             {console.log("Related Products:", relatedProducts)}
                             {relatedProducts.map(relatedProduct => {

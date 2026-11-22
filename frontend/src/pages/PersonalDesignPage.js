@@ -243,8 +243,8 @@ export default function PersonalDesignPage() {
                                         className="w-full h-2 bg-gray-700 accent-gold-400 rounded-lg appearance-none cursor-pointer range-lg"
                                     />
                                     <div className="flex justify-between text-xs text-gray-300 mt-2">
-                                        <span>חלש (מעט קווים)</span>
-                                        <span>חזק (מלא קווים)</span>
+                                        <span>{t('pencilLight')}</span>
+                                        <span>{t('pencilStrong')}</span>
                                     </div>
                                 </div>
                             </div>

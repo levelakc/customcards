@@ -100,6 +100,14 @@ export default function HomePage() {
     const backgroundVideoUrl = settings.backgroundVideoUrl;
     const videoOpacity = settings.videoOpacity;
 
+    const isEnglish = i18n.language?.startsWith('en');
+    const hasHebrew = (str) => typeof str === 'string' && /[\u0590-\u05FF]/.test(str);
+    const localizedSetting = (settingVal, fallbackKey) => {
+        if (!settingVal) return t(fallbackKey);
+        if (isEnglish && hasHebrew(settingVal)) return t(fallbackKey);
+        return settingVal;
+    };
+
     return (
         <div>
             {/* FIX: Removed 'h-screen' and used the custom 'var(--app-height)' style */}
@@ -147,10 +155,10 @@ export default function HomePage() {
                         }}
                     >
                         <span className="shimmer-text">
-                            {settings?.heroTitle || t('heroTitle')}
+                            {localizedSetting(settings?.heroTitle, 'heroTitle')}
                         </span>
                     </h1>
-                    <p className="text-xl md:text-2xl mb-8 drop-shadow-md">{settings?.heroDescription || t('heroDescription')}</p>
+                    <p className="text-xl md:text-2xl mb-8 drop-shadow-md">{localizedSetting(settings?.heroDescription, 'heroDescription')}</p>
                     <div className="flex flex-col sm:flex-row items-center justify-center gap-6 mt-10">
                         <button 
                             onClick={handleScrollToDesigns} 
@@ -178,7 +186,7 @@ export default function HomePage() {
                     <div className="py-20 bg-[#141414] border-t border-b border-gold-500/20">
                         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                             <h2 className="text-4xl md:text-5xl font-extrabold gold-gradient-text text-center mb-16 font-luxury block">
-                                {settings.promotedTitle || t('ourTopPicks')}
+                                {localizedSetting(settings.promotedTitle, 'ourTopPicks')}
                             </h2>
                             <div className="grid grid-cols-1 md:grid-cols-3 gap-10">
                                 {settings.promotedProducts.map(product => (

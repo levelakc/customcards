@@ -1,9 +1,11 @@
 import React, { useState, useEffect, useRef, useCallback, useMemo } from 'react';
+import { useTranslation } from 'react-i18next';
 import ProductCard from './ProductCard';
 
 const ANIMATION_DURATION = 800; // 0.8 seconds
 
 export default function Carousel3D({ items }) {
+    const { t } = useTranslation();
     const [windowWidth, setWindowWidth] = useState(window.innerWidth);
     const [currentPage, setCurrentPage] = useState(0);
     const [visiblePageIndices, setVisiblePageIndices] = useState([0]);
@@ -151,7 +153,7 @@ export default function Carousel3D({ items }) {
     }, [visiblePageIndices, cardsPerPage, items]);
 
     if (!items || items.length === 0) {
-        return <div className="text-center text-white py-10">טוען מוצרים...</div>;
+        return <div className="text-center text-white py-10">{t('loadingDesigns')}</div>;
     }
 
     return (

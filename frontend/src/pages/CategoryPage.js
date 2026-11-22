@@ -15,8 +15,8 @@ export default function CategoryPage() {
     const category = useMemo(() => categories.find(c => String(c._id) === String(id)), [categories, id]);
     const productsInCategory = useMemo(() => products.filter(p => String(p.category?._id) === String(id)), [products, id]);
 
-    if (isGlobalLoading) return <div className="text-center p-10 text-white bg-gray-900 min-h-screen">טוען קטגוריה...</div>;
-    if (!category) return <div className="text-center p-10 text-white bg-gray-900 min-h-screen">קטגוריה לא נמצאה.</div>;
+    if (isGlobalLoading) return <div className="text-center p-10 text-white bg-gray-900 min-h-screen">{t('loadingCategory')}</div>;
+    if (!category) return <div className="text-center p-10 text-white bg-gray-900 min-h-screen">{t('categoryNotFound')}</div>;
 
     const currentLanguage = i18n.language || 'he';
     const categoryName = category.name?.[currentLanguage] || category.name?.he || category.name?.en || category.name || '';

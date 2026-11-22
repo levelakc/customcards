@@ -1,9 +1,11 @@
 import React, { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useRouter } from '../contexts/RouterContext';
 import { useAuth } from '../contexts/AuthContext';
 import { EyeIcon, EyeOffIcon } from '../components/Icons';
 
 export default function RegisterPage() {
+    const { t } = useTranslation();
     const { navigate } = useRouter();
     const { register } = useAuth();
     const [name, setName] = useState('');
@@ -42,28 +44,28 @@ export default function RegisterPage() {
     return (
         <div className="min-h-screen bg-gray-900 flex flex-col justify-center py-12 sm:px-6 lg:px-8">
             <div className="sm:mx-auto sm:w-full sm:max-w-md">
-                <h2 className="mt-6 text-center text-3xl font-extrabold text-white">יצירת חשבון חדש</h2>
+                <h2 className="mt-6 text-center text-3xl font-extrabold text-white">{t('createAccountTitle')}</h2>
             </div>
             <div className="mt-8 sm:mx-auto sm:w-full sm:max-w-md">
-                <div className="bg-gray-800 py-8 px-4 shadow-xl sm:rounded-lg sm:px-10">
+                <div className="bg-gray-800 py-8 px-4 shadow-xl sm:rounded-lg sm:px-10 border border-gold-500/20">
                     <form className="space-y-6" onSubmit={handleSubmit}>
                         <div>
-                            <label className="block text-sm font-medium text-gray-300">שם מלא</label>
+                            <label className="block text-sm font-medium text-gray-300">{t('fullName')}</label>
                             <input type="text" value={name} onChange={e => setName(e.target.value)} required className="appearance-none block w-full px-3 py-2 border border-gray-600 rounded-md bg-gray-700 text-white"/>
                         </div>
                         <div>
-                            <label className="block text-sm font-medium text-gray-300">כתובת אימייל</label>
+                            <label className="block text-sm font-medium text-gray-300">{t('email')}</label>
                             <input type="email" value={email} onChange={e => setEmail(e.target.value)} required className="appearance-none block w-full px-3 py-2 border border-gray-600 rounded-md bg-gray-700 text-white"/>
                         </div>
                         <div>
-                            <label className="block text-sm font-medium text-gray-300">סיסמה</label>
+                            <label className="block text-sm font-medium text-gray-300">{t('password')}</label>
                             <div className="mt-1 relative">
                                 <input 
                                     type={showPassword ? "text" : "password"} 
                                     value={password} 
                                     onChange={e => setPassword(e.target.value)} 
                                     required 
-                                    className="appearance-none block w-full px-3 py-2 border border-gray-600 rounded-md bg-gray-700 text-white pl-10 text-right"
+                                    className="appearance-none block w-full px-3 py-2 border border-gray-600 rounded-md bg-gray-700 text-white pl-10"
                                 />
                                 <button
                                     type="button"
@@ -75,28 +77,28 @@ export default function RegisterPage() {
                             </div>
                         </div>
                         <div>
-                            <label className="block text-sm font-medium text-gray-300">מספר טלפון</label>
+                            <label className="block text-sm font-medium text-gray-300">{t('phoneNumber')}</label>
                             <input type="tel" value={phone} onChange={e => setPhone(e.target.value)} required className="appearance-none block w-full px-3 py-2 border border-gray-600 rounded-md bg-gray-700 text-white"/>
                         </div>
                         <div>
-                            <label className="block text-sm font-medium text-gray-300">כתובת למשלוח</label>
+                            <label className="block text-sm font-medium text-gray-300">{t('shippingAddress')}</label>
                             <div className="space-y-2 mt-1">
-                                <input type="text" placeholder="רחוב ומספר בית" value={street} onChange={e => setStreet(e.target.value)} required className="appearance-none block w-full px-3 py-2 border border-gray-600 rounded-md bg-gray-700 text-white"/>
-                                <input type="text" placeholder="עיר" value={city} onChange={e => setCity(e.target.value)} required className="appearance-none block w-full px-3 py-2 border border-gray-600 rounded-md bg-gray-700 text-white"/>
-                                <input type="text" placeholder="מיקוד" value={postalCode} onChange={e => setPostalCode(e.target.value)} required className="appearance-none block w-full px-3 py-2 border border-gray-600 rounded-md bg-gray-700 text-white"/>
+                                <input type="text" placeholder={t('streetAddress')} value={street} onChange={e => setStreet(e.target.value)} required className="appearance-none block w-full px-3 py-2 border border-gray-600 rounded-md bg-gray-700 text-white"/>
+                                <input type="text" placeholder={t('city')} value={city} onChange={e => setCity(e.target.value)} required className="appearance-none block w-full px-3 py-2 border border-gray-600 rounded-md bg-gray-700 text-white"/>
+                                <input type="text" placeholder={t('postalCode')} value={postalCode} onChange={e => setPostalCode(e.target.value)} required className="appearance-none block w-full px-3 py-2 border border-gray-600 rounded-md bg-gray-700 text-white"/>
                             </div>
                         </div>
 
                         {error && <p className="text-red-400 text-sm text-center">{error}</p>}
                         
                         <div className="text-sm text-center">
-                           <button type="button" onClick={() => navigate('login')} className="font-medium text-indigo-400 hover:text-indigo-300">
-                                יש לך כבר חשבון? התחבר
+                           <button type="button" onClick={() => navigate('login')} className="font-medium text-gold-400 hover:text-gold-300">
+                                {t('haveAccountLogin')}
                            </button>
                         </div>
                         <div>
-                            <button type="submit" disabled={loading} className="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 disabled:bg-indigo-400">
-                                {loading ? 'יוצר חשבון...' : 'הירשם'}
+                            <button type="submit" disabled={loading} className="w-full btn-premium btn-gold disabled:opacity-50">
+                                {loading ? t('registering') : t('register')}
                             </button>
                         </div>
                     </form>
@@ -107,7 +109,7 @@ export default function RegisterPage() {
                                 <div className="w-full border-t border-gray-600"></div>
                             </div>
                             <div className="relative flex justify-center text-sm">
-                                <span className="px-2 bg-gray-800 text-gray-400">או הירשם עם</span>
+                                <span className="px-2 bg-gray-800 text-gray-400">{t('orRegisterWith')}</span>
                             </div>
                         </div>
 

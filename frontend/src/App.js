@@ -58,6 +58,12 @@ function AppContent() {
     }, []);
 
     useEffect(() => {
+        const dir = i18n.dir();
+        document.documentElement.dir = dir;
+        document.documentElement.lang = i18n.language || 'he';
+    }, [i18n, i18n.language]);
+
+    useEffect(() => {
         if (GOOGLE_ANALYTICS_ID && GOOGLE_ANALYTICS_ID !== 'YOUR_GOOGLE_ANALYTICS_ID') {
             ReactGA.send({ hitType: "pageview", page: window.location.pathname + window.location.search });
         }
